@@ -269,7 +269,7 @@ new Command('get_money', function(msg,args) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT FROM users WHERE name=\''+escape_mysql(message.member.user.id+'')+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(message.member.user.id+'')+'\'',function(err,rows){
 			if (rows.length==0) {
 				f(0);
 			} else {
