@@ -294,7 +294,7 @@ new Command('bank_remove_money_user', function(msg,args) {
 	//     - User ID
 	//     - Amount Money
 	args[2] = (parseFloat(args[2]) || 0.0)*-1;
-	Command.List['bank_give_money_user'](msg,args);
+	Command.List['bank_give_money_user']._fn(msg,args);
 });
 // ADMIN
 new Command('bank_set_money_user', function(msg,args) {
@@ -303,7 +303,7 @@ new Command('bank_set_money_user', function(msg,args) {
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
-	Command.List['bank_give_money_user'](msg,args,true);
+	Command.List['bank_give_money_user']._fn(msg,args,true);
 });
 // ADMIN
 new Command('bank_get_money_user', function(msg,args) {
