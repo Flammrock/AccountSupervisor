@@ -182,7 +182,7 @@ new Command('bank_add_user', function(msg,args) {
 				} catch (e) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
 				}
-				query('INSERT INTO user(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
+				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
 					msg.reply('User `'+args[1]+'` added in `'+args[0]+'` Bank with Success!');
 				});
 			} else {
@@ -197,7 +197,7 @@ new Command('bank_add_user', function(msg,args) {
 				} catch (e) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
 				}
-				query('UPDATE table_name SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
 					msg.reply('User `'+args[1]+'` added in `'+args[0]+'` Bank with Success!');
 				});
 			}
@@ -271,7 +271,8 @@ new Command('get_money', function(msg,args) {
 		}
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
 			if (rows.length==0) {
-				f(0);
+				msg.reply('Sorry, you don\'t have a bank account `'+args[0]+'` yet!\nPlease create a bank account with the command:\n   - `+bank_add_user '+args[0]+' <@'+msg.member.user.id+'>`');
+				return;
 			} else {
 				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
@@ -284,7 +285,6 @@ new Command('get_money', function(msg,args) {
 						return;
 					}
 				} catch (e) {}
-				console.log("okkkkk");
 				f(money);
 			}
 		});
