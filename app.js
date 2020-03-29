@@ -216,37 +216,126 @@ new Command('bank_add_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_remove_user', function(msg,args) {
+	if (args.length < 2) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
+	var id = args[1].match(/<@(\d+)>/);
+	if (id==null) {
+		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	id = id[1];
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+		if (rows1.length==0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+			if (rows.length > 0) {
+				var obj = JSON.parse(rows[0].data);
+				obj.bank = obj.bank || {};
+				try {
+					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
+						obj.bank[escape_mysql(args[0])] = null;
+						delete obj.bank[escape_mysql(args[0])];
+					}
+				} catch (e) {}
+				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+					msg.reply('User '+args[1]+' removed in `'+args[0]+'` Bank with Success!');
+				});
+			}
+		});
+	});
 });
 // ADMIN
-new Command('bank_give_money_user', function(msg,args) {
+new Command('bank_give_money_user', function(msg,args,t) {
+	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
+	var id = args[1].match(/<@(\d+)>/);
+	if (id==null) {
+		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	id = id[1];
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+		if (rows1.length==0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+			if (rows.length > 0) {
+				var obj = JSON.parse(rows[0].data);
+				obj.bank = obj.bank || {};
+				try {
+					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined' && typeof t === 'undefined') {
+						obj.bank[escape_mysql(args[0])] = (parseFloat(obj.bank[escape_mysql(args[0])]) || 0.0) + (parseFloat(args[2]) || 0.0);
+					} else {
+						obj.bank[escape_mysql(args[0])] = parseFloat(args[2]) || 0.0;
+					}
+				} catch (e) {
+					obj.bank[escape_mysql(args[0])] = parseFloat(args[2]) || 0.0;
+				}
+				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+					msg.reply('`'+(parseFloat(args[2]) || 0.0)+'` Money '+((parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');
+				});
+			}
+		});
+	});
 });
 // ADMIN
 new Command('bank_remove_money_user', function(msg,args) {
+	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
+	args[2] = (parseFloat(args[2]) || 0.0)*-1;
+	Command.List['bank_give_money_user'](msg,args);
 });
 // ADMIN
 new Command('bank_set_money_user', function(msg,args) {
+	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
+	Command.List['bank_give_money_user'](msg,args,true);
 });
 // ADMIN
 new Command('bank_get_money_user', function(msg,args) {
+	if (args.length < 2) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	//     - Amount Money
+	var id = args[1].match(/<@(\d+)>/);
+	if (id==null) {
+		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	id = id[1];
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+		if (rows1.length==0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+			if (rows.length > 0) {
+				var obj = JSON.parse(rows[0].data);
+				obj.bank = obj.bank || {};
+				try {
+					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
+						msg.reply('User '+args[1]+' have `'+obj.bank[escape_mysql(args[0])]+'` Money Left in his `'+args[0]+'` Bank account!');
+						return;
+					} else {}
+				} catch (e) {}
+			}
+			msg.reply('User '+args[1]+' don\'t have a `'+args[0]+'` Bank account!');
+		});
+	});
 });
 
 // CITOYEN
@@ -272,7 +361,7 @@ new Command('get_money', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	var f = function(money) {
-		msg.reply('You have `'+money+'` Money left in your account bank `'+args[0]+'`');
+		msg.reply('You have `'+money+'` Money left in your `'+args[0]+'` Bank account!');
 	};
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
