@@ -162,16 +162,16 @@ new Command('bank_add_user', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	console.log(msg.member.user.id);
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+	console.log(msg.server.members.get("name", args[1]).id);
+	/*query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		//query('SELECT FROM users WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
-		//	msg.reply('Bank `'+args[0]+'` deleted with success!');
-		//});
-	});
+		query('SELECT FROM users WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('Bank `'+args[0]+'` deleted with success!');
+		});
+	});*/
 });
 // ADMIN
 new Command('bank_remove_user', function(msg,args) {
