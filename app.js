@@ -236,13 +236,14 @@ new Command('item_steal', function(msg,args) {
 
 
 
+/*
+new Command('bank_create', function(msg,args) {
+	//msg.channel.send('wesh comment ça va?');
+});
+new Command('bank_create', function(msg,args) {
+	//msg.channel.send('wesh comment ça va?');
+});*/
 
-new Command('bank_create', function(msg,args) {
-	//msg.channel.send('wesh comment ça va?');
-});
-new Command('bank_create', function(msg,args) {
-	//msg.channel.send('wesh comment ça va?');
-});
 
 
 //////////////////////////////////////
