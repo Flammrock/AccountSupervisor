@@ -1,11 +1,6 @@
 const Discord = require('discord.js');
 const mysql = require("mysql");
 const bot = new Discord.Client();
-var express = require('express');
-
-console.log(process.env);
-
-const port = process.env.PORT || 80;
 
 
 const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoC3CQ.meL6PnRHcv91pS2xnyRytJ3oiZE';
@@ -372,18 +367,25 @@ bot.login(TOKEN);
 //////////////////////////////////////
 //          INTERFACE WEB           //
 //////////////////////////////////////
-var app = express();
+if (process.env.DYNO.replace('web','')!=process.env.DYNO) {
+	
+	const port = process.env.PORT || 80;
+	var express = require('express');
+	var app = express();
 
-app.get('/', function (req, res) {
-   res.send('Hello World');
-})
+	app.get('/', function (req, res) {
+	   res.send('Hello World');
+	})
 
-var server = app.listen(port, function () {
-   var host = server.address().address
-   var port = server.address().port
-   
-   console.log("Example app listening at http://%s:%s", host, port)
-})
+	var server = app.listen(port, function () {
+	   var host = server.address().address
+	   var port = server.address().port
+	   
+	   console.log("Example app listening at http://%s:%s", host, port)
+	});
+	
+}
+
 
 
 
