@@ -263,16 +263,19 @@ new Command('get_money', function(msg,args) {
 	//     - Bank Name
 	var f = function(money) {
 		msg.reply('You have `'+money+'` Money left in your account bank `'+args[0]+'`');
-	}
+	};
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(message.member.user.id+'')+'\'',function(err,rows){
+		console.log(msg.member.user.id);
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
 			if (rows.length==0) {
+				console.log("no account");
 				f(0);
 			} else {
+				console.log("yes account");
 				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
 				var money = 0.0;
@@ -280,8 +283,8 @@ new Command('get_money', function(msg,args) {
 					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
 						money = parseFloat(obj.bank[escape_mysql(args[0])]) || 0.0;
 					}
-					obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
 				} catch (e) {}
+				console.log("okkkkk");
 				f(money);
 			}
 		});
