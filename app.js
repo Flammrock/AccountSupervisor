@@ -19,11 +19,25 @@ const DATABASE = {
 	database:   'heroku_bc02ac5f0db76cb'
 };
 
-var connection = mysql.createConnection(DATABASE);
-connection.connect((err) => {
-  if (err) throw err;
-  console.log('Mysql: Connected!');
-});
+
+function query(SQL,fn) {
+	
+	var connection = mysql.createConnection(DATABASE);
+	connection.connect((err) => {
+	  if (err) {connection.end();return;};
+	  console.log('Mysql: Connected!');
+	});
+	if (SQL) {
+		connection.query(SQL,(err,rows) => {
+			if (err) {connection.end();return;};
+			fn(err,rows);
+		});
+	}
+	connection.end();
+	connection.on('error', function() {connection.end();});
+	
+}
+query();
 
 /*
 connection.query(`CREATE TABLE users (
@@ -37,7 +51,7 @@ connection.query(`CREATE TABLE users (
 
   console.log('TABLE CREATED!');
 });*/
-
+/*
 connection.query(`CREATE TABLE bank (
   id int(11) NOT NULL AUTO_INCREMENT,
   name varchar(50),
@@ -47,7 +61,7 @@ connection.query(`CREATE TABLE bank (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});
+});*/
 
 
 //////////////////////////////////////
@@ -94,6 +108,15 @@ class ParserCommand {
 	}
 	
 }
+
+
+
+// ADMIN
+new Command('ping', function(msg,args) {
+	msg.channel.send('pong');
+});
+
+
 
 // BANK
 
@@ -169,6 +192,7 @@ new Command('bank_delete_account', function(msg,args) {
 
 
 
+// SHOP
 
 // ADMIN
 new Command('shop_create', function(msg,args) {
