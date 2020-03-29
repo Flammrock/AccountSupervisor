@@ -41,6 +41,7 @@ function query(SQL,fn) {
 	connection.on('error', function() {connection.end();});
 	
 }
+function escape_mysql(s) {return s.replace(/'/g,"''");}
 query();
 
 /*
@@ -130,11 +131,11 @@ new Command('bank_create', function(msg,args) {
 	// ARGS :
 	//    - Bank Name
 	//    - Amount Money On First Registration
-	console.log('SELECT * FROM bank WHERE name=`'+args[0]+'`');
-	query('SELECT * FROM bank WHERE name=`'+args[0]+'`',function(err,rows){
+	console.log('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'');
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 		console.log('rows:',rows);
-		query('INSERT INTO bank(name,data) VALUES (`'+args[0]+'`,`'+args[1]+'`);',function(err,rows){
-			
+		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\');',function(err,rows){
+			msg.reply('Bank `'+args[0]+'` created with success!');
 		});
 	});
 });
