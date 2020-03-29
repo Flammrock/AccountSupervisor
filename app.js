@@ -24,21 +24,21 @@ function query(SQL,fn) {
 	
 	var connection = mysql.createConnection(DATABASE);
 	connection.connect((err) => {
-	  if (err) {connection.end();return;};
-	  console.log('Mysql: Connected!');
+		if (err) {connection.end();return;};
+		if (SQL) {
+			connection.query(SQL,(err,rows) => {
+				if (err) {connection.end();return;};
+				try {
+					fn(err,rows);
+					connection.end();return;
+				} catch (e) {connection.end();return;}
+			});
+		} else {
+			console.log('Mysql: Connected!');
+			connection.end();
+		}
 	});
 	connection.on('error', function() {connection.end();});
-	if (SQL) {
-		connection.query(SQL,(err,rows) => {
-			if (err) {connection.end();return;};
-			try {
-			fn(err,rows);
-			connection.end();return;
-			} catch (e) {connection.end();return;}
-		});
-	} else {
-		connection.end();
-	}
 	
 }
 query();
