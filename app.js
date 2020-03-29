@@ -131,10 +131,12 @@ new Command('bank_create', function(msg,args) {
 	// ARGS :
 	//    - Bank Name
 	//    - Amount Money On First Registration
-	console.log('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'');
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
-		console.log('rows:',rows);
-		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\');',function(err,rows){
+		if (rows.length > 0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` is already created :cold_sweat:');
+			return;
+		}
+		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
 			msg.reply('Bank `'+args[0]+'` created with success!');
 		});
 	});
@@ -143,6 +145,15 @@ new Command('bank_create', function(msg,args) {
 new Command('bank_delete', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('DELETE FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('Bank `'+args[0]+'` deleted with success!');
+		});
+	});
 });
 // ADMIN
 new Command('bank_add_user', function(msg,args) {
