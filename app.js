@@ -349,6 +349,7 @@ new Command('list_command', function(msg,args) {
 //////////////////////////////////////
 //           DISCORD BOT            //
 //////////////////////////////////////
+if (process.env.DYNO.replace('worker','')!=process.env.DYNO) {
 bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`);
 });
@@ -363,6 +364,7 @@ bot.on('message', msg => {
 });
 
 bot.login(TOKEN);
+}
 
 //////////////////////////////////////
 //          INTERFACE WEB           //
