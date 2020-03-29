@@ -261,6 +261,9 @@ new Command('bank_give_money_user', function(msg,args,t) {
 		return;
 	}
 	id = id[1];
+	var f = function() {
+		msg.reply('`'+((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0)))+'` Money '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
+	}
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
@@ -280,7 +283,13 @@ new Command('bank_give_money_user', function(msg,args,t) {
 					obj.bank[escape_mysql(args[0])] = parseFloat(args[2]) || 0.0;
 				}
 				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
-					msg.reply('`'+(parseFloat(args[2]) || 0.0)+'` Money '+((parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');
+					f();
+				});
+			} else {
+				var obj = {bank:{}};
+				obj.bank[escape_mysql(args[0])] = (parseFloat(args[2]) || 0.0);
+				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
+					f();
 				});
 			}
 		});
@@ -340,20 +349,105 @@ new Command('bank_get_money_user', function(msg,args) {
 
 // CITOYEN
 new Command('give_money', function(msg,args) {
+	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
+	var id_currentuser = msg.member.user.id+'';
+	var id_user = args[1].match(/<@(\d+)>/);
+	if (id_user==null) {
+		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	id_user = id_user[1];
+	if (id_currentuser == id_user) {
+		msg.reply('Sorry, you can\'t give yourself your own money :upside_down');
+		return;
+	}
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+		if (rows1.length==0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rows){
+			if (rows.length > 0) {
+				
+			}
+		});
+	});
 });
 // CITOYEN
 new Command('bank_create_account', function(msg,args) {
+	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
+	var id = msg.member.user.id+'';
+	var f = function() {
+		msg.reply('Your `'+args[0]+'` Bank account is created with Success!');
+	};
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+		if (rows1.length==0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
+			if (rows.length!=0) {
+				var obj = JSON.parse(rows[0].data);
+				obj.bank = obj.bank || {};
+				if (typeof obj.bank[escape_mysql(args[0])] === 'undefined') {
+					try {
+						obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
+					} catch (e) {
+						obj.bank[escape_mysql(args[0])] = 0.0;
+					}
+					query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+						f();
+					});
+				} else {
+					msg.reply('Sorry, you have already a `'+args[0]+'` Bank account :cold_sweat:');
+				}
+			} else {
+				var obj = {bank:{}};
+				try {
+					obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
+				} catch (e) {
+					obj.bank[escape_mysql(args[0])] = 0.0;
+				}
+				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
+					f();
+				});
+			}
+		});
+	});
 });
 // CITOYEN
 new Command('bank_delete_account', function(msg,args) {
+	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
+	var id = msg.member.user.id+'';
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
+			if (rows.length!=0) {
+				var obj = JSON.parse(rows[0].data);
+				obj.bank = obj.bank || {};
+				if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
+					obj.bank[escape_mysql(args[0])] = null;
+					delete obj.bank[escape_mysql(args[0])];
+					query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+						msg.reply('Your `'+args[0]+'` Bank account is deleted with Success!');
+					});
+					return;
+				}
+			}
+			msg.reply('Sorry, you don\'t have a `'+args[0]+'` Bank account :cold_sweat:');
+		});
+	});
 });
 // CITOYEN
 new Command('get_money', function(msg,args) {
