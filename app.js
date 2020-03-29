@@ -349,10 +349,11 @@ new Command('bank_get_money_user', function(msg,args) {
 
 // CITOYEN
 new Command('give_money', function(msg,args) {
-	if (args.length < 3) return;
+	if (args.length < 4) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
+	//     - User Bank Name
 	//     - Amount Money
 	var id_currentuser = msg.member.user.id+'';
 	var id_user = args[1].match(/<@(\d+)>/);
@@ -370,10 +371,36 @@ new Command('give_money', function(msg,args) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rows){
-			if (rows.length > 0) {
-				
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rowsu){
+			if (rowsu.length > 0) {
+				var obju = JSON.parse(rowsu[0]);
+				obju.bank = obju.bank || {};
+				if (typeof obju.bank[escape_mysql(args[0])] !== 'undefined') {
+					if ((parseFloat(obju.bank[escape_mysql(args[0])])||0) < (parseFloat(args[2])||0)) {
+						msg.reply('Sorry, you don\'t have enought money in your `'+args[0]+'` Bank account!');
+						return;
+					}
+					query('SELECT * FROM users WHERE name=\''+escape_mysql(id_user)+'\'',function(err,rows){
+						if (rows.length > 0) {
+							var obj = JSON.parse(rows[0]);
+							obj.bank = obj.bank || {};
+							if (typeof obj.bank[escape_mysql(args[2])] !== 'undefined') {
+								obju.bank[escape_mysql(args[0])] = parseFloat(obju.bank[escape_mysql(args[0])])||0) - (parseFloat(args[3])||0);
+								obj.bank[escape_mysql(args[2])] = parseFloat(obj.bank[escape_mysql(args[2])])||0) + (parseFloat(args[3])||0);
+								query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obju))+'\' WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rows){
+									query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id_user)+'\'',function(err,rows){
+										msg.reply('You give `'args[3]+'` Money to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account');
+									});
+								});
+								return;
+							}
+						}
+						msg.reply('Sorry, '+args[1]+' don\'t have a `'+args[0]+'` Bank account!');
+					});
+					return;
+				}
 			}
+			msg.reply('Sorry, you don\'t have a `'+args[0]+'` Bank account!');
 		});
 	});
 });
