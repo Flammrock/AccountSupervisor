@@ -122,9 +122,14 @@ new Command('ping', function(msg,args) {
 
 // ADMIN
 new Command('bank_create', function(msg,args) {
+	if (args.length < 2) return;
 	// ARGS :
 	//    - Bank Name
 	//    - Amount Money On First Registration
+	query('SELECT * FROM bank WHERE name=`'+args[0]+'`',function(err,rows){
+		console.log(rows);
+		query('INSERT INTO bank(name,data) VALUES (`'+args[0]+'`,`'+args[1]+'`);',function(err,rows){});
+	});
 });
 // ADMIN
 new Command('bank_delete', function(msg,args) {
