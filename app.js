@@ -149,7 +149,20 @@ new Command('bank_delete', function(msg,args) {
 		query('DELETE FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('Bank `'+args[0]+'` deleted with success!');
 		});
-		
+		query('SELECT * FROM users',function(err,rows){
+			for (var i = 0; i < rows.length; i++) {
+				try {
+					var data = JSON.parse(rows[i].data);
+					if (typeof data.bank !== 'undefined') {
+						if (typeof data.bank[escape_mysql(args[0])] !== 'undefined') {
+							data.bank[escape_mysql(args[0])] = null;
+							delete data.bank[escape_mysql(args[0])];
+							query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql(rows[i].name)+'\'',function(err,rows){});
+						}
+					}
+				} catch (e) {}
+			}
+		});
 	});
 });
 // ADMIN
