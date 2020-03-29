@@ -27,14 +27,18 @@ function query(SQL,fn) {
 	  if (err) {connection.end();return;};
 	  console.log('Mysql: Connected!');
 	});
+	connection.on('error', function() {connection.end();});
 	if (SQL) {
 		connection.query(SQL,(err,rows) => {
 			if (err) {connection.end();return;};
+			try {
 			fn(err,rows);
+			connection.end();return;
+			} catch (e) {connection.end();return;}
 		});
+	} else {
+		connection.end();
 	}
-	connection.end();
-	connection.on('error', function() {connection.end();});
 	
 }
 query();
@@ -126,9 +130,12 @@ new Command('bank_create', function(msg,args) {
 	// ARGS :
 	//    - Bank Name
 	//    - Amount Money On First Registration
+	console.log('SELECT * FROM bank WHERE name=`'+args[0]+'`');
 	query('SELECT * FROM bank WHERE name=`'+args[0]+'`',function(err,rows){
-		console.log(rows);
-		query('INSERT INTO bank(name,data) VALUES (`'+args[0]+'`,`'+args[1]+'`);',function(err,rows){});
+		console.log('rows:',rows);
+		query('INSERT INTO bank(name,data) VALUES (`'+args[0]+'`,`'+args[1]+'`);',function(err,rows){
+			
+		});
 	});
 });
 // ADMIN
