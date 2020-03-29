@@ -1,6 +1,11 @@
 const Discord = require('discord.js');
 const mysql = require("mysql");
 const bot = new Discord.Client();
+var express = require('express');
+
+
+
+
 
 const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoC3CQ.meL6PnRHcv91pS2xnyRytJ3oiZE';
 const DATABASE_URI = 'mysql://bf3a501fa9da19:d1726edb@us-cdbr-iron-east-01.cleardb.net/heroku_bc02ac5f0db76cb?reconnect=true';
@@ -33,6 +38,21 @@ connection.query(`CREATE TABLE users (
   console.log('TABLE CREATED!');
 });*/
 
+connection.query(`CREATE TABLE bank (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  name varchar(50),
+  data text,
+  PRIMARY KEY (id)
+) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
+  if(err) throw err;
+
+  console.log('TABLE CREATED!');
+});
+
+
+//////////////////////////////////////
+//           COMMAND BOT            //
+//////////////////////////////////////
 class Command {
 	
 	constructor(name,_fn) {
@@ -75,14 +95,135 @@ class ParserCommand {
 	
 }
 
+// BANK
 
-new Command('hello_world', function(msg,args) {
-	msg.channel.send('wesh comment ça va?');
+// ADMIN
+new Command('bank_create', function(msg,args) {
+	// ARGS :
+	//    - Bank Name
+	//    - Amount Money On First Registration
+});
+// ADMIN
+new Command('bank_delete', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+});
+// ADMIN
+new Command('bank_add_user', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+	//     - User ID
+});
+// ADMIN
+new Command('bank_remove_user', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+	//     - User ID
+});
+// ADMIN
+new Command('bank_give_money_user', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+	//     - User ID
+	//     - Amount Money
+});
+// ADMIN
+new Command('bank_remove_money_user', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+	//     - User ID
+	//     - Amount Money
+});
+// ADMIN
+new Command('bank_set_money_user', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+	//     - User ID
+	//     - Amount Money
+});
+// ADMIN
+new Command('bank_get_money_user', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+	//     - User ID
+	//     - Amount Money
+});
+
+// CITOYEN
+new Command('give_money', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+	//     - User ID
+	//     - Amount Money
+});
+// CITOYEN
+new Command('bank_create_account', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
+});
+// CITOYEN
+new Command('bank_delete_account', function(msg,args) {
+	// ARGS :
+	//     - Bank Name
 });
 
 
-//console.log(TOKEN);
 
+
+// ADMIN
+new Command('shop_create', function(msg,args) {
+	// ARGS :
+	//    - Shop Name
+	//    - Salons Available
+	//    - File HTML
+});
+// ADMIN
+new Command('shop_delete', function(msg,args) {
+	// ARGS :
+	//     - Shop Name
+});
+// ADMIN
+new Command('shop_update_salons', function(msg,args) {
+	// ARGS :
+	//    - Shop Name
+	//    - Salons Available
+});
+// ADMIN
+new Command('shop_update_file', function(msg,args) {
+	// ARGS :
+	//    - Shop Name
+	//    - File HTML
+});
+
+// CITOYEN
+new Command('item_pay', function(msg,args) {
+	// ARGS :
+	//     - Shop Name
+	//     - Item ID
+});
+// THIEF
+new Command('item_steal', function(msg,args) {
+	// ARGS :
+	//     - Shop Name
+	//     - Item ID
+});
+
+
+
+
+
+
+new Command('bank_create', function(msg,args) {
+	//msg.channel.send('wesh comment ça va?');
+});
+new Command('bank_create', function(msg,args) {
+	//msg.channel.send('wesh comment ça va?');
+});
+
+
+//////////////////////////////////////
+//           DISCORD BOT            //
+//////////////////////////////////////
 bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`);
 });
@@ -97,3 +238,22 @@ bot.on('message', msg => {
 });
 
 bot.login(TOKEN);
+
+//////////////////////////////////////
+//          INTERFACE WEB           //
+//////////////////////////////////////
+var app = express();
+
+app.get('/', function (req, res) {
+   res.send('Hello World');
+})
+
+var server = app.listen(80, function () {
+   var host = server.address().address
+   var port = server.address().port
+   
+   console.log("Example app listening at http://%s:%s", host, port)
+})
+
+
+
