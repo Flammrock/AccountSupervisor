@@ -27,7 +27,7 @@ function query(SQL,fn) {
 		if (err) {connection.end();return;};
 		if (SQL) {
 			connection.query(SQL,(err,rows) => {
-				if (err) {connection.end();return;};
+				if (err) {console.log(err);connection.end();return;};
 				try {
 					fn(err,rows);
 					connection.end();return;
