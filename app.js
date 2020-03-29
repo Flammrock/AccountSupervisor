@@ -190,9 +190,9 @@ new Command('bank_add_user', function(msg,args) {
 				obj.bank = obj.bank || {};
 				try {
 					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
-						 obj.bank[escape_mysql(args[0])] = (parseFloat( obj.bank[escape_mysql(args[0])]) || 0.0) + (parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0);
+						 obj.bank[escape_mysql(args[0])] = (parseFloat(obj.bank[escape_mysql(args[0])]) || 0.0) + (parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0);
 					} else {
-						obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0);
+						obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
 					}
 				} catch (e) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
