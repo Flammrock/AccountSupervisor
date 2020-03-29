@@ -172,7 +172,7 @@ new Command('bank_add_user', function(msg,args) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
 			if (rows.length==0) {
 				var obj = {
 					bank: {}
@@ -269,19 +269,19 @@ new Command('get_money', function(msg,args) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		console.log(msg.member.user.id);
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
 			if (rows.length==0) {
-				console.log("no account");
 				f(0);
 			} else {
-				console.log("yes account");
 				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
 				var money = 0.0;
 				try {
 					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
 						money = parseFloat(obj.bank[escape_mysql(args[0])]) || 0.0;
+					} else {
+						msg.reply('Sorry, you don\'t have a bank account `'+args[0]+'` yet!\nPlease create a bank account with the command:\n   - `+bank_add_user '+args[0]+' <@'+msg.member.user.id+'>`');
+						return;
 					}
 				} catch (e) {}
 				console.log("okkkkk");
