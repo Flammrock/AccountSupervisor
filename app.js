@@ -3,6 +3,7 @@ const mysql = require("mysql");
 const bot = new Discord.Client();
 var express = require('express');
 
+console.log(process.env);
 
 const port = process.env.PORT || 80;
 
@@ -153,6 +154,7 @@ new Command('bank_delete', function(msg,args) {
 		query('DELETE FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('Bank `'+args[0]+'` deleted with success!');
 		});
+		
 	});
 });
 // ADMIN
