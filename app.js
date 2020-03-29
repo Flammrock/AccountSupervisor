@@ -48,7 +48,6 @@ query();
 connection.query(`CREATE TABLE users (
   id int(11) NOT NULL AUTO_INCREMENT,
   name varchar(50),
-  money int(11),
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
@@ -162,16 +161,48 @@ new Command('bank_add_user', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	console.log(args[1].match(/<@(\d+)>/));
-	/*query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
-		if (rows.length==0) {
+	var id = args[1].match(/<@(\d+)>/);
+	if (id==null) {
+		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	id = id[1];
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+		if (rows1.length==0) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT FROM users WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
-			msg.reply('Bank `'+args[0]+'` deleted with success!');
+		query('SELECT FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+			if (rows.length==0) {
+				var obj = {
+					bank: {}
+				};
+				try {
+				obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
+				} catch (e) {
+					obj.bank[escape_mysql(args[0])] = 0.0;
+				}
+				query('INSERT INTO user(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
+					// Just Add User
+				});
+			} else {
+				var obj = rows[0].data;
+				obj.bank = obj.bank || {};
+				try {
+					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
+						 obj.bank[escape_mysql(args[0])] = (parseFloat( obj.bank[escape_mysql(args[0])]) || 0.0) + (parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0);
+					} else {
+						obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0);
+					}
+				} catch (e) {
+					obj.bank[escape_mysql(args[0])] = 0.0;
+				}
+				query('UPDATE table_name SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+					// Just Update User
+				});
+			}
 		});
-	});*/
+	});
 });
 // ADMIN
 new Command('bank_remove_user', function(msg,args) {
