@@ -385,8 +385,8 @@ new Command('give_money', function(msg,args) {
 							var obj = JSON.parse(rows[0]);
 							obj.bank = obj.bank || {};
 							if (typeof obj.bank[escape_mysql(args[2])] !== 'undefined') {
-								obju.bank[escape_mysql(args[0])] = parseFloat(obju.bank[escape_mysql(args[0])])||0) - (parseFloat(args[3])||0);
-								obj.bank[escape_mysql(args[2])] = parseFloat(obj.bank[escape_mysql(args[2])])||0) + (parseFloat(args[3])||0);
+								obju.bank[escape_mysql(args[0])] = (parseFloat(obju.bank[escape_mysql(args[0])])||0) - (parseFloat(args[3])||0);
+								obj.bank[escape_mysql(args[2])] = (parseFloat(obj.bank[escape_mysql(args[2])])||0) + (parseFloat(args[3])||0);
 								query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obju))+'\' WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rows){
 									query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id_user)+'\'',function(err,rows){
 										msg.reply('You give `'args[3]+'` Money to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account');
