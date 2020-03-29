@@ -178,15 +178,15 @@ new Command('bank_add_user', function(msg,args) {
 					bank: {}
 				};
 				try {
-				obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
+					obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
 				} catch (e) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
 				}
 				query('INSERT INTO user(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
-					// Just Add User
+					msg.reply('User `'+args[1]+'` added in `'+args[0]+'` Bank with Success!');
 				});
 			} else {
-				var obj = rows[0].data;
+				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
 				try {
 					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
@@ -198,7 +198,7 @@ new Command('bank_add_user', function(msg,args) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
 				}
 				query('UPDATE table_name SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
-					// Just Update User
+					msg.reply('User `'+args[1]+'` added in `'+args[0]+'` Bank with Success!');
 				});
 			}
 		});
@@ -255,6 +255,37 @@ new Command('bank_create_account', function(msg,args) {
 new Command('bank_delete_account', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
+});
+// CITOYEN
+new Command('get_money', function(msg,args) {
+	if (args.length < 1) return;
+	// ARGS :
+	//     - Bank Name
+	var f = function(money) {
+		msg.reply('You have `'+money+'` Money left in your account bank `'+args[0]+'`');
+	}
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('SELECT FROM users WHERE name=\''+escape_mysql(message.member.user.id+'')+'\'',function(err,rows){
+			if (rows.length==0) {
+				f(0);
+			} else {
+				var obj = JSON.parse(rows[0].data);
+				obj.bank = obj.bank || {};
+				var money = 0.0;
+				try {
+					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
+						money = parseFloat(obj.bank[escape_mysql(args[0])]) || 0.0;
+					}
+					obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
+				} catch (e) {}
+				f(money);
+			}
+		});
+	});
 });
 
 
