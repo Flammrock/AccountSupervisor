@@ -4,7 +4,7 @@ const bot = new Discord.Client();
 var express = require('express');
 
 
-
+const port = process.env.PORT || 80;
 
 
 const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoC3CQ.meL6PnRHcv91pS2xnyRytJ3oiZE';
@@ -272,7 +272,7 @@ app.get('/', function (req, res) {
    res.send('Hello World');
 })
 
-var server = app.listen(80, function () {
+var server = app.listen(port, function () {
    var host = server.address().address
    var port = server.address().port
    
