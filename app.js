@@ -76,7 +76,7 @@ class Command {
 	}
 	
 	static isExist(name) {
-		return typeof Command.List !== 'undefined';
+		return typeof Command.List[name] !== 'undefined';
 	}
 	
 	static execute(msg,data) {
@@ -244,7 +244,9 @@ new Command('bank_create', function(msg,args) {
 	//msg.channel.send('wesh comment ça va?');
 });*/
 
-
+new Command('list_command', function(msg,args) {
+	msg.channel.send(Object.keys(Command.List).join(', '));
+});
 
 //////////////////////////////////////
 //           DISCORD BOT            //
