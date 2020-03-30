@@ -366,12 +366,14 @@ new Command('give_money', function(msg,args) {
 		msg.reply('Sorry, you can\'t give yourself your own money :upside_down:');
 		return;
 	}
-	console.log('WESH');
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+		console.log('WESH22');
 		if (rows1.length==0) {
+			console.log('?????');
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
+		console.log('COUCOU');
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rowsu){
 			if (rowsu.length > 0) {
 				var obju = JSON.parse(rowsu[0]);
