@@ -618,6 +618,7 @@ bot.on('ready', () => {
 bot.on('message', msg => {
 	var role_admin = false;
 	var role_citoyen = false;
+	console.log(msg);
 	msg.guild.roles.cache.forEach(role => {
 		if (role.name=='AccountSupervisorAdmin') role_admin = true;
 		if (role.name=='AccountSupervisorCitoyen') role_citoyen = true;
