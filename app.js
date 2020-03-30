@@ -150,6 +150,7 @@ new Command('ping', function(msg,args) {
 new Command('bank_create', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
+	console.log('GUIDDDDD::',escape_mysql(msg.guild.id+'_'));
 	// ARGS :
 	//    - Bank Name
 	//    - Amount Money On First Registration
