@@ -4,7 +4,7 @@ const bot = new Discord.Client();
 
 
 const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoC3CQ.meL6PnRHcv91pS2xnyRytJ3oiZE';
-const DATABASE_URI = process.env.DATABASE_URL'mysql://bf3a501fa9da19:d1726edb@us-cdbr-iron-east-01.cleardb.net/heroku_bc02ac5f0db76cb?reconnect=true';
+const DATABASE_URI = process.env.DATABASE_URL;
 const DATABASE_PARSE = DATABASE_URI.match(/mysql:\/\/([^:]+):([^@]+)@([^\/]+)\/([^\?]+)\??/);
 
 console.log(DATABASE_PARSE);
