@@ -366,6 +366,7 @@ new Command('give_money', function(msg,args) {
 		msg.reply('Sorry, you can\'t give yourself your own money :upside_down:');
 		return;
 	}
+	console.log('WESH');
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
