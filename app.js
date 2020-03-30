@@ -153,12 +153,12 @@ new Command('bank_create', function(msg,args) {
 	// ARGS :
 	//    - Bank Name
 	//    - Amount Money On First Registration
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length > 0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank is already created :cold_sweat:');
 			return;
 		}
-		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
+		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Bank created with success!');
 		});
 	});
@@ -169,15 +169,15 @@ new Command('bank_delete', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('DELETE FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+		query('DELETE FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Bank deleted with success!');
 		});
-		query('SELECT * FROM users',function(err,rows){
+		query('SELECT * FROM users WHERE name LIKE \''+escape_mysql(msg.guild.id+'_')'%\'',function(err,rows){
 			for (var i = 0; i < rows.length; i++) {
 				try {
 					var data = JSON.parse(rows[i].data);
@@ -185,7 +185,7 @@ new Command('bank_delete', function(msg,args) {
 						if (typeof data.bank[escape_mysql(args[0])] !== 'undefined') {
 							data.bank[escape_mysql(args[0])] = null;
 							delete data.bank[escape_mysql(args[0])];
-							query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql(rows[i].name)+'\'',function(err,rows){});
+							query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(rows[i].name)+'\'',function(err,rows){});
 						}
 					}
 				} catch (e) {}
@@ -206,12 +206,12 @@ new Command('bank_add_user', function(msg,args) {
 		return;
 	}
 	id = id[1];
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 			if (rows.length==0) {
 				var obj = {
 					bank: {}
@@ -221,7 +221,7 @@ new Command('bank_add_user', function(msg,args) {
 				} catch (e) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
 				}
-				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
+				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
 					msg.reply('User '+args[1]+' added in `'+args[0]+'` Bank with Success!');
 				});
 			} else {
@@ -236,7 +236,7 @@ new Command('bank_add_user', function(msg,args) {
 				} catch (e) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
 				}
-				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 					msg.reply('User '+args[1]+' added in `'+args[0]+'` Bank with Success!');
 				});
 			}
@@ -256,12 +256,12 @@ new Command('bank_remove_user', function(msg,args) {
 		return;
 	}
 	id = id[1];
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 			if (rows.length > 0) {
 				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
@@ -271,7 +271,7 @@ new Command('bank_remove_user', function(msg,args) {
 						delete obj.bank[escape_mysql(args[0])];
 					}
 				} catch (e) {}
-				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 					msg.reply('User '+args[1]+' removed in `'+args[0]+'` Bank with Success!');
 				});
 			}
@@ -295,12 +295,12 @@ new Command('bank_give_money_user', function(msg,args,t) {
 	var f = function() {
 		msg.reply('`'+((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0)))+'` Money '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
 	}
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 			if (rows.length > 0) {
 				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
@@ -313,13 +313,13 @@ new Command('bank_give_money_user', function(msg,args,t) {
 				} catch (e) {
 					obj.bank[escape_mysql(args[0])] = parseFloat(args[2]) || 0.0;
 				}
-				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 					f();
 				});
 			} else {
 				var obj = {bank:{}};
 				obj.bank[escape_mysql(args[0])] = (parseFloat(args[2]) || 0.0);
-				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
+				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
 					f();
 				});
 			}
@@ -360,12 +360,12 @@ new Command('bank_get_money_user', function(msg,args) {
 		return;
 	}
 	id = id[1];
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 			if (rows.length > 0) {
 				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
@@ -401,12 +401,12 @@ new Command('give_money', function(msg,args) {
 		msg.reply('Sorry, you can\'t give yourself your own money :upside_down:');
 		return;
 	}
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank  doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rowsu){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id_currentuser)+'\'',function(err,rowsu){
 			if (rowsu.length > 0) {
 				var obju = JSON.parse(rowsu[0].data);
 				obju.bank = obju.bank || {};
@@ -415,15 +415,15 @@ new Command('give_money', function(msg,args) {
 						msg.reply('Sorry, you don\'t have enought money in your `'+args[0]+'` Bank account!');
 						return;
 					}
-					query('SELECT * FROM users WHERE name=\''+escape_mysql(id_user)+'\'',function(err,rows){
+					query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id_user)+'\'',function(err,rows){
 						if (rows.length > 0) {
 							var obj = JSON.parse(rows[0].data);
 							obj.bank = obj.bank || {};
 							if (typeof obj.bank[escape_mysql(args[2])] !== 'undefined') {
 								obju.bank[escape_mysql(args[0])] = (parseFloat(obju.bank[escape_mysql(args[0])])||0) - Math.abs((parseFloat(args[3])||0));
 								obj.bank[escape_mysql(args[2])] = (parseFloat(obj.bank[escape_mysql(args[2])])||0) + Math.abs((parseFloat(args[3])||0));
-								query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obju))+'\' WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rows){
-									query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id_user)+'\'',function(err,rows){
+								query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obju))+'\' WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id_currentuser)+'\'',function(err,rows){
+									query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id_user)+'\'',function(err,rows){
 										msg.reply('You give `'+args[3]+'` Money to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account }');
 									});
 								});
@@ -449,12 +449,12 @@ new Command('bank_create_account', function(msg,args) {
 	var f = function() {
 		msg.reply('Your `'+args[0]+'` Bank account is created with Success!');
 	};
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
 			if (rows.length!=0) {
 				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
@@ -464,7 +464,7 @@ new Command('bank_create_account', function(msg,args) {
 					} catch (e) {
 						obj.bank[escape_mysql(args[0])] = 0.0;
 					}
-					query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+					query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 						f();
 					});
 				} else {
@@ -477,7 +477,7 @@ new Command('bank_create_account', function(msg,args) {
 				} catch (e) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
 				}
-				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
+				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(msg.guild.id+'_')+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
 					f();
 				});
 			}
@@ -491,19 +491,19 @@ new Command('bank_delete_account', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	var id = msg.member.user.id+'';
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
 			if (rows.length!=0) {
 				var obj = JSON.parse(rows[0].data);
 				obj.bank = obj.bank || {};
 				if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
 					obj.bank[escape_mysql(args[0])] = null;
 					delete obj.bank[escape_mysql(args[0])];
-					query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
+					query('UPDATE users SET data = \''+escape_mysql(msg.guild.id+'_')+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
 						msg.reply('Your `'+args[0]+'` Bank account is deleted with Success!');
 					});
 					return;
@@ -522,12 +522,12 @@ new Command('get_money', function(msg,args) {
 	var f = function(money) {
 		msg.reply('You have `'+money+'` Money left in your `'+args[0]+'` Bank account!');
 	};
-	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
+		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.reply('Sorry, you don\'t have a `'+args[0]+'` Bank account yet!\nPlease create a bank account with the command:\n        `+bank_create_account '+args[0]+'`');
 				return;
@@ -615,7 +615,6 @@ bot.on('ready', () => {
 });
 
 bot.on('message', msg => {
-	console.log(msg);
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
