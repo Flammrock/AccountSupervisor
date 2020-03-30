@@ -23,7 +23,7 @@ function query(SQL,fn) {
 	
 	var connection = mysql.createConnection(DATABASE);
 	connection.connect((err) => {
-		if (err) {connection.end();return;};
+		if (err) {connection.end();console.log(err);return;};
 		if (SQL) {
 			connection.query(SQL,(err,rows) => {
 				if (err) {console.log(err);connection.end();return;};
