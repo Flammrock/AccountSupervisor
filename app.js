@@ -12,9 +12,9 @@ console.log(DATABASE_PARSE);
 const PREFIX = '+';
 
 const DATABASE = {
-	host:       DATABASE_PARSE[1],
-	user:       DATABASE_PARSE[2],
-	password:   DATABASE_PARSE[3],
+	host:       DATABASE_PARSE[3],
+	user:       DATABASE_PARSE[1],
+	password:   DATABASE_PARSE[2],
 	database:   DATABASE_PARSE[4]
 };
 
