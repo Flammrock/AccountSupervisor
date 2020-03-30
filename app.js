@@ -617,11 +617,12 @@ bot.on('ready', () => {
 bot.on('message', msg => {
 	var role_admin = false;
 	var role_citoyen = false;
-	msg.guild.roles.every((role) => {
+	console.log(msg.guild.roles);
+	/*msg.guild.roles.every((role) => {
 		if (role.name=='AccountSupervisorAdmin') role_admin = true;
 		if (role.name=='AccountSupervisorCitoyen') role_citoyen = true;
-	})
-	if (!role_admin) {
+	})*/
+	/*if (!role_admin) {
 		msg.guild.roles.create({
 			data: {
 				name: 'AccountSupervisorAdmin',
@@ -638,7 +639,7 @@ bot.on('message', msg => {
 			},
 			reason: '',
 		});
-	}
+	}*/
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
