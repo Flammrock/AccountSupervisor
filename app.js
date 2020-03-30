@@ -617,10 +617,10 @@ bot.on('ready', () => {
 bot.on('message', msg => {
 	var role_admin = false;
 	var role_citoyen = false;
-	msg.guild.roles.forEach(role => {
+	msg.guild.roles.every((role) => {
 		if (role.name=='AccountSupervisorAdmin') role_admin = true;
-		if (role.name=='AccountSupervisorAdmin') role_citoyen = true;
-	});
+		if (role.name=='AccountSupervisorCitoyen') role_citoyen = true;
+	})
 	if (!role_admin) {
 		msg.guild.roles.create({
 			data: {
