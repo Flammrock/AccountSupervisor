@@ -612,6 +612,7 @@ new Command('list_command', function(msg,args) {
 //////////////////////////////////////
 bot.on('ready', () => {
 	console.log(`Logged in as ${bot.user.tag}!`);
+	console.log(bot);
 });
 
 bot.on('message', msg => {
