@@ -1,11 +1,9 @@
 const Discord = require('discord.js');
 const mysql = require("mysql");
-const bot = new Discord.Client({
-    token: "NjkzODI1MzM0ODM1MTUwOTE4.XoC3CQ.meL6PnRHcv91pS2xnyRytJ3oiZE",
-    autorun: true
-});
+const bot = new Discord.Client();
 
 
+const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoC3CQ.meL6PnRHcv91pS2xnyRytJ3oiZE';
 const DATABASE_URI = process.env.DATABASE_URL;
 const DATABASE_PARSE = DATABASE_URI.match(/mysql:\/\/([^:]+):([^@]+)@([^\/]+)\/([^\?]+)\??/);
 
@@ -91,18 +89,18 @@ class Command {
 	static checkPermission(msg,mode) {
 		switch (mode) {
 			case 'ADMIN':
-				/*if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
+				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
 					msg.delete();
 					msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
 					return false;
-				}*/
+				}
 				break;
 			case 'CITOYEN':
-				/*if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorCitoyen") || msg.member.hasPermission("ADMINISTRATOR"))) {
+				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorCitoyen") || msg.member.hasPermission("ADMINISTRATOR"))) {
 					msg.delete();
 					msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
 					return false;
-				}*/
+				}
 				break;
 			default:
 				break;
@@ -612,56 +610,18 @@ new Command('list_command', function(msg,args) {
 //////////////////////////////////////
 //           DISCORD BOT            //
 //////////////////////////////////////
-
 bot.on('ready', () => {
-  console.log(`Logged in as ${bot.user.tag}!`);
+	console.log(`Logged in as ${bot.user.tag}!`);
 });
 
-bot.on('message', function(user, userID, channelID, msg, event) {
-	console.log('SERVER_ID:',bot.channels[channelID].guild_id);
-	var ServerID = bot.channels[channelID].guild_id;
-	console.log(bot.servers[serverID].roles);
-  if (msg.substring(0,PREFIX.length)==PREFIX) {
-    var data = new ParserCommand(msg);
-	if (Command.isExist(data.name)) {
-		Command.execute({
-			event: event,
-			user: user,
-			userID: userID,
-			content: msg,
-			channelID: channelID,
-			channel: {
-				send: function(m) {
-					bot.sendMessage({
-					to: channelID,
-					message: m
-					});
-				}
-			},
-			reply: function(m) {
-				bot.sendMessage({
-					to: channelID,
-					message: '<@'+userID+'>, '+m
-				});
-			},
-			delete: function(t) {
-				setTimeout(function(){
-					bot.deleteMessage({
-						channelID: channelID,
-						messageID: event.d.id
-					});
-				},t);
-			},
-			member: {user:{id:userID}},
-			author: {
-				send: function(m) {
-					bot.sendMessage({
-						to: userID,
-						message: m
-					});
-				}
-			}
-		},data);
+bot.on('message', msg => {
+	console.log(msg);
+	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
+		var data = new ParserCommand(msg.content);
+		if (Command.isExist(data.name)) {
+			Command.execute(msg,data);
+		}
 	}
-  }
 });
+
+bot.login(TOKEN);
