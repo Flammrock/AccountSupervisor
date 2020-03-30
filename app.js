@@ -375,9 +375,9 @@ new Command('give_money', function(msg,args) {
 			if (rowsu.length > 0) {
 				var obju = JSON.parse(rowsu[0].data);
 				obju.bank = obju.bank || {};
-				console.log(obju.bank,typeof obju.bank[escape_mysql(args[0])] !== 'undefined');
 				if (typeof obju.bank[escape_mysql(args[0])] !== 'undefined') {
-					if ((parseFloat(obju.bank[escape_mysql(args[0])])||0) < (parseFloat(args[2])||0)) {
+					console.log((parseFloat(obju.bank[escape_mysql(args[0])])||0),Math.abs((parseFloat(args[2])||0)));
+					if ((parseFloat(obju.bank[escape_mysql(args[0])])||0) < Math.abs((parseFloat(args[2])||0))) {
 						msg.reply('Sorry, you don\'t have enought money in your `'+args[0]+'` Bank account!');
 						return;
 					}
