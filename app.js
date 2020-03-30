@@ -18,10 +18,11 @@ const DATABASE = {
 	database:   DATABASE_PARSE[4]
 };
 
+console.log(DATABASE);
 
 function query(SQL,fn) {
 	
-	var connection = mysql.createConnection(DATABASE_URI);
+	var connection = mysql.createConnection(DATABASE);
 	connection.connect((err) => {
 		if (err) {connection.end();console.log(err);return;};
 		if (SQL) {
