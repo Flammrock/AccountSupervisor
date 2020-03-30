@@ -86,7 +86,7 @@ class Command {
 		Command.List[data.name]._fn(msg,data.args);
 	}
 	
-	static Command.checkPermission(msg,mode) {
+	static checkPermission(msg,mode) {
 		switch (mode) {
 			case 'ADMIN':
 				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
