@@ -177,7 +177,7 @@ new Command('bank_delete', function(msg,args) {
 		query('DELETE FROM bank WHERE name=\''+escape_mysql(msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Bank deleted with success!');
 		});
-		query('SELECT * FROM users WHERE name LIKE \''+escape_mysql(msg.guild.id+'_')'%\'',function(err,rows){
+		query('SELECT * FROM users WHERE name LIKE \''+escape_mysql(msg.guild.id+'_')+'%\'',function(err,rows){
 			for (var i = 0; i < rows.length; i++) {
 				try {
 					var data = JSON.parse(rows[i].data);
