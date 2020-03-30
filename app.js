@@ -612,10 +612,29 @@ new Command('list_command', function(msg,args) {
 //////////////////////////////////////
 bot.on('ready', () => {
 	console.log(`Logged in as ${bot.user.tag}!`);
-	console.log(bot);
 });
 
 bot.on('message', msg => {
+	var roles = msg.guild.roles;
+	for (var role in roles) {
+		if (roles.hasOwnProperty(role)) {
+			console.log(role);
+        }
+	}
+	/*msg.guild.roles.create({
+	  data: {
+		name: 'AccountSupervisorAdmin',
+		color: 'RED',
+	  },
+	  reason: '',
+	});
+	msg.guild.roles.create({
+	  data: {
+		name: 'AccountSupervisorCitoyen',
+		color: 'BLUE',
+	  },
+	  reason: '',
+	});*/
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
