@@ -12,10 +12,10 @@ console.log(DATABASE_PARSE);
 const PREFIX = '+';
 
 const DATABASE = {
-	host:       'us-cdbr-iron-east-01.cleardb.net',
-	user:       'bf3a501fa9da19',
-	password:   'd1726edb',
-	database:   'heroku_bc02ac5f0db76cb'
+	host:       DATABASE_PARSE[1],
+	user:       DATABASE_PARSE[2],
+	password:   DATABASE_PARSE[3],
+	database:   DATABASE_PARSE[4]
 };
 
 
@@ -116,7 +116,7 @@ class ParserCommand {
 
 // ADMIN
 new Command('ping', function(msg,args) {
-	if (!msg.member.roles.find(r => r.name === "BankAdmin") && !msg.member.hasPermission("ADMINISTRATOR")) {
+	if (!(msg.member.roles.find(r => r.name === "BankAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
 		msg.delete(0);
 		msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
 		return;
