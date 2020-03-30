@@ -86,7 +86,7 @@ class Command {
 		Command.List[data.name]._fn(msg,data.args);
 	}
 	
-	static checkPermission(msg,mode) {
+	static Command.checkPermission(msg,mode) {
 		switch (mode) {
 			case 'ADMIN':
 				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
@@ -138,7 +138,7 @@ class ParserCommand {
 
 // ADMIN
 new Command('ping', function(msg,args) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	msg.channel.send('pong');
 });
 
@@ -148,7 +148,7 @@ new Command('ping', function(msg,args) {
 
 // ADMIN
 new Command('bank_create', function(msg,args) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//    - Bank Name
@@ -165,7 +165,7 @@ new Command('bank_create', function(msg,args) {
 });
 // ADMIN
 new Command('bank_delete', function(msg,args) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
@@ -195,7 +195,7 @@ new Command('bank_delete', function(msg,args) {
 });
 // ADMIN
 new Command('bank_add_user', function(msg,args) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//     - Bank Name
@@ -245,7 +245,7 @@ new Command('bank_add_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_remove_user', function(msg,args) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//     - Bank Name
@@ -280,7 +280,7 @@ new Command('bank_remove_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_give_money_user', function(msg,args,t) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
@@ -328,7 +328,7 @@ new Command('bank_give_money_user', function(msg,args,t) {
 });
 // ADMIN
 new Command('bank_remove_money_user', function(msg,args) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
@@ -339,7 +339,7 @@ new Command('bank_remove_money_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_set_money_user', function(msg,args) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
@@ -349,7 +349,7 @@ new Command('bank_set_money_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_get_money_user', function(msg,args) {
-	if (!checkPermission(msg,'ADMIN')) return false;
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//     - Bank Name
@@ -383,7 +383,7 @@ new Command('bank_get_money_user', function(msg,args) {
 
 // CITOYEN
 new Command('give_money', function(msg,args) {
-	if (!checkPermission(msg,'CITOYEN')) return false;
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 4) return;
 	// ARGS :
 	//     - Bank Name
@@ -441,7 +441,7 @@ new Command('give_money', function(msg,args) {
 });
 // CITOYEN
 new Command('bank_create_account', function(msg,args) {
-	if (!checkPermission(msg,'CITOYEN')) return false;
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
@@ -486,7 +486,7 @@ new Command('bank_create_account', function(msg,args) {
 });
 // CITOYEN
 new Command('bank_delete_account', function(msg,args) {
-	if (!checkPermission(msg,'CITOYEN')) return false;
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
@@ -515,7 +515,7 @@ new Command('bank_delete_account', function(msg,args) {
 });
 // CITOYEN
 new Command('get_money', function(msg,args) {
-	if (!checkPermission(msg,'CITOYEN')) return false;
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
