@@ -615,7 +615,7 @@ bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`);
 });
 
-bot.on('message', user, userID, channelID, msg, evt => {
+bot.on('message', (user, userID, channelID, msg, evt) => {
 	console.log('SERVER_ID:',bot.channels[channelID].guild_id);
   if (msg.content.substring(0,PREFIX.length)==PREFIX) {
     var data = new ParserCommand(msg.content);
