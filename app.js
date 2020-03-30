@@ -113,6 +113,11 @@ class ParserCommand {
 
 // ADMIN
 new Command('ping', function(msg,args) {
+	if (!msg.member.roles.find(r => r.name === "BankAdmin") && !msg.member.hasPermission("ADMINISTRATOR")) {
+		msg.delete(0);
+		msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
+		return;
+    }
 	msg.channel.send('pong');
 });
 
@@ -389,7 +394,7 @@ new Command('give_money', function(msg,args) {
 								obj.bank[escape_mysql(args[2])] = (parseFloat(obj.bank[escape_mysql(args[2])])||0) + Math.abs((parseFloat(args[3])||0));
 								query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obju))+'\' WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rows){
 									query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql(id_user)+'\'',function(err,rows){
-										msg.reply('You give `'+args[3]+'` Money to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account');
+										msg.reply('You give `'+args[3]+'` Money to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account }');
 									});
 								});
 								return;
