@@ -4,7 +4,10 @@ const bot = new Discord.Client();
 
 
 const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoC3CQ.meL6PnRHcv91pS2xnyRytJ3oiZE';
-const DATABASE_URI = 'mysql://bf3a501fa9da19:d1726edb@us-cdbr-iron-east-01.cleardb.net/heroku_bc02ac5f0db76cb?reconnect=true';
+const DATABASE_URI = process.env.DATABASE_URL'mysql://bf3a501fa9da19:d1726edb@us-cdbr-iron-east-01.cleardb.net/heroku_bc02ac5f0db76cb?reconnect=true';
+const DATABASE_PARSE = DATABASE_URI.match(/mysql:\/\/([^:]+):([^@]+)@([^\/]+)\/([^\?]+)\??/);
+
+console.log(DATABASE_PARSE);
 
 const PREFIX = '+';
 
@@ -133,11 +136,11 @@ new Command('bank_create', function(msg,args) {
 	//    - Amount Money On First Registration
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length > 0) {
-			msg.reply('Sorry, Bank `'+args[0]+'` is already created :cold_sweat:');
+			msg.reply('Sorry, `'+args[0]+'` Bank is already created :cold_sweat:');
 			return;
 		}
 		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
-			msg.reply('Bank `'+args[0]+'` created with success!');
+			msg.reply('`'+args[0]+'` Bank created with success!');
 		});
 	});
 });
@@ -152,7 +155,7 @@ new Command('bank_delete', function(msg,args) {
 			return;
 		}
 		query('DELETE FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
-			msg.reply('Bank `'+args[0]+'` deleted with success!');
+			msg.reply('`'+args[0]+'` Bank deleted with success!');
 		});
 		query('SELECT * FROM users',function(err,rows){
 			for (var i = 0; i < rows.length; i++) {
@@ -178,7 +181,7 @@ new Command('bank_add_user', function(msg,args) {
 	//     - User ID
 	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
-		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
 	}
 	id = id[1];
@@ -198,7 +201,7 @@ new Command('bank_add_user', function(msg,args) {
 					obj.bank[escape_mysql(args[0])] = 0.0;
 				}
 				query('INSERT INTO users(name,data) VALUES (\''+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
-					msg.reply('User `'+args[1]+'` added in `'+args[0]+'` Bank with Success!');
+					msg.reply('User '+args[1]+' added in `'+args[0]+'` Bank with Success!');
 				});
 			} else {
 				var obj = JSON.parse(rows[0].data);
@@ -227,13 +230,13 @@ new Command('bank_remove_user', function(msg,args) {
 	//     - User ID
 	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
-		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
 	}
 	id = id[1];
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
-			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
@@ -262,7 +265,7 @@ new Command('bank_give_money_user', function(msg,args,t) {
 	//     - Amount Money
 	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
-		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
 	}
 	id = id[1];
@@ -271,7 +274,7 @@ new Command('bank_give_money_user', function(msg,args,t) {
 	}
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
-			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
@@ -327,13 +330,13 @@ new Command('bank_get_money_user', function(msg,args) {
 	//     - User ID
 	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
-		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
 	}
 	id = id[1];
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
-			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(id)+'\'',function(err,rows){
@@ -363,7 +366,7 @@ new Command('give_money', function(msg,args) {
 	var id_currentuser = msg.member.user.id+'';
 	var id_user = args[1].match(/<@!?(\d+)>/);
 	if (id_user==null) {
-		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
 	}
 	id_user = id_user[1];
@@ -373,7 +376,7 @@ new Command('give_money', function(msg,args) {
 	}
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
-			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			msg.reply('Sorry, `'+args[0]+'` Bank  doesn\'t exist :cold_sweat:');
 			return;
 		}
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rowsu){
@@ -420,7 +423,7 @@ new Command('bank_create_account', function(msg,args) {
 	};
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
 		if (rows1.length==0) {
-			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
@@ -461,7 +464,7 @@ new Command('bank_delete_account', function(msg,args) {
 	var id = msg.member.user.id+'';
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
-			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
@@ -491,12 +494,12 @@ new Command('get_money', function(msg,args) {
 	};
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
-			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+			msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 			return;
 		}
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.reply('Sorry, you don\'t have a bank account `'+args[0]+'` yet!\nPlease create a bank account with the command:\n        `+bank_create_account '+args[0]+'`');
+				msg.reply('Sorry, you don\'t have a `'+args[0]+'` Bank account yet!\nPlease create a bank account with the command:\n        `+bank_create_account '+args[0]+'`');
 				return;
 			} else {
 				var obj = JSON.parse(rows[0].data);
@@ -506,7 +509,7 @@ new Command('get_money', function(msg,args) {
 					if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
 						money = parseFloat(obj.bank[escape_mysql(args[0])]) || 0.0;
 					} else {
-						msg.reply('Sorry, you don\'t have a bank account `'+args[0]+'` yet!\nPlease create a bank account with the command:\n        `+bank_create_account '+args[0]+'`');
+						msg.reply('Sorry, you don\'t have a `'+args[0]+'` Bank account yet!\nPlease create a bank account with the command:\n        `+bank_create_account '+args[0]+'`');
 						return;
 					}
 				} catch (e) {}
