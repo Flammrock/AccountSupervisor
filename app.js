@@ -86,6 +86,28 @@ class Command {
 		Command.List[data.name]._fn(msg,data.args);
 	}
 	
+	static checkPermission(msg,mode) {
+		switch (mode) {
+			case 'ADMIN':
+				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
+					msg.delete();
+					msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
+					return false;
+				}
+				break;
+			case 'CITOYEN':
+				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorCitoyen") || msg.member.hasPermission("ADMINISTRATOR"))) {
+					msg.delete();
+					msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
+					return false;
+				}
+				break;
+			default:
+				break;
+		}
+		return true;
+	}
+	
 	
 }
 Command.List = {};
@@ -116,11 +138,7 @@ class ParserCommand {
 
 // ADMIN
 new Command('ping', function(msg,args) {
-	if (!(msg.member.roles.cache.some(r => r.name === "BankAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
-		msg.delete();
-		msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
-		return;
-    }
+	if (!checkPermission(msg,'ADMIN')) return false;
 	msg.channel.send('pong');
 });
 
@@ -130,6 +148,7 @@ new Command('ping', function(msg,args) {
 
 // ADMIN
 new Command('bank_create', function(msg,args) {
+	if (!checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//    - Bank Name
@@ -146,6 +165,7 @@ new Command('bank_create', function(msg,args) {
 });
 // ADMIN
 new Command('bank_delete', function(msg,args) {
+	if (!checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
@@ -175,6 +195,7 @@ new Command('bank_delete', function(msg,args) {
 });
 // ADMIN
 new Command('bank_add_user', function(msg,args) {
+	if (!checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//     - Bank Name
@@ -224,6 +245,7 @@ new Command('bank_add_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_remove_user', function(msg,args) {
+	if (!checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//     - Bank Name
@@ -258,6 +280,7 @@ new Command('bank_remove_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_give_money_user', function(msg,args,t) {
+	if (!checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
@@ -305,6 +328,7 @@ new Command('bank_give_money_user', function(msg,args,t) {
 });
 // ADMIN
 new Command('bank_remove_money_user', function(msg,args) {
+	if (!checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
@@ -315,6 +339,7 @@ new Command('bank_remove_money_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_set_money_user', function(msg,args) {
+	if (!checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
@@ -324,6 +349,7 @@ new Command('bank_set_money_user', function(msg,args) {
 });
 // ADMIN
 new Command('bank_get_money_user', function(msg,args) {
+	if (!checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//     - Bank Name
@@ -357,6 +383,7 @@ new Command('bank_get_money_user', function(msg,args) {
 
 // CITOYEN
 new Command('give_money', function(msg,args) {
+	if (!checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 4) return;
 	// ARGS :
 	//     - Bank Name
@@ -414,6 +441,7 @@ new Command('give_money', function(msg,args) {
 });
 // CITOYEN
 new Command('bank_create_account', function(msg,args) {
+	if (!checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
@@ -458,6 +486,7 @@ new Command('bank_create_account', function(msg,args) {
 });
 // CITOYEN
 new Command('bank_delete_account', function(msg,args) {
+	if (!checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
@@ -486,6 +515,7 @@ new Command('bank_delete_account', function(msg,args) {
 });
 // CITOYEN
 new Command('get_money', function(msg,args) {
+	if (!checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
@@ -585,7 +615,8 @@ bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`);
 });
 
-bot.on('message', msg => {
+bot.on('message', user, userID, channelID, msg, evt => {
+	console.log('SERVER_ID:',bot.channels[channelID].guild_id);
   if (msg.content.substring(0,PREFIX.length)==PREFIX) {
     var data = new ParserCommand(msg.content);
 	if (Command.isExist(data.name)) {
