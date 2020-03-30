@@ -665,5 +665,3 @@ bot.on('message', function(user, userID, channelID, msg, event) {
 	}
   }
 });
-
-bot.login(TOKEN);
