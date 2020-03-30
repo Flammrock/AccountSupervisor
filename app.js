@@ -176,7 +176,7 @@ new Command('bank_add_user', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	var id = args[1].match(/<@(\d+)>/);
+	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
 		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
@@ -225,7 +225,7 @@ new Command('bank_remove_user', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	var id = args[1].match(/<@(\d+)>/);
+	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
 		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
@@ -260,7 +260,7 @@ new Command('bank_give_money_user', function(msg,args,t) {
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
-	var id = args[1].match(/<@(\d+)>/);
+	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
 		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
@@ -325,7 +325,7 @@ new Command('bank_get_money_user', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	var id = args[1].match(/<@(\d+)>/);
+	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
 		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
@@ -361,7 +361,7 @@ new Command('give_money', function(msg,args) {
 	//     - User Bank Name
 	//     - Amount Money
 	var id_currentuser = msg.member.user.id+'';
-	var id_user = args[1].match(/<@(\d+)>/);
+	var id_user = args[1].match(/<@!?(\d+)>/);
 	if (id_user==null) {
 		msg.reply('Sorry, User `'+args[1]+'` doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
