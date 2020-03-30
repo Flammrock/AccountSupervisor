@@ -116,7 +116,7 @@ class ParserCommand {
 
 // ADMIN
 new Command('ping', function(msg,args) {
-	if (!(msg.member.roles.find(r => r.name === "BankAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
+	if (!(msg.member.roles.find("name", "BankAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
 		msg.delete(0);
 		msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
 		return;
