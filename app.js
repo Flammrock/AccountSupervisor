@@ -375,7 +375,9 @@ new Command('give_money', function(msg,args) {
 		}
 		console.log('COUCOU');
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rowsu){
+			console.log('wowowowwowowowowowwo:',escape_mysql(id_currentuser));
 			if (rowsu.length > 0) {
+				console.log('LOLOLOLOL');
 				var obju = JSON.parse(rowsu[0]);
 				obju.bank = obju.bank || {};
 				console.log(obju.bank,typeof obju.bank[escape_mysql(args[0])] !== 'undefined');
