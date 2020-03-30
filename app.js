@@ -367,29 +367,23 @@ new Command('give_money', function(msg,args) {
 		return;
 	}
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql(args[0])+'\'',function(err,rows1){
-		console.log('WESH22');
 		if (rows1.length==0) {
-			console.log('?????');
 			msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
 			return;
 		}
-		console.log('COUCOU');
 		query('SELECT * FROM users WHERE name=\''+escape_mysql(id_currentuser)+'\'',function(err,rowsu){
-			console.log('wowowowwowowowowowwo:',escape_mysql(id_currentuser));
 			if (rowsu.length > 0) {
-				console.log('LOLOLOLOL');
-				var obju = JSON.parse(rowsu[0]);
+				var obju = JSON.parse(rowsu[0].data);
 				obju.bank = obju.bank || {};
 				console.log(obju.bank,typeof obju.bank[escape_mysql(args[0])] !== 'undefined');
 				if (typeof obju.bank[escape_mysql(args[0])] !== 'undefined') {
-					console.log('youppiiiii');
 					if ((parseFloat(obju.bank[escape_mysql(args[0])])||0) < (parseFloat(args[2])||0)) {
 						msg.reply('Sorry, you don\'t have enought money in your `'+args[0]+'` Bank account!');
 						return;
 					}
 					query('SELECT * FROM users WHERE name=\''+escape_mysql(id_user)+'\'',function(err,rows){
 						if (rows.length > 0) {
-							var obj = JSON.parse(rows[0]);
+							var obj = JSON.parse(rows[0].data);
 							obj.bank = obj.bank || {};
 							if (typeof obj.bank[escape_mysql(args[2])] !== 'undefined') {
 								obju.bank[escape_mysql(args[0])] = (parseFloat(obju.bank[escape_mysql(args[0])])||0) - Math.abs((parseFloat(args[3])||0));
