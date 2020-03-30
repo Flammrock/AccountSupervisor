@@ -21,7 +21,7 @@ const DATABASE = {
 
 function query(SQL,fn) {
 	
-	var connection = mysql.createConnection(DATABASE);
+	var connection = mysql.createConnection(DATABASE_URI);
 	connection.connect((err) => {
 		if (err) {connection.end();console.log(err);return;};
 		if (SQL) {
