@@ -615,26 +615,30 @@ bot.on('ready', () => {
 });
 
 bot.on('message', msg => {
-	var roles = msg.guild.roles;
-	for (var role in roles) {
-		if (roles.hasOwnProperty(role)) {
-			console.log(role);
-        }
-	}
-	/*msg.guild.roles.create({
-	  data: {
-		name: 'AccountSupervisorAdmin',
-		color: 'RED',
-	  },
-	  reason: '',
+	var role_admin = false;
+	var role_citoyen = false;
+	msg.guild.roles.forEach(role => {
+		if (role.name=='AccountSupervisorAdmin') role_admin = true;
+		if (role.name=='AccountSupervisorAdmin') role_citoyen = true;
 	});
-	msg.guild.roles.create({
-	  data: {
-		name: 'AccountSupervisorCitoyen',
-		color: 'BLUE',
-	  },
-	  reason: '',
-	});*/
+	if (!role_admin) {
+		msg.guild.roles.create({
+			data: {
+				name: 'AccountSupervisorAdmin',
+				color: 'RED',
+			},
+			reason: '',
+		});
+	}
+	if (!role_citoyen) {
+		msg.guild.roles.create({
+			data: {
+				name: 'AccountSupervisorCitoyen',
+				color: 'BLUE',
+			},
+			reason: '',
+		});
+	}
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
