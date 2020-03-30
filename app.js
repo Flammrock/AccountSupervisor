@@ -616,31 +616,32 @@ bot.on('ready', () => {
 });
 
 bot.on('message', msg => {
-	var role_admin = false;
-	var role_citoyen = false;
-	console.log(msg);
-	msg.guild.roles.cache.forEach(role => {
-		if (role.name=='AccountSupervisorAdmin') role_admin = true;
-		if (role.name=='AccountSupervisorCitoyen') role_citoyen = true;
-	});
-	if (!role_admin) {
-		msg.guild.roles.create({
-			data: {
-				name: 'AccountSupervisorAdmin',
-				color: 'RED',
-			},
-			reason: '',
+	try {
+		var role_admin = false;
+		var role_citoyen = false;
+		msg.guild.roles.cache.forEach(role => {
+			if (role.name=='AccountSupervisorAdmin') role_admin = true;
+			if (role.name=='AccountSupervisorCitoyen') role_citoyen = true;
 		});
-	}
-	if (!role_citoyen) {
-		msg.guild.roles.create({
-			data: {
-				name: 'AccountSupervisorCitoyen',
-				color: 'BLUE',
-			},
-			reason: '',
-		});
-	}
+		if (!role_admin) {
+			msg.guild.roles.create({
+				data: {
+					name: 'AccountSupervisorAdmin',
+					color: 'RED',
+				},
+				reason: '',
+			});
+		}
+		if (!role_citoyen) {
+			msg.guild.roles.create({
+				data: {
+					name: 'AccountSupervisorCitoyen',
+					color: 'BLUE',
+				},
+				reason: '',
+			});
+		}
+	} catch(e) {}
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
