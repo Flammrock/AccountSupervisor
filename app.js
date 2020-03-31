@@ -606,7 +606,7 @@ new Command('shop_create', function(msg,args) {
 			need: (args.length >= 3) ? (args[2].trim()=="") ? args[2].split(' ') : [] : []
 		};
 		if (!Command.checkSalons(msg,data.salons)) return false;
-		query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(data)+'\')',function(err,rows){
+		query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop created with success!');
 		});
 	});
