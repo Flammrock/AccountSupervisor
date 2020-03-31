@@ -145,7 +145,7 @@ class Command {
 					console.log(msg.guild.channels);
 					console.log('============================');
 					console.log(typeof msg.guild.channels.find);
-				if (msg.guild.channels.find(c => {c.id == salonslist[i].match(test)[1]})) {
+				if (typeof msg.guild.channels[salonslist[i].match(test)[1]] !== 'undefined') {
 					console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKKK');
 					continue;
 				}
