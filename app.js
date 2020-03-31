@@ -182,7 +182,9 @@ class ParserCommand {
 		var i1 = this.rawdata.indexOf(' ');
 		if (i1 > 0) {
 			this.name = this.rawdata.substring(1,i1);
-			this.args = this.rawdata.substring(i1+1).match(/"[^"]*"|[^ ]+/g);
+			this.args = this.rawdata.substring(i1+1).match(/"[^"]*"|[^ ]+/g,function(m){
+				return m.match(/^"?([^"]*)"?/)[1];
+			});
 			if (this.args == null) this.args = [];
 		} else {
 			this.name = this.rawdata.substring(1);
