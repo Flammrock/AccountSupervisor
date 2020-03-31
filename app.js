@@ -634,6 +634,7 @@ new Command('item_create', function(msg,args) {
 		data.type = (args.length >= 4) ? args[3] : '';
 		data.image = (args.length >= 5) ? args[4] : '';
 		data.description = (args.length >= 6) ? args[5] : 'No Description';
+		console.log(args);
 		query('INSERT INTO items(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Item created with success!');
 		});
@@ -925,6 +926,7 @@ new Command('item_view', function(msg,args) {
 			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
 			return;
 		}
+		console.log(rows[0].data);
 		var data = JSON.parse(rows[0].data);
 		var _embed = new Discord.MessageEmbed()
 			.setTitle('Item '+args[0])
