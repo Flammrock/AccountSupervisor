@@ -1263,6 +1263,7 @@ new Command('shop_delete_all_items_associed_with', function(msg,args) {
 					}
 				}
 			}
+			console.log('DELETE FROM shop WHERE name=\''+rows2.join('\' OR name=\'')+'\'');
 			query('DELETE FROM shop WHERE name=\''+rows2.join('\' OR name=\'')+'\'',function(err,rows) {
 				f();
 			});
