@@ -142,7 +142,10 @@ class Command {
 			console.log(salonslist[i].match(test)[1]);
 			if (salonslist[i].match(test)!=null) {
 				try {
-				if (msg.guild.channels.find(c => c.id == salonslist[i].match(test)[1])) {
+					console.log(msg.guild.channels);
+					console.log('============================');
+					console.log(typeof msg.guild.channels.find);
+				if (msg.guild.channels.find(c => {c.id == salonslist[i].match(test)[1]})) {
 					console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKKK');
 					continue;
 				}
