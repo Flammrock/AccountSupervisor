@@ -1076,9 +1076,9 @@ new Command('item_pay', function(msg,args) {
 			return;
 		}
 		var tempdata = JSON.parse(rows[0].data);
-		data.web = typeof data.web !== 'undefined' ? data.web : true;
-		if (data.salons.length==0) {
-			if (data.web) {
+		tempdata.web = typeof tempdata.web !== 'undefined' ? tempdata.web : true;
+		if (tempdata.salons.length==0) {
+			if (tempdata.web) {
 				msg.reply('Sorry, `'+args[0]+'` Shop is only accessible through the web :cold_sweat:\nLink to the online shop: https://accountsupervisorwebinterface.herokuapp.com/guild/'+msg.guild.id+'/shop/'+encodeURIComponent(args[0]));
 			} else {
 				msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
@@ -1086,15 +1086,15 @@ new Command('item_pay', function(msg,args) {
 			return;
 		} else {
 			var okisin = false;
-			for (var u = 0; u < data.salons.length; u++) {
-				if (data.salons[u]==chan) {
+			for (var u = 0; u < tempdata.salons.length; u++) {
+				if (tempdata.salons[u]==chan) {
 					okisin = true;
 					break;
 				}
 			}
 			if (!okisin) {
-				msg.reply('Sorry, `'+args[0]+'` Shop is only accessible on this salons: '+data.salons.join(', '));
-				if (data.web) {
+				msg.reply('Sorry, `'+args[0]+'` Shop is only accessible on this salons: '+tempdata.salons.join(', '));
+				if (tempdata.web) {
 					msg.channel.send('However, `'+args[0]+'` Shop is accessible through the web\nLink to the online shop: https://accountsupervisorwebinterface.herokuapp.com/guild/'+msg.guild.id+'/shop/'+encodeURIComponent(args[0]));
 				}
 			}
