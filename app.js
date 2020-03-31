@@ -131,16 +131,13 @@ class Command {
 	}
 	
 	static checkSalons(msg,salonslist) {
-		console.log('???????2');
 		var test = /<#(\d+)>/;
 		for (var i = 0; i < salonslist.length; i++) {
 			if (salonslist[i].match(test)!=null) {
-				console.log('???___?____???_____');
 				if (msg.guild.channels.exists('id', salonslist[i].match(test)[1])) {
 					continue;
 				}
 			}
-			console.log('?????AZADEFRTHYJUKH?GFBVD??789652');
 			msg.reply('Sorry `'+salonslist[i]+'` doesn\'t exist :cold_sweat:');
 			return false;
 		}
@@ -609,7 +606,7 @@ new Command('shop_create', function(msg,args) {
 			need: (args.length >= 3) ? (args[2].trim()=="") ? args[2].split(' ') : [] : []
 		};
 		if (!Command.checkSalons(msg,data.salons)) return false;
-		query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
+		query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(data)+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop created with success!');
 		});
 	});
@@ -642,7 +639,6 @@ new Command('shop_update_salons', function(msg,args) {
 			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
 			return;
 		}
-		console.log(rows[0].data);
 		var data = JSON.parse(rows[0].data);
 		data.salons = (args[1].trim()=="") ? args[1].split(' ') : [];
 		if (!Command.checkSalons(msg,data.salons)) return false;
