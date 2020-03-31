@@ -906,12 +906,39 @@ new Command('item_list', function(msg,args) {
 			if (rows.length==0) {
 				msg.reply('There are no Items!');
 			} else {
-				msg.author.send('• **'+rows.join('\n• **'));
+				var rows2 = [];
+				for (var i = 0; i < rows.length; i++) {
+					rows2.push(rows[i].name);
+				}
+				msg.author.send('• **'+rows2.join('\n• **'));
 				msg.reply('I sent you the list of items!');
 			}
 		});
 	} else {
-		
+		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			if (rows.length==0) {
+				msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+				return;
+			}
+			query('SELECT name FROM items',function(err,rows) {
+				if (rows.length==0) {
+					msg.reply('There are no Items!');
+				} else {
+					var rows2 = [];
+					for (var i = 0; i < rows.length; i++) {
+						var data = JSON.parse(rows[i].data);
+						for (var j = 0; j < data.shops.length; j++) {
+							if (data.shops[j]==args[0]) {
+								rows2.push(rows[i].name);
+								break;
+							}
+						}
+					}
+					msg.author.send('• **'+rows2.join('\n• **'));
+					msg.reply('I sent you the list of items!');
+				}
+			});
+		});
 	}
 });
 // CITOYEN
