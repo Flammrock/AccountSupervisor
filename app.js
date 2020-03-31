@@ -752,8 +752,8 @@ new Command('item_view', function(msg,args) {
 			msg.channel.send(_embed);
 		} else {
 			var data = JSON.parse(rows[0].data);
-			var data.inventory = data.inventory || {};
-			var data.inventory.items = data.inventory.items || {};
+			data.inventory = data.inventory || {};
+			data.inventory.items = data.inventory.items || {};
 			var items = [];
 			for (var i in data.inventory.items) {
 				if (data.inventory.items.hasOwnProperty(i)) {
