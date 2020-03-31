@@ -131,13 +131,16 @@ class Command {
 	}
 	
 	static checkSalons(msg,salonslist) {
+		console.log('???????2');
 		var test = /<#(\d+)>/;
 		for (var i = 0; i < salonslist.length; i++) {
 			if (salonslist[i].match(test)!=null) {
+				console.log('???___?____???_____');
 				if (msg.guild.channels.exists('id', salonslist[i].match(test)[1])) {
 					continue;
 				}
 			}
+			console.log('?????AZADEFRTHYJUKH?GFBVD??789652');
 			msg.reply('Sorry `'+salonslist[i]+'` doesn\'t exist :cold_sweat:');
 			return false;
 		}
@@ -639,6 +642,7 @@ new Command('shop_update_salons', function(msg,args) {
 			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
 			return;
 		}
+		console.log('???????');
 		var data = JSON.parse(rows[0].data);
 		data.salons = (args[1].trim()=="") ? args[1].split(' ') : [];
 		if (!Command.checkSalons(msg,data.salons)) return false;
