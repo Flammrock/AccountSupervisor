@@ -733,9 +733,6 @@ new Command('item_view', function(msg,args) {
 	}
 	id = id[1];
 	
-	
-	console.log(msg.guild.members.get("id", id));
-	
 	if (!msg.guild.members.cache.find(r => r.id == id)) {
 		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
