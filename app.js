@@ -615,6 +615,7 @@ new Command('item_create', function(msg,args) {
 	// ARGS :
 	//    - Item Name
 	//    - Price
+	//    - Shops
 	//    - Type
 	//    - Image
 	//    - Description
@@ -625,11 +626,107 @@ new Command('item_create', function(msg,args) {
 		}
 		var data = {};
 		data.price = (args.length >= 2) ? (parseFloat(args[1]) || 0.0) : 0.0;
-		data.type = (args.length >= 3) ? args[2] : '';
-		data.image = (args.length >= 4) ? args[3] : '';
-		data.description = (args.length >= 5) ? args[4] : 'No Description';
+		data.shops = (args.length >= 3) ? args[2].split(' ') : [];
+		data.type = (args.length >= 4) ? args[3] : '';
+		data.image = (args.length >= 5) ? args[4] : '';
+		data.description = (args.length >= 6) ? args[5] : 'No Description';
 		query('INSERT INTO items(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Item created with success!');
+		});
+	});
+});
+// ADMIN
+new Command('item_update_price', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
+	// ARGS :
+	//    - Item Name
+	//    - Price
+	query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		data.price = (parseFloat(args[1]) || 0.0) : 0.0;
+		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Item updated with success!');
+		});
+	});
+});
+// ADMIN
+new Command('item_update_shops', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
+	// ARGS :
+	//    - Item Name
+	//    - Shops
+	query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		data.shops = args[1].split(' ') : [];
+		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Item updated with success!');
+		});
+	});
+});
+// ADMIN
+new Command('item_update_type', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
+	// ARGS :
+	//    - Item Name
+	//    - Type
+	query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		data.type = args[1] : '';
+		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Item updated with success!');
+		});
+	});
+});
+// ADMIN
+new Command('item_update_image', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
+	// ARGS :
+	//    - Item Name
+	//    - Image
+	query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		data.image = args[1] : '';
+		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Item updated with success!');
+		});
+	});
+});
+// ADMIN
+new Command('item_update_desciption', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
+	// ARGS :
+	//    - Item Name
+	//    - Description
+	query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		data.description = args[1] : 'No Description';
+		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Item updated with success!');
 		});
 	});
 });
@@ -718,7 +815,7 @@ new Command('item_remove', function(msg,args) {
 	Command.List['item_give']._fn(msg,args,true);
 });
 // ADMIN
-new Command('item_view', function(msg,args) {
+new Command('inventory_item_view', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -742,6 +839,9 @@ new Command('item_view', function(msg,args) {
 	
 	var Max_Item = 10;
 	var page = (args.length >= 2) ? (parseInt(args[1]) || 1) : 1;
+	if (page < 1) {
+		page = 1;
+	}
 	
 	query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 		if (rows.length==0) {
@@ -797,7 +897,41 @@ new Command('item_list', function(msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	// ARGS :
 	//    - Optional: Shop Name
+	if (args.length==0) {
+		query('SELECT name FROM items',function(err,rows) {
+			if (rows.length==0) {
+				msg.reply('There are no Items!');
+			} else {
+				msg.author.send('• **'+rows.join('\n• **'));
+				msg.reply('I sent you the list of items!');
+			}
+		});
+	} else {
+		
+	}
 });
+// CITOYEN
+new Command('item_view', function(msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 1) return;
+	// ARGS :
+	//    - Item Name
+	query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		var _embed = new Discord.MessageEmbed()
+			.setTitle('Item '+args[0])
+			.setColor(0xff0000)
+			.setDescription('**PRICE**: '+data.price+'\n**SHOPS**: '+data.shop.join(', ')+'\n**TYPE**: '+data.type+'\n**Image**: '+data.image+'\n**Description**: '+data.description);
+		msg.channel.send(_embed);
+	});
+});
+
+
+
 
 // SHOP
 
