@@ -1126,7 +1126,7 @@ new Command('item_pay', function(msg,args) {
 						if ((parseFloat(userdata.money) || 0.0) < Math.abs(parseFloat(data.price) || 0.0)) {
 							msg.reply('Sorry, you haven\'t enought money :cold_sweat:');
 						} else {
-							userdata.money = ((parseFloat(userdata.money) || 0.0) - Math.abs(parseFloat(data.price) || 0.0);
+							userdata.money = (parseFloat(userdata.money) || 0.0) - Math.abs(parseFloat(data.price) || 0.0);
 							userdata.inventory = userdata.inventory || {};
 							userdata.inventory.items = userdata.inventory.items || {};
 							if (typeof userdata.inventory.items[escape_mysql(args[1])] === 'undefined') {
