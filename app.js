@@ -720,12 +720,13 @@ new Command('item_remove', function(msg,args) {
 // ADMIN
 new Command('item_view', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	console.log(args.length);
 	if (args.length < 2) return;
 	// ARGS :
 	//    - Item Name
 	//    - User id
 	//    - Optional: page number
-	console.log(args);
+	
 	const embed = new Discord.MessageEmbed()
       // Set the title of the field
       .setTitle('Inventory of '+args[1])
