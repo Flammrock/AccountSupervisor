@@ -924,7 +924,7 @@ new Command('item_list', function(msg,args) {
 				msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
 				return;
 			}
-			query('SELECT name FROM items',function(err,rows) {
+			query('SELECT * FROM items',function(err,rows) {
 				if (rows.length==0) {
 					msg.reply('There are no Items!');
 				} else {
