@@ -939,7 +939,7 @@ new Command('item_list', function(msg,args) {
 						}
 					}
 					var _embed = new Discord.MessageEmbed()
-					  .setTitle('List Of Items')
+					  .setTitle('List Of Items in the Shop '+args[0])
 					  .setColor(0xff0000)
 					  .setDescription('• **'+rows2.join('**\n• **')+'**');
 					msg.author.send(_embed);
@@ -1064,13 +1064,86 @@ new Command('item_pay', function(msg,args) {
 	// ARGS :
 	//     - Shop Name
 	//     - Item ID
+	//     - Optional: Bank Name
+	var id = msg.member.user.id+'';
+	var f = function(){
+		msg.reply('You buy the `'+args[1]+'` Item in the `'+args[0]+'` Shop with Success!');
+	};
 	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
 			return;
 		}
-		var data = JSON.parse(rows[0].data);
-		
+		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
+			if (rows.length==0) {
+				msg.reply('Sorry, `'+args[1]+'` Item doesn\'t exist :cold_sweat:');
+				return;
+			}
+			var data = JSON.parse(rows[0].data);
+			var isin = false;
+			for (var i = 0; i < data.shops.length; i++) {
+				if (data.shops[i]==args[0]) {
+					isin = true;
+					break;
+				}
+			}
+			if (isin) {
+				query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
+					if (rows.length==0) {
+						msg.reply('Sorry, you haven\'t enought money :cold_sweat:');
+						return;
+					}
+					var userdata = JSON.parse(rows[0].data);
+					if (args.length >= 2) {
+						query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[2])+'\'',function(err,rows){
+							if (rows.length==0) {
+								msg.reply('Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
+								return;
+							}
+							userdata.bank = userdata.bank || {};
+							if (typeof userdata.bank[escape_mysql(args[2])] === 'undefined') {
+								msg.reply('Sorry, you don\'t have a `'+args[2]+'` Bank account!');
+							} else {
+								if ((parseFloat(userdata.bank[escape_mysql(args[2])]) || 0.0) < Math.abs(parseFloat(data.price) || 0.0)) {
+									msg.reply('Sorry, you haven\'t enought money :cold_sweat:');
+								} else {
+									userdata.bank[escape_mysql(args[2])] = (parseFloat(userdata.bank[escape_mysql(args[2])]) || 0.0) - Math.abs(parseFloat(data.price) || 0.0);
+									userdata.inventory = userdata.inventory || {};
+									userdata.inventory.items = userdata.inventory.items || {};
+									if (typeof userdata.inventory.items[escape_mysql(args[1])] === 'undefined') {
+										userdata.inventory.items[escape_mysql(args[1])] = 1
+									} else {
+										userdata.inventory.items[escape_mysql(args[1])] = (parseInt(userdata.inventory.items[escape_mysql(args[1])]) || 0) + 1;
+									}
+									query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
+										f();
+									});
+								}
+							}
+						});
+					} else {
+						userdata.money = parseFloat(userdata.money) || 0.0;
+						if ((parseFloat(userdata.money) || 0.0) < Math.abs(parseFloat(data.price) || 0.0)) {
+							msg.reply('Sorry, you haven\'t enought money :cold_sweat:');
+						} else {
+							userdata.money = ((parseFloat(userdata.money) || 0.0) - Math.abs(parseFloat(data.price) || 0.0);
+							userdata.inventory = userdata.inventory || {};
+							userdata.inventory.items = userdata.inventory.items || {};
+							if (typeof userdata.inventory.items[escape_mysql(args[1])] === 'undefined') {
+								userdata.inventory.items[escape_mysql(args[1])] = 1
+							} else {
+								userdata.inventory.items[escape_mysql(args[1])] = (parseInt(userdata.inventory.items[escape_mysql(args[1])]) || 0) + 1;
+							}
+							query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
+								f();
+							});
+						}
+					}
+				});
+			} else {
+				msg.reply('Sorry, `'+args[1]+'` Item isn\'t in the `'+args[0]+'` Shop :cold_sweat:');
+			}
+		});
 	});
 });
 // THIEF
