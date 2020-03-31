@@ -139,11 +139,17 @@ class Command {
 	static checkSalons(msg,salonslist) {
 		var test = /<#(\d+)>/;
 		for (var i = 0; i < salonslist.length; i++) {
+			console.log(salonslist[i].match(test)[1]);
 			if (salonslist[i].match(test)!=null) {
+				try {
+					console.log(msg.guild.channels);
+					console.log('============================');
+					console.log(msg.guild.channels.cache);
 				if (typeof msg.guild.channels.cache[salonslist[i].match(test)[1]] !== 'undefined') {
 					console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKKK');
 					continue;
 				}
+				} catch (e) {console.log(e.toString());}
 			}
 			msg.reply('Sorry `'+salonslist[i]+'` doesn\'t exist :cold_sweat:');
 			return false;
