@@ -1249,30 +1249,24 @@ new Command('shop_delete_all_items_associed_with', function(msg,args) {
 	var f = function() {
 		msg.reply('All Items in `'+args[0]+'` Shop deleted!');
 	};
-	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM items',function(err,rows) {
 		if (rows.length==0) {
-			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
-			return;
-		}
-		query('SELECT * FROM items',function(err,rows) {
-			if (rows.length==0) {
-				f();
-			} else {
-				var rows2 = [];
-				for (var i = 0; i < rows.length; i++) {
-					var data = JSON.parse(rows[i].data);
-					for (var j = 0; j < data.shops.length; j++) {
-						if (data.shops[j]==args[0]) {
-							rows2.push(rows[i].name);
-							break;
-						}
+			f();
+		} else {
+			var rows2 = [];
+			for (var i = 0; i < rows.length; i++) {
+				var data = JSON.parse(rows[i].data);
+				for (var j = 0; j < data.shops.length; j++) {
+					if (data.shops[j]==args[0]) {
+						rows2.push(rows[i].name);
+						break;
 					}
 				}
-				query('DELETE FROM shop WHERE name=\''+rows2.join('\';DELETE FROM shop WHERE name=\'')+'\';',function(err,rows) {
-					f();
-				});
 			}
-		});
+			query('DELETE FROM shop WHERE name=\''+rows2.join('\' OR name=\'')+'\'',function(err,rows) {
+				f();
+			});
+		}
 	});
 });
 
