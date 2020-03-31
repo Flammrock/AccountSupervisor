@@ -736,8 +736,8 @@ new Command('item_view', function(msg,args) {
 	id = id[1];
 	
 	
-	console.log(msg.guild.members.get("id", id));
-	console.log(msg.guild.members.get("id", parseInt(id));
+	console.log(msg.guild.members.get("id", id)));
+	console.log(msg.guild.members.get("id", parseInt(id)));
 	
 	var _embed = new Discord.MessageEmbed()
       .setTitle('Inventory of '+name)
