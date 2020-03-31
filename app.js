@@ -77,6 +77,17 @@ query(`CREATE TABLE IF NOT EXISTS shop (
   console.log('TABLE CREATED!');
 });
 
+query(`CREATE TABLE IF NOT EXISTS items (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  name varchar(50),
+  data text,
+  PRIMARY KEY (id)
+) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
+  if(err) throw err;
+
+  console.log('TABLE CREATED!');
+});
+
 
 //////////////////////////////////////
 //           COMMAND BOT            //
@@ -107,7 +118,7 @@ class Command {
 				}
 				break;
 			case 'CITOYEN':
-				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorCitoyen") || msg.member.hasPermission("ADMINISTRATOR"))) {
+				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.roles.cache.some(r => r.name === "AccountSupervisorCitoyen") || msg.member.hasPermission("ADMINISTRATOR"))) {
 					msg.delete();
 					msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
 					return false;
@@ -571,13 +582,15 @@ new Command('shop_create', function(msg,args) {
 	// ARGS :
 	//    - Shop Name
 	//    - Optional: Salons Available
+	//    - Optional: Need Item Type for access
 	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length > 0) {
 			msg.reply('Sorry, `'+args[0]+'` Shop is already created :cold_sweat:');
 			return;
 		}
 		var data = {
-			salons: (args.length >= 2) ? (args[1].trim()=="") ? args[1].split(' ') : [] : []
+			salons: (args.length >= 2) ? (args[1].trim()=="") ? args[1].split(' ') : [] : [],
+			need: (args.length >= 3) ? (args[2].trim()=="") ? args[2].split(' ') : [] : []
 		};
 		query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop created with success!');
@@ -601,7 +614,7 @@ new Command('shop_delete', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('shop_update', function(msg,args) {
+new Command('shop_update_salons', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -619,12 +632,41 @@ new Command('shop_update', function(msg,args) {
 		});
 	});
 });
+// ADMIN
+new Command('shop_update_need', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
+	// ARGS :
+	//    - Shop Name
+	//    - Salons Available
+	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		data.need = (args[1].trim()=="") ? args[1].split(' ') : [];
+		query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Shop updated with success!');
+		});
+	});
+});
 
 // CITOYEN
 new Command('item_pay', function(msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 2) return;
 	// ARGS :
 	//     - Shop Name
 	//     - Item ID
+	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		
+	});
 });
 // THIEF
 new Command('item_steal', function(msg,args) {
@@ -658,6 +700,7 @@ bot.on('ready', () => {
 
 bot.on('message', msg => {
 	try {
+		console.log(msg.channel.id, msg.content);
 		var role_admin = false;
 		var role_citoyen = false;
 		msg.guild.roles.cache.forEach(role => {
