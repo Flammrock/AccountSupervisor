@@ -1194,7 +1194,7 @@ new Command('shop_delete', function(msg,args) {
 			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
 			return;
 		}
-		query('DELETE FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		query('DELETE FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop deleted with success!');
 		});
 	});
