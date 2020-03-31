@@ -37,7 +37,7 @@ function query(SQL,fn) {
 				try {
 					fn(err,rows);
 					connection.end();return;
-				} catch (e) {connection.end();return;}
+				} catch (e) {connection.end();console.log(e);return;}
 			});
 		} else {
 			console.log('Mysql: Connected!');
