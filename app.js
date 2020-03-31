@@ -725,9 +725,10 @@ new Command('item_view', function(msg,args) {
 	//    - Item Name
 	//    - User id
 	//    - Optional: page number
+	console.log(args);
 	const embed = new Discord.MessageEmbed()
       // Set the title of the field
-      .setTitle('A slick little embed')
+      .setTitle('Inventory of '+args[1])
       // Set the color of the embed
       .setColor(0xff0000)
       // Set the main content of the embed
