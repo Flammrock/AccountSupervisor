@@ -1069,6 +1069,7 @@ new Command('item_pay', function(msg,args) {
 	var f = function(){
 		msg.reply('You buy the `'+args[1]+'` Item in the `'+args[0]+'` Shop with Success!');
 	};
+	console.log('CHANNNNNELLLLL IDDD::::::',msg.channel.id);
 	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
