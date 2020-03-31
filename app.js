@@ -177,6 +177,7 @@ class ParserCommand {
 	}
 	
 	parse() {
+		var _this = this;
 		this.name = "";
 		this.args = [];
 		var i1 = this.rawdata.indexOf(' ');
@@ -184,7 +185,7 @@ class ParserCommand {
 			this.name = this.rawdata.substring(1,i1);
 			this.args = [];
 			this.rawdata.substring(i1+1).replace(/"[^"]*"|[^ ]+/g,function(m){
-				this.args.push(m.match(/^"?([^"]*)"?/)[1]);
+				_this.args.push(m.match(/^"?([^"]*)"?/)[1]);
 				return m;
 			});
 		} else {
