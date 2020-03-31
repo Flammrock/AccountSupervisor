@@ -908,9 +908,10 @@ new Command('item_list', function(msg,args) {
 			} else {
 				var rows2 = [];
 				for (var i = 0; i < rows.length; i++) {
-					rows2.push(rows[i].name);
+					var h = rows[i].name.substring(rows[i].name.indexOf('_')).indexOf('_');
+					rows2.push(rows[i].name.substring(h));
 				}
-				msg.author.send('• **'+rows2.join('\n• **'));
+				msg.author.send('• **'+rows2.join('**\n• **')+'**');
 				msg.reply('I sent you the list of items!');
 			}
 		});
@@ -929,12 +930,13 @@ new Command('item_list', function(msg,args) {
 						var data = JSON.parse(rows[i].data);
 						for (var j = 0; j < data.shops.length; j++) {
 							if (data.shops[j]==args[0]) {
-								rows2.push(rows[i].name);
+								var h = rows[i].name.substring(rows[i].name.indexOf('_')).indexOf('_');
+								rows2.push(rows[i].name.substring(h));
 								break;
 							}
 						}
 					}
-					msg.author.send('• **'+rows2.join('\n• **'));
+					msg.author.send('• **'+rows2.join('**\n• **')+'**');
 					msg.reply('I sent you the list of items!');
 				}
 			});
