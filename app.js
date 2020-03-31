@@ -577,7 +577,7 @@ new Command('shop_create', function(msg,args) {
 			return;
 		}
 		var data = {
-			salons: (args.length >= 2) ? (args[1].trim()=="") ? args[1].split(' ') : [] : [];
+			salons: (args.length >= 2) ? (args[1].trim()=="") ? args[1].split(' ') : [] : []
 		};
 		query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop created with success!');
