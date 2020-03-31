@@ -44,8 +44,7 @@ function query(SQL,fn) {
 function escape_mysql(s) {return s.replace(/'/g,"''");}
 query();
 
-/*
-connection.query(`CREATE TABLE users (
+connection.query(`CREATE TABLE IF NOT EXISTS users (
   id int(11) NOT NULL AUTO_INCREMENT,
   name varchar(50),
   data text,
@@ -54,9 +53,9 @@ connection.query(`CREATE TABLE users (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});*/
-/*
-connection.query(`CREATE TABLE bank (
+});
+
+connection.query(`CREATE TABLE IF NOT EXISTS bank (
   id int(11) NOT NULL AUTO_INCREMENT,
   name varchar(50),
   data text,
@@ -65,7 +64,18 @@ connection.query(`CREATE TABLE bank (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});*/
+});
+
+connection.query(`CREATE TABLE IF NOT EXISTS shop (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  name varchar(50),
+  data text,
+  PRIMARY KEY (id)
+) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
+  if(err) throw err;
+
+  console.log('TABLE CREATED!');
+});
 
 
 //////////////////////////////////////
