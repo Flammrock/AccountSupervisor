@@ -720,22 +720,31 @@ new Command('item_remove', function(msg,args) {
 // ADMIN
 new Command('item_view', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	console.log(args.length);
 	if (args.length < 2) return;
 	// ARGS :
 	//    - Item Name
 	//    - User id
 	//    - Optional: page number
 	
-	const embed = new Discord.MessageEmbed()
-      // Set the title of the field
-      .setTitle('Inventory of '+args[1])
-      // Set the color of the embed
+	var name = msg.author.username + msg.author.discriminator;
+	
+	var id = args[1].match(/<@!?(\d+)>/);
+	if (id==null) {
+		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	id = id[1];
+	
+	
+	console.log(msg.guild.members.get("id", id));
+	console.log(msg.guild.members.get("id", parseInt(id));
+	
+	var _embed = new Discord.MessageEmbed()
+      .setTitle('Inventory of '+name)
       .setColor(0xff0000)
-      // Set the main content of the embed
       .setDescription('Hello, this is a slick embed!');
-    // Send the embed to the same channel as the message
-    msg.channel.send(embed);
+	  
+    msg.channel.send(_embed);
 });
 
 // CITOYEN
