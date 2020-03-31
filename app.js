@@ -138,9 +138,7 @@ class Command {
 	
 	static checkSalons(msg,salonslist) {
 		var test = /<#(\d+)>/;
-		console.log(salonslist.length,'!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 		for (var i = 0; i < salonslist.length; i++) {
-			console.log(salonslist[i].match(test)[1]);
 			if (salonslist[i].match(test)!=null) {
 				if (msg.guild.channels.exists('id', salonslist[i].match(test)[1])) {
 					continue;
@@ -610,8 +608,8 @@ new Command('shop_create', function(msg,args) {
 			return;
 		}
 		var data = {
-			salons: (args.length >= 2) ? (args[1].trim()=="") ? args[1].split(' ') : [] : [],
-			need: (args.length >= 3) ? (args[2].trim()=="") ? args[2].split(' ') : [] : []
+			salons: (args.length >= 2) ? (args[1].trim()!="") ? args[1].split(' ') : [] : [],
+			need: (args.length >= 3) ? (args[2].trim()!="") ? args[2].split(' ') : [] : []
 		};
 		if (!Command.checkSalons(msg,data.salons)) return false;
 		query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
@@ -648,9 +646,7 @@ new Command('shop_update_salons', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		console.log('ARGUMENT::::::::',args[1],args[1].split(' '));
-		data.salons = (args[1].trim()=="") ? args[1].split(' ') : [];
-		console.log(data.salons,'§§§§§§§§§§§');
+		data.salons = (args[1].trim()!="") ? args[1].split(' ') : [];
 		if (!Command.checkSalons(msg,data.salons)) return false;
 		query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop updated with success!');
@@ -670,7 +666,7 @@ new Command('shop_update_need', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		data.need = (args[1].trim()=="") ? args[1].split(' ') : [];
+		data.need = (args[1].trim()!="") ? args[1].split(' ') : [];
 		query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop updated with success!');
 		});
