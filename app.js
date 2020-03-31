@@ -908,8 +908,7 @@ new Command('item_list', function(msg,args) {
 			} else {
 				var rows2 = [];
 				for (var i = 0; i < rows.length; i++) {
-					var h = rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_');
-					rows2.push(rows[i].name.substring(h+1));
+					rows2.push(rows[i].name.substring(rows[i].name.indexOf('_')+1).substring(rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_')+1));
 				}
 				var _embed = new Discord.MessageEmbed()
 				  .setTitle('List Of Items')
@@ -934,8 +933,7 @@ new Command('item_list', function(msg,args) {
 						var data = JSON.parse(rows[i].data);
 						for (var j = 0; j < data.shops.length; j++) {
 							if (data.shops[j]==args[0]) {
-								var h = rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_');
-								rows2.push(rows[i].name.substring(h+1));
+								rows2.push(rows[i].name.substring(rows[i].name.indexOf('_')+1).substring(rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_')+1));
 								break;
 							}
 						}
