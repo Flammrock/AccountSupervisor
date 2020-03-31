@@ -644,6 +644,7 @@ new Command('shop_update_salons', function(msg,args) {
 		var data = JSON.parse(rows[0].data);
 		console.log('ARGUMENT::::::::',args[1],args[1].split(' '));
 		data.salons = (args[1].trim()=="") ? args[1].split(' ') : [];
+		console.log(data.salons.length,'§§§§§§§§§§§');
 		if (!Command.checkSalons(msg,data.salons)) return false;
 		query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop updated with success!');
