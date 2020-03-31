@@ -1069,11 +1069,35 @@ new Command('item_pay', function(msg,args) {
 	var f = function(){
 		msg.reply('You buy the `'+args[1]+'` Item in the `'+args[0]+'` Shop with Success!');
 	};
-	console.log('CHANNNNNELLLLL IDDD::::::',msg.channel.id);
+	var chan = '<#'+msg.channel.id+'>';
 	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
 			return;
+		}
+		var tempdata = JSON.parse(rows[0].data);
+		data.web = typeof data.web !== 'undefined' ? data.web : true;
+		if (data.salons.length==0) {
+			if (data.web) {
+				msg.reply('Sorry, `'+args[0]+'` Shop is only accessible through the web :cold_sweat:\nLink to the online shop: https://accountsupervisorwebinterface.herokuapp.com/guild/'+msg.guild.id+'/shop/'+encodeURIComponent(args[0]));
+			} else {
+				msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+			}
+			return;
+		} else {
+			var okisin = false;
+			for (var u = 0; u < data.salons.length; u++) {
+				if (data.salons[u]==chan) {
+					okisin = true;
+					break;
+				}
+			}
+			if (!okisin) {
+				msg.reply('Sorry, `'+args[0]+'` Shop is only accessible on this salons: '+data.salons.join(', '));
+				if (data.web) {
+					msg.channel.send('However, `'+args[0]+'` Shop is accessible through the web\nLink to the online shop: https://accountsupervisorwebinterface.herokuapp.com/guild/'+msg.guild.id+'/shop/'+encodeURIComponent(args[0]));
+				}
+			}
 		}
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
 			if (rows.length==0) {
