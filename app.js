@@ -908,10 +908,14 @@ new Command('item_list', function(msg,args) {
 			} else {
 				var rows2 = [];
 				for (var i = 0; i < rows.length; i++) {
-					var h = rows[i].name.substring(rows[i].name.indexOf('_')).indexOf('_');
-					rows2.push(rows[i].name.substring(h));
+					var h = rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_');
+					rows2.push(rows[i].name.substring(h+1));
 				}
-				msg.author.send('• **'+rows2.join('**\n• **')+'**');
+				var _embed = new Discord.MessageEmbed()
+				  .setTitle('List Of Items')
+				  .setColor(0xff0000)
+				  .setDescription('• **'+rows2.join('**\n• **')+'**');
+				msg.author.send(_embed);
 				msg.reply('I sent you the list of items!');
 			}
 		});
@@ -930,13 +934,17 @@ new Command('item_list', function(msg,args) {
 						var data = JSON.parse(rows[i].data);
 						for (var j = 0; j < data.shops.length; j++) {
 							if (data.shops[j]==args[0]) {
-								var h = rows[i].name.substring(rows[i].name.indexOf('_')).indexOf('_');
-								rows2.push(rows[i].name.substring(h));
+								var h = rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_');
+								rows2.push(rows[i].name.substring(h+1));
 								break;
 							}
 						}
 					}
-					msg.author.send('• **'+rows2.join('**\n• **')+'**');
+					var _embed = new Discord.MessageEmbed()
+					  .setTitle('List Of Items')
+					  .setColor(0xff0000)
+					  .setDescription('• **'+rows2.join('**\n• **')+'**');
+					msg.author.send(_embed);
 					msg.reply('I sent you the list of items!');
 				}
 			});
