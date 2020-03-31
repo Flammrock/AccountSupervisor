@@ -142,10 +142,10 @@ class Command {
 			console.log(salonslist[i].match(test)[1]);
 			if (salonslist[i].match(test)!=null) {
 				try {
-					console.log(msg.guild.channels);
-					console.log('============================');
-					console.log(msg.guild.channels.cache);
-				if (typeof msg.guild.channels.cache[salonslist[i].match(test)[1]] !== 'undefined') {
+					//console.log(msg.guild.channels);
+					//console.log('============================');
+					//console.log(msg.guild.channels.cache);
+				if (msg.guild.channels.cache.find(r => r.id == [salonslist[i].match(test)[1]])) {
 					console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKKK');
 					continue;
 				}
