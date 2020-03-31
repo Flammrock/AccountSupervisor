@@ -642,7 +642,7 @@ new Command('shop_update_salons', function(msg,args) {
 			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
 			return;
 		}
-		console.log('???????');
+		console.log(rows[0].data);
 		var data = JSON.parse(rows[0].data);
 		data.salons = (args[1].trim()=="") ? args[1].split(' ') : [];
 		if (!Command.checkSalons(msg,data.salons)) return false;
