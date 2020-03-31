@@ -624,7 +624,7 @@ new Command('item_create', function(msg,args) {
 			return;
 		}
 		var data = {};
-		data.price = (args.length >= 2) ? ((parseFloat(args[1]) || 0.0) : 0.0;
+		data.price = (args.length >= 2) ? (parseFloat(args[1]) || 0.0) : 0.0;
 		data.type = (args.length >= 3) ? args[2] : '';
 		data.image = (args.length >= 4) ? args[3] : '';
 		data.description = (args.length >= 5) ? args[4] : 'No Description';
