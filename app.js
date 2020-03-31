@@ -737,9 +737,8 @@ new Command('item_view', function(msg,args) {
 		return;
 	}
 	
-	var user = msg.guild.members.cache.find(r => r.id == id);
-	console.log(user);
-	var name = user.nickname;
+	var user = msg.guild.members.cache.find(r => r.id == id).user;
+	var name = user.username + user.discriminator;
 	
 	
 	var _embed = new Discord.MessageEmbed()
