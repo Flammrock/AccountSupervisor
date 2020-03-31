@@ -648,7 +648,7 @@ new Command('item_update_price', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		data.price = (parseFloat(args[1]) || 0.0) : 0.0;
+		data.price = (parseFloat(args[1]) || 0.0);
 		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Item updated with success!');
 		});
@@ -667,7 +667,7 @@ new Command('item_update_shops', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		data.shops = args[1].split(' ') : [];
+		data.shops = args[1].split(' ');
 		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Item updated with success!');
 		});
@@ -686,7 +686,7 @@ new Command('item_update_type', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		data.type = args[1] : '';
+		data.type = args[1];
 		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Item updated with success!');
 		});
@@ -705,7 +705,7 @@ new Command('item_update_image', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		data.image = args[1] : '';
+		data.image = args[1];
 		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Item updated with success!');
 		});
@@ -724,7 +724,7 @@ new Command('item_update_desciption', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		data.description = args[1] : 'No Description';
+		data.description = args[1];
 		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Item updated with success!');
 		});
