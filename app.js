@@ -139,8 +139,11 @@ class Command {
 	static checkSalons(msg,salonslist) {
 		var test = /<#(\d+)>/;
 		for (var i = 0; i < salonslist.length; i++) {
+			console.log(salonslist[i].match(test)[1]);
 			if (salonslist[i].match(test)!=null) {
+				console.log('???????????????');
 				if (msg.guild.channels.exists('id', salonslist[i].match(test)[1])) {
+					console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKKK');
 					continue;
 				}
 			}
@@ -647,6 +650,7 @@ new Command('shop_update_salons', function(msg,args) {
 		}
 		var data = JSON.parse(rows[0].data);
 		data.salons = (args[1].trim()!="") ? args[1].split(' ') : [];
+		console.log(data.salons);
 		if (!Command.checkSalons(msg,data.salons)) return false;
 		query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Shop updated with success!');
