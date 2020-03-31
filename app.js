@@ -611,7 +611,7 @@ new Command('get_money', function(msg,args) {
 // ADMIN
 new Command('item_create', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	if (args.length < 4) return;
+	if (args.length < 1) return;
 	// ARGS :
 	//    - Item Name
 	//    - Price
@@ -768,7 +768,7 @@ new Command('item_view', function(msg,args) {
 				msg.channel.send(_embed);
 			} else {
 				var _text = '';
-				for (var i=0+(page-1)*Max_Item; i < items.length && i < Max_Item; i++) {
+				for (var i=0+(page-1)*Max_Item; i < items.length && i < page*Max_Item; i++) {
 					_text += '**'+items[i].name+'**: '+items[i].data+' Quantity\n\n';
 				}
 				if (_text=='') {
