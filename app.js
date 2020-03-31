@@ -725,7 +725,7 @@ new Command('item_view', function(msg,args) {
 	//    - User id
 	//    - Optional: page number
 	
-	var id = args[1].match(/<@!?(\d+)>/);
+	var id = args[0].match(/<@!?(\d+)>/);
 	if (id==null) {
 		msg.reply('Sorry, User '+args[0]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
