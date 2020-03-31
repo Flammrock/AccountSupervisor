@@ -726,8 +726,6 @@ new Command('item_view', function(msg,args) {
 	//    - User id
 	//    - Optional: page number
 	
-	var name = msg.author.username + msg.author.discriminator;
-	
 	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
 		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
@@ -737,7 +735,15 @@ new Command('item_view', function(msg,args) {
 	
 	
 	console.log(msg.guild.members.get("id", id));
-	console.log(msg.guild.members.get("id", parseInt(id)));
+	
+	if (!msg.guild.members.cache.find(r => r.id == id)) {
+		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	
+	var user = msg.guild.members.cache.find(r => r.id == id);
+	var name = user.username + user.discriminator;
+	
 	
 	var _embed = new Discord.MessageEmbed()
       .setTitle('Inventory of '+name)
