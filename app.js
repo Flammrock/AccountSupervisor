@@ -720,26 +720,26 @@ new Command('item_remove', function(msg,args) {
 // ADMIN
 new Command('item_view', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	if (args.length < 2) return;
+	if (args.length < 1) return;
 	// ARGS :
-	//    - Item Name
 	//    - User id
 	//    - Optional: page number
 	
 	var id = args[1].match(/<@!?(\d+)>/);
 	if (id==null) {
-		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		msg.reply('Sorry, User '+args[0]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
 	}
 	id = id[1];
 	
 	if (!msg.guild.members.cache.find(r => r.id == id)) {
-		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		msg.reply('Sorry, User '+args[0]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
 		return;
 	}
 	
 	var user = msg.guild.members.cache.find(r => r.id == id);
-	var name = user.username + user.discriminator;
+	console.log(user);
+	var name = user.nickname;
 	
 	
 	var _embed = new Discord.MessageEmbed()
