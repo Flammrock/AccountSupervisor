@@ -566,27 +566,58 @@ new Command('get_money', function(msg,args) {
 
 // ADMIN
 new Command('shop_create', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 1) return;
 	// ARGS :
 	//    - Shop Name
-	//    - Salons Available
-	//    - File HTML
+	//    - Optional: Salons Available
+	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length > 0) {
+			msg.reply('Sorry, `'+args[0]+'` Shop is already created :cold_sweat:');
+			return;
+		}
+		var data = {
+			salons: (args.length >= 2) ? (args[1].trim()=="") ? args[1].split(' ') : [] : [];
+		};
+		query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
+			msg.reply('`'+args[0]+'` Shop created with success!');
+		});
+	});
 });
 // ADMIN
 new Command('shop_delete', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 1) return;
 	// ARGS :
 	//     - Shop Name
+	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+			return;
+		}
+		query('DELETE FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Shop deleted with success!');
+		});
+	});
 });
 // ADMIN
-new Command('shop_update_salons', function(msg,args) {
+new Command('shop_update', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
 	// ARGS :
 	//    - Shop Name
 	//    - Salons Available
-});
-// ADMIN
-new Command('shop_update_file', function(msg,args) {
-	// ARGS :
-	//    - Shop Name
-	//    - File HTML
+	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		data.salons = (args[1].trim()=="") ? args[1].split(' ') : [];
+		query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Shop updated with success!');
+		});
+	});
 });
 
 // CITOYEN
