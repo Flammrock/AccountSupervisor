@@ -1097,6 +1097,7 @@ new Command('item_pay', function(msg,args) {
 				if (tempdata.web) {
 					msg.channel.send('However, `'+args[0]+'` Shop is accessible through the web\nLink to the online shop: https://accountsupervisorwebinterface.herokuapp.com/guild/'+msg.guild.id+'/shop/'+encodeURIComponent(args[0]));
 				}
+				return;
 			}
 		}
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
