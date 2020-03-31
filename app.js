@@ -141,8 +141,7 @@ class Command {
 		for (var i = 0; i < salonslist.length; i++) {
 			console.log(salonslist[i].match(test)[1]);
 			if (salonslist[i].match(test)!=null) {
-				console.log('???????????????');
-				if (msg.guild.channels.exists('id', salonslist[i].match(test)[1])) {
+				if (msg.guild.channels.find(c => c.id == salonslist[i].match(test)[1])) {
 					console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKKK');
 					continue;
 				}
