@@ -628,8 +628,8 @@ new Command('item_create', function(msg,args) {
 		data.type = (args.length >= 3) ? args[2] : '';
 		data.image = (args.length >= 4) ? args[3] : '';
 		data.description = (args.length >= 5) ? args[4] : 'No Description';
-		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
-			msg.reply('`'+args[0]+'` Bank created with success!');
+		query('INSERT INTO items(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
+			msg.reply('`'+args[0]+'` Item created with success!');
 		});
 	});
 });
@@ -738,15 +738,58 @@ new Command('item_view', function(msg,args) {
 	}
 	
 	var user = msg.guild.members.cache.find(r => r.id == id).user;
-	var name = user.username + user.discriminator;
+	var name = user.username + '#' + user.discriminator;
+	
+	var Max_Item = 10;
+	var page = (args.length >= 2) ? (parseInt(args[1]) || 1) : 1;
+	
+	query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
+		if (rows.length==0) {
+			var _embed = new Discord.MessageEmbed()
+			  .setTitle('Inventory of '+name)
+			  .setColor(0xff0000)
+			  .setDescription('Empty Inventory :stuck_out_tongue_closed_eyes:');
+			msg.channel.send(_embed);
+		} else {
+			var data = JSON.parse(rows[0].data);
+			var data.inventory = data.inventory || {};
+			var data.inventory.items = data.inventory.items || {};
+			var items = [];
+			for (var i in data.inventory.items) {
+				if (data.inventory.items.hasOwnProperty(i)) {
+					items.push({name:i,data:data.inventory.items[i]});
+				}
+			}
+			if (items.length==0) {
+				var _embed = new Discord.MessageEmbed()
+				  .setTitle('Inventory of '+name)
+				  .setColor(0xff0000)
+				  .setDescription('Empty Inventory :stuck_out_tongue_closed_eyes:');
+				msg.channel.send(_embed);
+			} else {
+				var _text = '';
+				for (var i=0+(page-1)*Max_Item; i < items.length && i < Max_Item; i++) {
+					_text += '**'+items[i].name+'**: '+items[i].data+' Quantity\n\n';
+				}
+				if (_text=='') {
+					var _embed = new Discord.MessageEmbed()
+					  .setTitle('Inventory of '+name)
+					  .setColor(0xff0000)
+					  .setDescription('Page '+page+' doesn\'t exist :stuck_out_tongue_closed_eyes:');
+					msg.channel.send(_embed);
+					return;
+				}
+				_text += '*Page '+page+' of '+(Math.ceil(items.length/Max_Item))+'*';
+				var _embed = new Discord.MessageEmbed()
+					.setTitle('Inventory of '+name)
+					.setColor(0xff0000)
+					.setDescription(_text);
+				msg.channel.send(_embed);
+			}
+		}
+	});
 	
 	
-	var _embed = new Discord.MessageEmbed()
-      .setTitle('Inventory of '+name)
-      .setColor(0xff0000)
-      .setDescription('Hello, this is a slick embed!');
-	  
-    msg.channel.send(_embed);
 });
 
 // CITOYEN
