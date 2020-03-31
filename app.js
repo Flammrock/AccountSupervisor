@@ -134,6 +134,7 @@ class Command {
 		var test = /<#(\d+)>/;
 		for (var i = 0; i < salonslist.length; i++) {
 			if (salonslist[i].match(test)!=null) {
+				console.log(salonslist[i].match(test)[1], msg.guild.channels.exists('id', salonslist[i].match(test)[1]));
 				if (msg.guild.channels.exists('id', salonslist[i].match(test)[1])) {
 					continue;
 				}
