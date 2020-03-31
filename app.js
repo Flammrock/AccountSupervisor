@@ -925,7 +925,6 @@ new Command('item_view', function(msg,args) {
 			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
 			return;
 		}
-		try {
 		var data = JSON.parse(rows[0].data);
 		var _embed = new Discord.MessageEmbed()
 			.setTitle('Item '+args[0])
