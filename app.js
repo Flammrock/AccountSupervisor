@@ -309,7 +309,7 @@ new Command('company-create', function(msg,args) {
 				msg.reply('Sorry, `'+args[0]+'` Company-Shop is already created :cold_sweat:');
 				return;
 			}
-			Command.List['shop-create'].fn(msg,[
+			Command.List['shop-create']._fn(msg,[
 				args[0],
 				"",
 				"",
@@ -340,7 +340,7 @@ new Command('company-delete', function(msg,args) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 			return;
 		}
-		Command.List['shop-delete'].fn(msg,[args[0]]);
+		Command.List['shop-delete']._fn(msg,[args[0]]);
 		query('DELETE FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Company deleted with success!');
 		});
@@ -628,7 +628,7 @@ new Command('company-add-shop-website', function(msg,args) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 			return;
 		}
-		Command.List['shop-update-web'].fn(msg,[args[0],"true"]);
+		Command.List['shop-update-web']._fn(msg,[args[0],"true"]);
 	});
 });
 // ADMIN/CITOYEN+OWNER
@@ -648,7 +648,7 @@ new Command('company-remove-shop-website', function(msg,args) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 			return;
 		}
-		Command.List['shop-update-web'].fn(msg,[args[0],"false"]);
+		Command.List['shop-update-web']._fn(msg,[args[0],"false"]);
 	});
 });
 // ADMIN/CITOYEN+OWNER
@@ -681,7 +681,7 @@ new Command('company-create-item', function(msg,args) {
 		} else if (newargs.length>2) {
 			newargs[2] = shopname;
 		}
-		Command.List['item-create'].fn(msg,args);
+		Command.List['item-create']._fn(msg,args);
 	});
 });
 // ADMIN/CITOYEN+OWNER
@@ -719,7 +719,7 @@ new Command('company-delete-item', function(msg,args) {
 				msg.reply('Sorry, `'+args[0]+'` Item isn\'t created by the `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
-			Command.List['item-delete'].fn(msg,[args[1]]);
+			Command.List['item-delete']._fn(msg,[args[1]]);
 		});
 	});
 });
