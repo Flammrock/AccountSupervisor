@@ -676,6 +676,7 @@ new Command('company-create-item', function(msg,args) {
 		}
 		if (newargs.length==1) {
 			newargs.push("0.0");
+			newargs.push(shopname);
 		} else if (newargs.length==2) {
 			newargs.push(shopname);
 		} else if (newargs.length>2) {
