@@ -1291,7 +1291,7 @@ new Command('shop_create', function(msg,args) {
 			needType: (args.length >= 4) ? (args[3].trim()!="") ? args[3].split(' ') : [] : [],
 			needWeb: (args.length >= 5) ? (args[4].trim()!="") ? args[4].split(' ') : [] : [],
 			needWebType: (args.length >= 6) ? (args[5].trim()!="") ? args[5].split(' ') : [] : [],
-			web: (args.length >= 7) ? (args[6].trim()!="") ? args[5].toLowerCase()=="true" : false : true,
+			web: (args.length >= 7) ? (args[6].trim()!="") ? args[6].toLowerCase()=="true" : false : true,
 		};
 		if (!Command.checkSalons(msg,data.salons)) return false;
 		Command.checkItems(msg,data.need,function(){
@@ -1351,6 +1351,27 @@ new Command('shop_update_need', function(msg,args) {
 		}
 		var data = JSON.parse(rows[0].data);
 		data.need = (args[1].trim()!="") ? args[1].split(' ') : [];
+		Command.checkItems(msg,data.need,function(){
+			query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+				msg.reply('`'+args[0]+'` Shop updated with success!');
+			});
+		});
+	});
+});
+// ADMIN
+new Command('shop_update_web', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
+	// ARGS :
+	//    - Shop Name
+	//    - Web
+	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		data.web = (args[1].trim()!="") ? args[6].toLowerCase()=="true" : false;
 		Command.checkItems(msg,data.need,function(){
 			query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				msg.reply('`'+args[0]+'` Shop updated with success!');
