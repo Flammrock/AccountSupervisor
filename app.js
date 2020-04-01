@@ -364,7 +364,7 @@ new Command('character-select', function(msg,args) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 			return;
 		}
-		msg.member.setNickname(args[0]);
+		msg.member.user.setNickname(args[0]);
 		data.selected = 'selected_'+id;
 		query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Character selected with success!');
