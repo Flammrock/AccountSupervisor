@@ -1371,7 +1371,7 @@ new Command('shop_update_web', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		data.web = (args[1].trim()!="") ? args[6].toLowerCase()=="true" : false;
+		data.web = (args[1].trim()!="") ? args[1].toLowerCase()=="true" : false;
 		Command.checkItems(msg,data.need,function(){
 			query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				msg.reply('`'+args[0]+'` Shop updated with success!');
