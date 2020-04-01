@@ -339,7 +339,7 @@ new Command('character-delete', function(msg,args) {
 		}
 		var data = JSON.parse(rows[0].data);
 		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
-			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
+			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
 			return;
 		}
 		query('DELETE FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
@@ -361,23 +361,24 @@ new Command('character-select', function(msg,args) {
 		}
 		var data = JSON.parse(rows[0].data);
 		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
-			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
+			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
 			return;
 		}
-		console.log(args[0]);
-		msg.member.setNickname(args[0]);
+		msg.delete();
+		try {
+			msg.member.setNickname(args[0]);
+		} catch (e) {
+			msg.author.send('Your role is higher than mine so i can\'t change your nickname you have to do it yourself. (If you are the owner of the server, I cannot change your nickname at all)');
+		}
 		data.selected = 'selected_'+id;
 		query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-			msg.reply('`'+args[0]+'` Character selected with success!');
+			msg.author.send('`'+args[0]+'` Character selected with success!');
 		});
 	});
 });
 // CITOYEN+OWNER
 new Command('character-unselect', function(msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
-	if (args.length < 1) return;
-	// ARGS :
-	//    - Character Name
 	var id = msg.member.user.id+'';
 	query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
@@ -386,18 +387,92 @@ new Command('character-unselect', function(msg,args) {
 		}
 		var data = JSON.parse(rows[0].data);
 		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
-			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
+			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
 			return;
 		}
 		msg.member.setNickname('');
 		data.selected = null;
 		delete data.selected;
 		query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-			msg.reply('`'+args[0]+'` Character selected with success!');
+			msg.author.send('Character unselected with success!');
 		});
 	});
 });
-
+// CITOYEN
+new Command('character-list', function(msg,args) {
+	
+	var page = 1;
+	var d = true;
+	var id = msg.member.user.id+'';
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length >= 1) {
+		if (args[0].trim().substring(0,1)=='<') {
+			id = args[0].match(/<@!?(\d+)>/);
+			if (id==null) {
+				msg.reply('Sorry, User '+args[0]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+				return;
+			}
+			id = id[1];
+			page = (args.length >= 2) ? (parseInt(args[1]) || 1) : 1;
+		} else {
+			page = (args.length >= 1) ? (parseInt(args[0]) || 1) : 1;
+			d = false;
+		}
+	}
+	// ARGS :
+	//    - Optional: User id
+	//    - Optional: page number
+	
+	if (!msg.guild.members.cache.find(r => r.id == id)) {
+		msg.reply('Sorry, User '+args[0]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	
+	var duser = msg.guild.members.cache.find(r => r.id == id).user;
+	var dname = user.username + '#' + user.discriminator;
+	
+	var Max_Item = 10;
+	if (page < 1) {
+		page = 1;
+	}
+	
+	
+	query('SELECT * FROM characterdata',function(err,rows){
+		if (rows.length==0) {
+			var _embed = new Discord.MessageEmbed()
+			  .setTitle('List Of Characters')
+			  .setColor(0xff0000)
+			  .setDescription('No Character :stuck_out_tongue_closed_eyes:');
+			msg.channel.send(_embed);
+		} else {
+			var _text = '';
+			for (var i=0+(page-1)*Max_Item; i < rows.length && i < page*Max_Item; i++) {
+				var name = rows[i].name.substring(rows[i].name.indexOf('_')+1).substring(rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_')+1);
+				var data = JSON.parse(rows[i].data);
+				var user = msg.guild.members.cache.find(r => r.id == data.owner).user;
+				var nameu = user.username + '#' + user.discriminator;
+				if (d) {
+					if (data.owner!=id) continue;
+				}
+				_text += '**'+name+'**'+(d?'':(': '+nameu+'\n\n'));
+			}
+			if (_text=='') {
+				var _embed = new Discord.MessageEmbed()
+					.setTitle(d?('List Of Characters of '+dname):'List Of Characters')
+					.setColor(0xff0000)
+					.setDescription(page==1?'No Character :stuck_out_tongue_closed_eyes:':('Page '+page+' doesn\'t exist :stuck_out_tongue_closed_eyes:'));
+				msg.channel.send(_embed);
+				return;
+			}
+			_text += '*Page '+page+' of '+(Math.ceil(items.length/Max_Item))+'*';
+			var _embed = new Discord.MessageEmbed()
+				.setTitle(d?('List Of Characters of '+dname):'List Of Characters')
+				.setColor(0xff0000)
+				.setDescription(_text);
+			msg.channel.send(_embed);
+		}
+	});
+});
 
 // COMPANY
 // CITOYEN
