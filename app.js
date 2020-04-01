@@ -202,6 +202,23 @@ new Command('ping', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	msg.channel.send('pong');
 });
+// ADMIN
+new Command('all_reset_all', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	query('DELETE FROM users',function(err,rows1){
+		msg.reply('User System is reset!');
+	});
+	query('DELETE FROM bank',function(err,rows1){
+		msg.reply('Bank System is reset!');
+	});
+	query('DELETE FROM shop',function(err,rows1){
+		msg.reply('Shop System is reset!');
+	});
+	query('DELETE FROM items',function(err,rows1){
+		msg.reply('Item System is reset!');
+	});
+});
+
 
 
 // USER
