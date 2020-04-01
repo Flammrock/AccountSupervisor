@@ -127,7 +127,7 @@ query(`CREATE TABLE IF NOT EXISTS dataapp (
   console.log('TABLE CREATED!');
 });
 
-query(`CREATE TABLE IF NOT EXISTS character (
+query(`CREATE TABLE IF NOT EXISTS characterdata (
   id int(11) NOT NULL AUTO_INCREMENT,
   name varchar(50),
   data text,
@@ -312,7 +312,7 @@ new Command('character-create', function(msg,args) {
 		return;
 	}
 	id = id[1];
-	query('SELECT * FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length > 0) {
 			msg.reply('Sorry, `'+args[0]+'` Character is already created :cold_sweat:');
 			return;
@@ -332,7 +332,7 @@ new Command('character-delete', function(msg,args) {
 	// ARGS :
 	//    - Character Name
 	var id = msg.member.user.id+'';
-	query('SELECT * FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
 			return;
@@ -342,7 +342,7 @@ new Command('character-delete', function(msg,args) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 			return;
 		}
-		query('DELETE FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		query('DELETE FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Character deleted with success!');
 		});
 	});
@@ -354,7 +354,7 @@ new Command('character-select', function(msg,args) {
 	// ARGS :
 	//    - Character Name
 	var id = msg.member.user.id+'';
-	query('SELECT * FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
 			return;
@@ -366,7 +366,7 @@ new Command('character-select', function(msg,args) {
 		}
 		msg.member.setNickname(args[0]);
 		data.selected = 'selected_'+id;
-		query('UPDATE character SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Character selected with success!');
 		});
 	});
@@ -378,7 +378,7 @@ new Command('character-unselect', function(msg,args) {
 	// ARGS :
 	//    - Character Name
 	var id = msg.member.user.id+'';
-	query('SELECT * FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length==0) {
 			msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
 			return;
@@ -391,7 +391,7 @@ new Command('character-unselect', function(msg,args) {
 		msg.member.setNickname('');
 		data.selected = null;
 		delete data.selected;
-		query('UPDATE character SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Character selected with success!');
 		});
 	});
