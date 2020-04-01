@@ -402,7 +402,7 @@ new Command('character-unselect', function(msg,args) {
 new Command('character-list', function(msg,args) {
 	
 	var page = 1;
-	var d = true;
+	var d = false;
 	var id = msg.member.user.id+'';
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length >= 1) {
@@ -414,9 +414,9 @@ new Command('character-list', function(msg,args) {
 			}
 			id = id[1];
 			page = (args.length >= 2) ? (parseInt(args[1]) || 1) : 1;
+			d = true;
 		} else {
 			page = (args.length >= 1) ? (parseInt(args[0]) || 1) : 1;
-			d = false;
 		}
 	}
 	// ARGS :
@@ -456,7 +456,7 @@ new Command('character-list', function(msg,args) {
 					if (data.owner!=id) continue;
 				}
 				index++;
-				_text += '**'+name+'**'+(d?'':(': '+nameu+'\n\n'));
+				_text += '**'+name+'**'+(d?'\n\n':(': '+nameu+'\n\n'));
 			}
 			if (_text=='') {
 				var _embed = new Discord.MessageEmbed()
