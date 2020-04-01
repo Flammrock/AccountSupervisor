@@ -152,7 +152,7 @@ class Command {
 	}
 	
 	static checkItems(msg,itemsList,callback) {
-		if (itemsList.length==0) callback();
+		if (itemsList.length==0) {callback();return;}
 		for (var i = 0; i < itemsList.length; i++) {
 			itemsList[i] = escape_mysql(itemsList[i]);
 		}
@@ -1293,7 +1293,6 @@ new Command('shop_create', function(msg,args) {
 			needWebType: (args.length >= 6) ? (args[5].trim()!="") ? args[5].split(' ') : [] : [],
 			web: (args.length >= 7) ? (args[6].trim()!="") ? args[5].toLowerCase()=="true" : false : true,
 		};
-		console.log(data.need);
 		if (!Command.checkSalons(msg,data.salons)) return false;
 		Command.checkItems(msg,data.need,function(){
 			query('INSERT INTO shop(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
