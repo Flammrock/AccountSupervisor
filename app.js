@@ -245,7 +245,7 @@ new Command('bank_create', function(msg,args) {
 			return;
 		}
 		var data = {
-			moneyOnStart: args.length >= 2 ? (parseFloat(args[1]) || 0.0) : 0.0;
+			moneyOnStart: args.length >= 2 ? (parseFloat(args[1]) || 0.0) : 0.0
 		};
 		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Bank created with success!');
