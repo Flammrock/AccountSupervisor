@@ -235,16 +235,19 @@ new Command('user_reset_all', function(msg,args) {
 // ADMIN
 new Command('bank_create', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	if (args.length < 2) return;
+	if (args.length < 1) return;
 	// ARGS :
 	//    - Bank Name
-	//    - Amount Money On First Registration
+	//    - Optional: Amount Money On First Registration
 	query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length > 0) {
 			msg.reply('Sorry, `'+args[0]+'` Bank is already created :cold_sweat:');
 			return;
 		}
-		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(args[1])+'\')',function(err,rows){
+		var data = {
+			moneyOnStart: args.length >= 2 ? (parseFloat(args[1]) || 0.0) : 0.0;
+		};
+		query('INSERT INTO bank(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Bank created with success!');
 		});
 	});
