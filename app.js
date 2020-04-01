@@ -287,6 +287,28 @@ new Command('user-reset-all', function(msg,args) {
 });
 
 
+// CHARACTER
+// CITOYEN
+new Command('character-create', function(msg,args) {
+	
+});
+// CITOYEN+OWNER
+new Command('character-delete', function(msg,args) {
+	
+});
+// CITOYEN+OWNER
+new Command('character-select', function(msg,args) {
+	
+});
+// CITOYEN+OWNER
+new Command('character-speek', function(msg,args) {
+	
+});
+// CITOYEN+OWNER
+new Command('character-update-name', function(msg,args) {
+	
+});
+
 
 // COMPANY
 // CITOYEN
