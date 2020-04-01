@@ -429,12 +429,13 @@ new Command('company-send-request-job', function(msg,args) {
 		}
 		query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.reply('Sorry, `'+args[0]+'` Job doesn\'t exist :cold_sweat:');
+				msg.reply('Sorry, `'+args[1]+'` Job doesn\'t exist :cold_sweat:');
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
 			data.JobRequests = data.JobRequests || {};
 			data.JobRequests[id] = args[1];
+			console.log('ID-SEND-REQUEST:','"'+id+'"');
 			query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				msg.reply('You have send a `'+args[1]+'` Job Request in `'+args[0]+'` Company with Success!');
 			});
@@ -467,6 +468,7 @@ new Command('company-accept-request-job', function(msg,args) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 			return;
 		}
+		console.log('ID-ACCEPT-REQUEST:','"'+id2+'"');
 		if (typeof data.JobRequests[id2] !== 'undefined') {
 			data.Workers['worker_'+id2] = data.JobRequests[id2];
 			data.JobRequests[id2] = null;
