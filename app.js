@@ -681,7 +681,7 @@ new Command('company-create-item', function(msg,args) {
 		} else if (newargs.length>2) {
 			newargs[2] = shopname;
 		}
-		Command.List['item-create']._fn(msg,args);
+		Command.List['item-create']._fn(msg,newargs);
 	});
 });
 // ADMIN/CITOYEN+OWNER
