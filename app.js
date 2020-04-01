@@ -429,7 +429,7 @@ new Command('character-list', function(msg,args) {
 	}
 	
 	var duser = msg.guild.members.cache.find(r => r.id == id).user;
-	var dname = user.username + '#' + user.discriminator;
+	var dname = duser.username + '#' + duser.discriminator;
 	
 	var Max_Item = 10;
 	if (page < 1) {
