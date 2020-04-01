@@ -320,7 +320,7 @@ new Command('character-create', function(msg,args) {
 		var data = {
 			owner: id
 		};
-		query('INSERT INTO character(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
+		query('INSERT INTO characterdata(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
 			msg.reply('`'+args[0]+'` Character created with success!');
 		});
 	});
