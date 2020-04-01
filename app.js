@@ -446,6 +446,7 @@ new Command('character-list', function(msg,args) {
 			msg.channel.send(_embed);
 		} else {
 			var _text = '';
+			var index = 0;
 			for (var i=0+(page-1)*Max_Item; i < rows.length && i < page*Max_Item; i++) {
 				var name = rows[i].name.substring(rows[i].name.indexOf('_')+1).substring(rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_')+1);
 				var data = JSON.parse(rows[i].data);
@@ -454,6 +455,7 @@ new Command('character-list', function(msg,args) {
 				if (d) {
 					if (data.owner!=id) continue;
 				}
+				index++;
 				_text += '**'+name+'**'+(d?'':(': '+nameu+'\n\n'));
 			}
 			if (_text=='') {
@@ -464,7 +466,7 @@ new Command('character-list', function(msg,args) {
 				msg.channel.send(_embed);
 				return;
 			}
-			_text += '*Page '+page+' of '+(Math.ceil(items.length/Max_Item))+'*';
+			_text += '*Page '+page+' of '+(Math.ceil(index/Max_Item))+'*';
 			var _embed = new Discord.MessageEmbed()
 				.setTitle(d?('List Of Characters of '+dname):'List Of Characters')
 				.setColor(0xff0000)
