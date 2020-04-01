@@ -116,7 +116,18 @@ query(`CREATE TABLE IF NOT EXISTS company (
   console.log('TABLE CREATED!');
 });
 
-query(`CREATE TABLE IF NOT EXISTS data (
+query(`CREATE TABLE IF NOT EXISTS dataapp (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  name varchar(50),
+  data text,
+  PRIMARY KEY (id)
+) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
+  if(err) throw err;
+
+  console.log('TABLE CREATED!');
+});
+
+query(`CREATE TABLE IF NOT EXISTS character (
   id int(11) NOT NULL AUTO_INCREMENT,
   name varchar(50),
   data text,
@@ -288,25 +299,102 @@ new Command('user-reset-all', function(msg,args) {
 
 
 // CHARACTER
-// CITOYEN
+// ADMIN
 new Command('character-create', function(msg,args) {
-	
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 2) return;
+	// ARGS :
+	//    - Character Name
+	//    - user id
+	var id = args[1].match(/<@!?(\d+)>/);
+	if (id==null) {
+		msg.reply('Sorry, User '+args[1]+' doesn\'t exist :cold_sweat:\nPlease use the `@` to select a user :smile:');
+		return;
+	}
+	id = id[1];
+	query('SELECT * FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length > 0) {
+			msg.reply('Sorry, `'+args[0]+'` Character is already created :cold_sweat:');
+			return;
+		}
+		var data = {
+			owner: id
+		};
+		query('INSERT INTO character(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
+			msg.reply('`'+args[0]+'` Character created with success!');
+		});
+	});
 });
 // CITOYEN+OWNER
 new Command('character-delete', function(msg,args) {
-	
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 1) return;
+	// ARGS :
+	//    - Character Name
+	var id = msg.member.user.id+'';
+	query('SELECT * FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
+			return;
+		}
+		query('DELETE FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Character deleted with success!');
+		});
+	});
 });
 // CITOYEN+OWNER
 new Command('character-select', function(msg,args) {
-	
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 1) return;
+	// ARGS :
+	//    - Character Name
+	var id = msg.member.user.id+'';
+	query('SELECT * FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
+			return;
+		}
+		msg.member.setNickname(args[0]);
+		data.selected = 'selected_'+id;
+		query('UPDATE character SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Character selected with success!');
+		});
+	});
 });
 // CITOYEN+OWNER
-new Command('character-speek', function(msg,args) {
-	
-});
-// CITOYEN+OWNER
-new Command('character-update-name', function(msg,args) {
-	
+new Command('character-unselect', function(msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 1) return;
+	// ARGS :
+	//    - Character Name
+	var id = msg.member.user.id+'';
+	query('SELECT * FROM character WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		if (rows.length==0) {
+			msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
+			return;
+		}
+		var data = JSON.parse(rows[0].data);
+		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
+			return;
+		}
+		msg.member.setNickname('');
+		data.selected = null;
+		delete data.selected;
+		query('UPDATE character SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			msg.reply('`'+args[0]+'` Character selected with success!');
+		});
+	});
 });
 
 
@@ -424,9 +512,19 @@ new Command('company-remove-job', function(msg,args) {
 				return;
 			}
 			data.JobsList = data.JobsList || {};
+			data.Workers = data.Workers || {};
 			if (typeof data.JobsList[escape_mysql(args[1])] !== 'undefined') {
 				data.JobsList[escape_mysql(args[1])] = null;
 				delete data.JobsList[escape_mysql(args[1])];
+				for (var i in data.Workers) {
+					if (data.Workers.hasOwnProperty(i)) {
+						if (data.Workers[i]==args[1]) {
+							// fire
+							data.Workers[i] = null;
+							delete data.Workers[i];
+						}
+					}
+				}
 				query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 					msg.reply('Job '+args[1]+' removed from `'+args[0]+'` Company with Success!');
 				});
@@ -801,7 +899,7 @@ new Command('job-update-salary', function(msg,args) {
 		}
 		var data = JSON.parse(rows[0].data);
 		data.salary = parseFloat(args[1]) || 325000.0;
-		query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+		query('UPDATE job SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Job updated with success!');
 		});
 	});
@@ -1867,7 +1965,10 @@ new Command('item-pay', function(msg,args) {
 		});
 	});
 });
-
+// CITOYEN
+new Command('item-eat', function(msg,args) {
+	
+});
 
 
 
