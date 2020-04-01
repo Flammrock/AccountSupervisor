@@ -204,6 +204,14 @@ new Command('ping', function(msg,args) {
 });
 
 
+// USER
+// ADMIN
+new Command('user_reset_all', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	query('DELETE FROM users',function(err,rows1){
+		msg.reply('User System is reset!');
+	});
+});
 
 // BANK
 
@@ -441,6 +449,13 @@ new Command('bank_get_money_user', function(msg,args) {
 		});
 	});
 });
+// ADMIN
+new Command('bank_reset_all', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	query('DELETE FROM bank',function(err,rows1){
+		msg.reply('Bank System is reset!');
+	});
+});
 
 // CITOYEN
 new Command('give_money', function(msg,args) {
@@ -650,7 +665,7 @@ new Command('item_create', function(msg,args) {
 		var data = {};
 		data.price = (args.length >= 2) ? (parseFloat(args[1]) || 0.0) : 0.0;
 		data.shops = (args.length >= 3) ? args[2].split(' ') : [];
-		data.type = (args.length >= 4) ? args[3] : '';
+		data.type = (args.length >= 4) ? args[3].split(' ') : [];
 		data.image = (args.length >= 5) ? args[4] : '';
 		data.description = (args.length >= 6) ? args[5] : 'No Description';
 		query('INSERT INTO items(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
@@ -709,7 +724,7 @@ new Command('item_update_type', function(msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		data.type = args[1];
+		data.type = args[1].split(' ');
 		query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			msg.reply('`'+args[0]+'` Item updated with success!');
 		});
@@ -791,15 +806,24 @@ new Command('item_give', function(msg,args,t) {
 			msg.reply('Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
 			return;
 		}
+		var dataitem = JSON.parse(rows[0].data);
 		var g = (typeof t !== 'undefined') ? (args.length >= 2) ? (parseInt(args[2])*-1 || -1) : -1 : (args.length >= 2) ? (parseInt(args[2]) || 1) : 1;
 		query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 			if (rows.length==0) {
 				var data = {
 					inventory: {
-						items: {}
+						items: {},
+						itemstype: {}
 					}
 				};
 				data.inventory.items[escape_mysql(args[0])] = g;
+				for (var i = 0; i < dataitem.type.length; i++) {
+					data.inventory.itemstype[dataitem.type[i]] = g;
+					if (data.inventory.itemstype[dataitem.type[i]] < 0) {
+						data.inventory.itemstype[dataitem.type[i]] = null;
+						delete data.inventory.itemstype[dataitem.type[i]];
+					}
+				}
 				if (data.inventory.items[escape_mysql(args[0])] < 0) {
 					data.inventory.items[escape_mysql(args[0])] = null;
 					delete data.inventory.items[escape_mysql(args[0])];
@@ -811,6 +835,7 @@ new Command('item_give', function(msg,args,t) {
 				var data = JSON.parse(rows[0].data);
 				data.inventory = data.inventory || {};
 				data.inventory.items = data.inventory.items || {};
+				data.inventory.itemstype = data.inventory.itemstype || {};
 				if (typeof data.inventory.items[escape_mysql(args[0])] !== 'undefined') {
 					data.inventory.items[escape_mysql(args[0])] = (parseInt(data.inventory.items[escape_mysql(args[0])]) || 0) + g;
 				} else {
@@ -819,6 +844,17 @@ new Command('item_give', function(msg,args,t) {
 				if (data.inventory.items[escape_mysql(args[0])] < 0) {
 					data.inventory.items[escape_mysql(args[0])] = null;
 					delete data.inventory.items[escape_mysql(args[0])];
+				}
+				for (var i = 0; i < dataitem.type.length; i++) {
+					if (typeof data.inventory.itemstype[dataitem.type[i]] !== 'undefined') {
+						data.inventory.itemstype[dataitem.type[i]] = (parseInt(data.inventory.itemstype[dataitem.type[i]]) || 0) + g;
+					} else {
+						data.inventory.itemstype[dataitem.type[i]] = g;
+					}
+					if (data.inventory.itemstype[dataitem.type[i]] < 0) {
+						data.inventory.itemstype[dataitem.type[i]] = null;
+						delete data.inventory.itemstype[dataitem.type[i]];
+					}
 				}
 				query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 					f();
@@ -836,6 +872,13 @@ new Command('item_remove', function(msg,args) {
 	//    - User id
 	//    - Optional: Quantity
 	Command.List['item_give']._fn(msg,args,true);
+});
+// ADMIN
+new Command('item_reset_all', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	query('DELETE FROM items',function(err,rows1){
+		msg.reply('Item System is reset!');
+	});
 });
 
 // ADMIN/CITOYEN
@@ -871,6 +914,7 @@ new Command('inventory_item_clear', function(msg,args) {
 			var data = JSON.parse(rows[0].data);
 			data.inventory = data.inventory || {};
 			data.inventory.items = {};
+			data.inventory.itemstype = {};
 			query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				f();
 			});
@@ -1100,6 +1144,42 @@ new Command('item_pay', function(msg,args) {
 						return;
 					}
 					var userdata = JSON.parse(rows[0].data);
+					userdata.inventory = userdata.inventory || {};
+					userdata.inventory.items = userdata.inventory.items || {};
+					userdata.inventory.itemstype = userdata.inventory.itemstype || {};
+					var can = false;
+					for (var t = 0; t < tempdata.need.length; t++) {
+						for (var p in userdata.inventory.items) {
+							if (userdata.inventory.items.hasOwnProperty(p)) {
+								if (p==escape_mysql(tempdata.need[t])) {
+									can = true;
+									break;
+								}
+							}
+						}
+					}
+					if (tempdata.need.length==0) can = true;
+					var cantype = false;
+					for (var t = 0; t < tempdata.needType.length; t++) {
+						for (var p in userdata.inventory.itemstype) {
+							if (userdata.inventory.itemstype.hasOwnProperty(p)) {
+								if (p==tempdata.needType[t]) {
+									cantype = true;
+									break;
+								}
+							}
+						}
+					}
+					if (tempdata.needType.length==0) cantype = true;
+							
+					if (!can) {
+						msg.reply('You must have one of this Items: '+tempdata.need.join(', '));
+						return;
+					}
+					if (!cantype) {
+						msg.reply('You must have one of this Type Items: '+tempdata.needType.join(', '));
+						return;
+					}
 					if (args.length >= 2) {
 						query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[2])+'\'',function(err,rows){
 							if (rows.length==0) {
@@ -1114,12 +1194,18 @@ new Command('item_pay', function(msg,args) {
 									msg.reply('Sorry, you haven\'t enought money :cold_sweat:');
 								} else {
 									userdata.bank[escape_mysql(args[2])] = (parseFloat(userdata.bank[escape_mysql(args[2])]) || 0.0) - Math.abs(parseFloat(data.price) || 0.0);
-									userdata.inventory = userdata.inventory || {};
-									userdata.inventory.items = userdata.inventory.items || {};
+									
 									if (typeof userdata.inventory.items[escape_mysql(args[1])] === 'undefined') {
 										userdata.inventory.items[escape_mysql(args[1])] = 1
 									} else {
 										userdata.inventory.items[escape_mysql(args[1])] = (parseInt(userdata.inventory.items[escape_mysql(args[1])]) || 0) + 1;
+									}
+									for (var p = 0; p < data.type.length; p++) {
+										if (typeof userdata.inventory.itemstype[data.type[p]] === 'undefined') {
+											userdata.inventory.itemstype[data.type[p]] = 1
+										} else {
+											userdata.inventory.itemstype[data.type[p]] = (parseInt(userdata.inventory.itemstype[data.type[p]]) || 0) + 1;
+										}
 									}
 									query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 										f();
@@ -1139,6 +1225,13 @@ new Command('item_pay', function(msg,args) {
 								userdata.inventory.items[escape_mysql(args[1])] = 1
 							} else {
 								userdata.inventory.items[escape_mysql(args[1])] = (parseInt(userdata.inventory.items[escape_mysql(args[1])]) || 0) + 1;
+							}
+							for (var p = 0; p < data.type.length; p++) {
+								if (typeof userdata.inventory.itemstype[data.type[p]] === 'undefined') {
+									userdata.inventory.itemstype[data.type[p]] = 1
+								} else {
+									userdata.inventory.itemstype[data.type[p]] = (parseInt(userdata.inventory.itemstype[data.type[p]]) || 0) + 1;
+								}
 							}
 							query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 								f();
@@ -1166,6 +1259,10 @@ new Command('shop_create', function(msg,args) {
 	//    - Shop Name
 	//    - Optional: Salons Available
 	//    - Optional: Need Item Type for access
+	//    - Optional: Need TypeItem Type for access
+	//    - Optional: NeedWeb Item Type for access
+	//    - Optional: NeedWeb TypeItem Type for access
+	//    - Optional: Web access
 	query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 		if (rows.length > 0) {
 			msg.reply('Sorry, `'+args[0]+'` Shop is already created :cold_sweat:');
@@ -1173,7 +1270,11 @@ new Command('shop_create', function(msg,args) {
 		}
 		var data = {
 			salons: (args.length >= 2) ? (args[1].trim()!="") ? args[1].split(' ') : [] : [],
-			need: (args.length >= 3) ? (args[2].trim()!="") ? args[2].split(' ') : [] : []
+			need: (args.length >= 3) ? (args[2].trim()!="") ? args[2].split(' ') : [] : [],
+			needType: (args.length >= 4) ? (args[3].trim()!="") ? args[3].split(' ') : [] : [],
+			needWeb: (args.length >= 5) ? (args[4].trim()!="") ? args[4].split(' ') : [] : [],
+			needWebType: (args.length >= 6) ? (args[5].trim()!="") ? args[5].split(' ') : [] : [],
+			web: (args.length >= 7) ? (args[6].trim()!="") ? args[5].toLowerCase()=="true" : false : true,
 		};
 		if (!Command.checkSalons(msg,data.salons)) return false;
 		Command.checkItems(msg,data.need,function(){
@@ -1267,6 +1368,13 @@ new Command('shop_delete_all_items_associed_with', function(msg,args) {
 				f();
 			});
 		}
+	});
+});
+// ADMIN
+new Command('shop_reset_all', function(msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	query('DELETE FROM shop',function(err,rows1){
+		msg.reply('Shop System is reset!');
 	});
 });
 
