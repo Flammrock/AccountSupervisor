@@ -159,8 +159,8 @@ class Command {
 		return typeof Command.List[name] !== 'undefined';
 	}
 	
-	static execute(msg,data) {
-		Command.List[data.name]._fn(msg,data.args);
+	static execute(appdata,msg,data) {
+		Command.List[data.name]._fn(appdata,msg,data.args);
 	}
 	
 	static checkPermission(msg,mode) {
