@@ -160,7 +160,6 @@ class Command {
 	}
 	
 	static execute(appdata,msg,data) {
-		console.log('TADAAMERTYHUJBGFDRTY',appdata);
 		Command.List[data.name]._fn(appdata,msg,data.args);
 	}
 	
@@ -248,30 +247,20 @@ class Command {
 		}
 	}
 	
-	static async getDataApp(guildid) {
-		
-		var req = new Promise((resolve, reject) => {
-			query('SELECT * FROM dataapp WHERE name LIKE \'%'+guildid+'%\'', function(err,rows) {
-				var data = {};
-				for (var i = 0; i < rows.length; i++) {
-					var name = rows[i].name.substring(rows[i].name.indexOf('_')+1).substring(rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_')+1);
-					try {
-						data[name] = JSON.parse(rows[i].data);
-					} catch (e) {
-						data[name] = rows[i].data;
-					}
+	static getDataApp(guildid,callback) {
+		query('SELECT * FROM dataapp WHERE name LIKE \'%'+guildid+'%\'', function(err,rows) {
+			var data = {};
+			for (var i = 0; i < rows.length; i++) {
+				var name = rows[i].name.substring(rows[i].name.indexOf('_')+1).substring(rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_')+1);
+				try {
+					data[name] = JSON.parse(rows[i].data);
+				} catch (e) {
+					data[name] = rows[i].data;
 				}
-				resolve(data);
-			});
+			}
+			data['money-name'] = data['money-name'] || 'Money';
+			callback(data);
 		});
-		
-		var data = await req;
-		
-		data['money-name'] = data['money-name'] || 'Money';
-		//data['money-symbol'] = data['money-symbol'] || 'Money';
-		//data['money-format'] = data['money-format'] || '{amount} {symbol}';
-
-		return data;
 	}
 }
 Command.List = {};
@@ -1275,7 +1264,6 @@ new Command('bank-give-money-user', function(appdata,msg,args,t) {
 	//     - Amount Money
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		var f = function() {
-			console.log(appdata);
 			msg.channel.send(usernamecharname+', '+'`'+((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0)))+'` '+appdata['money-name']+' '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
 		}
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
@@ -2422,39 +2410,39 @@ bot.on('ready', () => {
 });
 
 bot.on('message', msg => {
-	try {
-		console.log(msg.channel.id, msg.content);
-		var role_admin = false;
-		var role_citoyen = false;
-		msg.guild.roles.cache.forEach(role => {
-			if (role.name=='AccountSupervisorAdmin') role_admin = true;
-			if (role.name=='AccountSupervisorCitoyen') role_citoyen = true;
-		});
-		if (!role_admin) {
-			msg.guild.roles.create({
-				data: {
-					name: 'AccountSupervisorAdmin',
-					color: 'RED',
-				},
-				reason: '',
-			});
-		}
-		if (!role_citoyen) {
-			msg.guild.roles.create({
-				data: {
-					name: 'AccountSupervisorCitoyen',
-					color: 'BLUE',
-				},
-				reason: '',
-			});
-		}
-	} catch(e) {}
-	var appdata = Command.getDataApp(msg.guild.id);
-	console.log('TADAAM',appdata);
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
+		try {
+			console.log(msg.channel.id, msg.content);
+			var role_admin = false;
+			var role_citoyen = false;
+			msg.guild.roles.cache.forEach(role => {
+				if (role.name=='AccountSupervisorAdmin') role_admin = true;
+				if (role.name=='AccountSupervisorCitoyen') role_citoyen = true;
+			});
+			if (!role_admin) {
+				msg.guild.roles.create({
+					data: {
+						name: 'AccountSupervisorAdmin',
+						color: 'RED',
+					},
+					reason: '',
+				});
+			}
+			if (!role_citoyen) {
+				msg.guild.roles.create({
+					data: {
+						name: 'AccountSupervisorCitoyen',
+						color: 'BLUE',
+					},
+					reason: '',
+				});
+			}
+		} catch(e) {}
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
-			Command.execute(appdata,msg,data);
+			Command.getDataApp(msg.guild.id,function(appdata){
+				Command.execute(appdata,msg,data);
+			});
 		}
 	}
 });
