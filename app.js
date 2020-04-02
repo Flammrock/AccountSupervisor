@@ -3703,7 +3703,7 @@ bot.on('message', msg => {
 	}
 	//msg.channel.send("<@everyone>" + " Hello!");
 	
-	console.log(msg.guild);
+	console.log(msg.guild.roles);
 	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 	
