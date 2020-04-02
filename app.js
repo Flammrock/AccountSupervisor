@@ -601,6 +601,7 @@ new Command('company-create', function(appdata,msg,args) {
 					"",
 					"",
 					"",
+					"",
 					"internet",
 					"false"
 				]);
