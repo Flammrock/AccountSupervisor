@@ -2537,7 +2537,7 @@ function activities() {
 	var time = Date.now();
 	var tick = getRandomIntInclusive(10, 30)*1000;
 	
-	bot.user.setStatus('dnd', 'Made by KwinkyWolf');
+	bot.user.setStatus('dnd');
 	
 	setInterval(() => {
 		if (Date.now()-time<tick) return;
