@@ -383,35 +383,38 @@ new Command('character-select', function(msg,args) {
 	// ARGS :
 	//    - Character Name
 	var id = msg.member.user.id+'';
-	query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-		if (rows.length==0) {
-			msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
-			return;
-		}
-		var data = JSON.parse(rows[0].data);
-		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
-			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
-			return;
-		}
-		msg.delete();
-		try {
-			msg.member.setNickname(args[0]);
-		} catch (e) {
-			msg.author.send('Your role is higher than mine so i can\'t change your nickname you have to do it yourself. (If you are the owner of the server, I cannot change your nickname at all)');
-		}
-		data.selected = 'selected_'+id;
-		query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-			msg.author.send('`'+args[0]+'` Character selected with success!');
+	Command.List['character-unselect']._fn(msg,[],function(){
+		query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			if (rows.length==0) {
+				msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
+				return;
+			}
+			var data = JSON.parse(rows[0].data);
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+				msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
+				return;
+			}
+			msg.delete();
+			try {
+				msg.member.setNickname(args[0]);
+			} catch (e) {
+				msg.author.send('Your role is higher than mine so i can\'t change your nickname you have to do it yourself. (If you are the owner of the server, I cannot change your nickname at all)');
+			}
+			data.selected = 'selected_'+id;
+			query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+				msg.author.send('`'+args[0]+'` Character selected with success!');
+			});
 		});
 	});
 });
 // CITOYEN+OWNER
-new Command('character-unselect', function(msg,args) {
+new Command('character-unselect', function(msg,args,c) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	var id = msg.member.user.id+'';
-	query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+	query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\'',function(err,rows){
 		if (rows.length==0) {
-			msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
+			if (!c) msg.author.send('Character is already unselected!');
+			if (c) c();
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
@@ -419,11 +422,12 @@ new Command('character-unselect', function(msg,args) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
 			return;
 		}
-		msg.member.setNickname('');
+		if (!c) msg.member.setNickname('');
 		data.selected = null;
 		delete data.selected;
-		query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-			msg.author.send('Character unselected with success!');
+		query('UPDATE characterdata SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql(rows[0].name)+'\'',function(err,rows){
+			if (!c) msg.author.send('Character unselected with success!');
+			if (c) c();
 		});
 	});
 });
