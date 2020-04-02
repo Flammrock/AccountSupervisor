@@ -510,6 +510,14 @@ new Command('destroy-data', function(appdata,msg,args) {
 	  console.log('TABLE CREATED!');
 	});
 	});});});});});});});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n+'+name+'\n```')
+		.addField('Permission', 'ADMIN', true)
+		.addField('Description', 'This Command destroy all data.', false)
+	msg.channel.send(_embed);
 });
 
 
@@ -520,6 +528,14 @@ new Command('user-reset-all', function(appdata,msg,args) {
 	query('DELETE FROM users',function(err,rows1){
 		msg.reply('User System is reset!');
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n+'+name+'\n```')
+		.addField('Permission', 'ADMIN', true)
+		.addField('Description', 'Reset Users Système.', false)
+	msg.channel.send(_embed);
 });
 
 
@@ -549,6 +565,14 @@ new Command('character-create', function(appdata,msg,args) {
 			msg.reply('`'+args[0]+'` Character created with success!');
 		});
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n+'+name+' [Character Name] [User]\n```')
+		.addField('Permission', 'ADMIN', true)
+		.addField('Description', 'Create a Character for the targeted user. Example:\n  +'+name+' "Bob Le Bricoleur" @Flammrock#5464', false)
+	msg.channel.send(_embed);
 });
 // CITOYEN+OWNER
 new Command('character-delete', function(appdata,msg,args) {
@@ -571,6 +595,14 @@ new Command('character-delete', function(appdata,msg,args) {
 			msg.reply('`'+args[0]+'` Character deleted with success!');
 		});
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n+'+name+' [Character Name]\n```')
+		.addField('Permission', 'ADMIN / CITOYEN-OWNER', true)
+		.addField('Description', 'Delete a Character by name. Example:\n  +'+name+' "Bob Le Bricoleur"', false)
+	msg.channel.send(_embed);
 });
 // CITOYEN+OWNER
 new Command('character-select', function(appdata,msg,args) {
@@ -602,6 +634,14 @@ new Command('character-select', function(appdata,msg,args) {
 			});
 		});
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n+'+name+' [Character Name]\n```')
+		.addField('Permission', 'CITOYEN-OWNER', true)
+		.addField('Description', 'Select a Character by name. Only the Owner of the Character can select it! Example:\n  +'+name+' "Bob Le Bricoleur"', false)
+	msg.channel.send(_embed);
 });
 // CITOYEN+OWNER
 new Command('character-unselect', function(appdata,msg,args,c) {
@@ -626,6 +666,14 @@ new Command('character-unselect', function(appdata,msg,args,c) {
 			if (c) c();
 		});
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n+'+name+'\n```')
+		.addField('Permission', 'CITOYEN-OWNER', true)
+		.addField('Description', 'Unselect the Character selected if the User have a selected Character. Only the Owner of the Character can unselect it! Example:\n  +'+name+'', false)
+	msg.channel.send(_embed);
 });
 // CITOYEN
 new Command('character-list', function(appdata,msg,args) {
@@ -703,6 +751,14 @@ new Command('character-list', function(appdata,msg,args) {
 			msg.channel.send(_embed);
 		}
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n+'+name+' {User} {Page}\n```\n        OR\n```css\n+'+name+' {Page}\n```')
+		.addField('Permission', 'CITOYEN', true)
+		.addField('Description', 'Get the list of all Character if no User is specified. Else, it will display the list Characters of specified User. Example:\n  +'+name+' 2\n  +'+name+' @Flammrock#5464\n  +'+name+' @Flammrock#5464 3', false)
+	msg.channel.send(_embed);
 });
 // CITOYEN
 new Command('character-who-i-am', function(appdata,msg,args) {
@@ -710,6 +766,14 @@ new Command('character-who-i-am', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		msg.reply('you are: '+usernamecharname);
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n+'+name+'\n```')
+		.addField('Permission', 'CITOYEN', true)
+		.addField('Description', 'Get the current name of the Character selected. Example:\n  +'+name, false)
+	msg.channel.send(_embed);
 });
 
 
