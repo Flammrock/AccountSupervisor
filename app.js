@@ -1044,6 +1044,7 @@ new Command('company-view', function(appdata,msg,args) {
 			data.JobsList = data.JobsList || {};
 			data.JobRequests = data.JobRequests || {};
 			data.Workers = data.Workers || {};
+			console.log(data);
 			var canEdit = data.owner==id || Command.checkPermission(msg,'ADMIN');
 			var t = data.owner.split(':');
 			var ownername = '';
