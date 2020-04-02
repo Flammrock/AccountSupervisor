@@ -50,9 +50,20 @@ function query(SQL,fn) {
 function escape_mysql(s) {return s.replace(/'/g,"''");}
 query();
 
+query(`DROP TABLE users`(err,rows) => {});
+query(`DROP TABLE bank`(err,rows) => {});
+query(`DROP TABLE shop`(err,rows) => {});
+query(`DROP TABLE items`(err,rows) => {});
+query(`DROP TABLE job`(err,rows) => {});
+query(`DROP TABLE company`(err,rows) => {});
+query(`DROP TABLE dataapp`(err,rows) => {});
+query(`DROP TABLE characterdata`(err,rows) => {});
+
+
+
 query(`CREATE TABLE IF NOT EXISTS users (
   id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(50),
+  name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
@@ -63,7 +74,7 @@ query(`CREATE TABLE IF NOT EXISTS users (
 
 query(`CREATE TABLE IF NOT EXISTS bank (
   id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(50),
+  name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
@@ -74,7 +85,7 @@ query(`CREATE TABLE IF NOT EXISTS bank (
 
 query(`CREATE TABLE IF NOT EXISTS shop (
   id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(50),
+  name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
@@ -85,7 +96,7 @@ query(`CREATE TABLE IF NOT EXISTS shop (
 
 query(`CREATE TABLE IF NOT EXISTS items (
   id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(50),
+  name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
@@ -96,7 +107,7 @@ query(`CREATE TABLE IF NOT EXISTS items (
 
 query(`CREATE TABLE IF NOT EXISTS job (
   id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(50),
+  name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
@@ -107,7 +118,7 @@ query(`CREATE TABLE IF NOT EXISTS job (
 
 query(`CREATE TABLE IF NOT EXISTS company (
   id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(50),
+  name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
@@ -118,7 +129,7 @@ query(`CREATE TABLE IF NOT EXISTS company (
 
 query(`CREATE TABLE IF NOT EXISTS dataapp (
   id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(50),
+  name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
@@ -129,7 +140,7 @@ query(`CREATE TABLE IF NOT EXISTS dataapp (
 
 query(`CREATE TABLE IF NOT EXISTS characterdata (
   id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(50),
+  name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
