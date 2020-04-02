@@ -5,18 +5,28 @@ const bot = new Discord.Client();
 
 const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoLXNQ.hFJvWBxgMR3gd7_A6iHSEOcDZwU';
 const DATABASE_URI = process.env.CLEARDB_DATABASE_URL;
-const DATABASE_PARSE = DATABASE_URI.match(/mysql:\/\/([^:]+):([^@]+)@([^\/]+)\/([^\?]+)\??/);
+
+
+//const DATABASE_PARSE = DATABASE_URI.match(/mysql:\/\/([^:]+):([^@]+)@([^\/]+)\/([^\?]+)\??/);
 
 console.log(DATABASE_PARSE);
 
 const PREFIX = '+';
 
-const DATABASE = {
+/*const DATABASE = {
 	host:       DATABASE_PARSE[3],
 	user:       DATABASE_PARSE[1],
 	password:   DATABASE_PARSE[2],
 	database:   DATABASE_PARSE[4]
+};*/
+
+const DATABASE = {
+	host:       'remotemysql.com',
+	user:       'shZoWU2Fm6',
+	password:   'yQfVte9k3s',
+	database:   'shZoWU2Fm6'
 };
+
 
 console.log(DATABASE);
 
@@ -263,6 +273,18 @@ class Command {
 			callback(data);
 		});
 	}
+
+	static extractData(content) {
+		var data = [];
+		if (content.substring(0,1)=='"' && content.slice(-1)=='"') {
+			content = content.slice(1,-1);
+		}
+		content.replace(/\[[^\[\]]*\]|[^ ]+/g,function(m){
+			data.push(m.match(/^\[?([^"]*)\]?/)[1]);
+			return m;
+		});
+		return data;
+	}
 }
 Command.List = {};
 
@@ -279,7 +301,7 @@ class ParserCommand {
 		this.args = [];
 		var i1 = this.rawdata.indexOf(' ');
 		if (i1 > 0) {
-			this.name = this.rawdata.substring(1,i1);
+			this.name = this.rawdata.substring(PREFIX.length,i1);
 			this.args = [];
 			this.rawdata.substring(i1+1).replace(/"[^"]*"|[^ ]+/g,function(m){
 				_this.args.push(m.match(/^"?([^"]*)"?/)[1]);
@@ -2374,8 +2396,8 @@ new Command('item-create', function(appdata,msg,args,t) {
 			}
 			var data = {};
 			data.price = (args.length >= 2) ? (parseFloat(args[1]) || 0.0) : 0.0;
-			data.shops = (args.length >= 3) ? args[2].split(' ') : [];
-			data.type = (args.length >= 4) ? args[3].split(' ') : [];
+			data.shops = (args.length >= 3) ? Command.extractData(args[2]) : [];
+			data.type = (args.length >= 4) ? Command.extractData(args[3]) : [];
 			data.image = (args.length >= 5) ? args[4] : '';
 			data.description = (args.length >= 6) ? args[5] : 'No Description';
 			query('INSERT INTO items(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\',\''+escape_mysql(JSON.stringify(data))+'\')',function(err,rows){
@@ -2435,7 +2457,7 @@ new Command('item-update-shops', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			data.shops = args[1].split(' ');
+			data.shops = Command.extractData(args[1]);
 			query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Item updated with success!');
 			});
@@ -2464,7 +2486,7 @@ new Command('item-update-type', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			data.type = args[1].split(' ');
+			data.type = Command.extractData(args[1]);
 			query('UPDATE items SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Item updated with success!');
 			});
@@ -3167,11 +3189,11 @@ new Command('shop-create', function(appdata,msg,args) {
 				return;
 			}
 			var data = {
-				salons: (args.length >= 2) ? (args[1].trim()!="") ? args[1].split(' ') : [] : [],
-				need: (args.length >= 3) ? (args[2].trim()!="") ? args[2].split(' ') : [] : [],
-				needType: (args.length >= 4) ? (args[3].trim()!="") ? args[3].split(' ') : [] : [],
-				needWeb: (args.length >= 5) ? (args[4].trim()!="") ? args[4].split(' ') : [] : [],
-				needWebType: (args.length >= 6) ? (args[5].trim()!="") ? args[5].split(' ') : [] : [],
+				salons: (args.length >= 2) ? (args[1].trim()!="") ? Command.extractData(args[1]) : [] : [],
+				need: (args.length >= 3) ? (args[2].trim()!="") ? Command.extractData(args[2]) : [] : [],
+				needType: (args.length >= 4) ? (args[3].trim()!="") ? Command.extractData(args[3]) : [] : [],
+				needWeb: (args.length >= 5) ? (args[4].trim()!="") ? Command.extractData(args[4]) : [] : [],
+				needWebType: (args.length >= 6) ? (args[5].trim()!="") ? Command.extractData(args[5]) : [] : [],
 				web: (args.length >= 7) ? (args[6].trim()!="") ? args[6].toLowerCase()=="true" : false : true,
 			};
 			if (!Command.checkSalons(msg,data.salons)) return false;
@@ -3232,7 +3254,7 @@ new Command('shop-update-salons', function(appdata,msg,args,t) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			data.salons = (args[1].trim()!="") ? args[1].split(' ') : [];
+			data.salons = (args[1].trim()!="") ? Command.extractData(args[1]) : [];
 			if (!Command.checkSalons(msg,data.salons)) return false;
 			query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Shop updated with success!');
@@ -3262,7 +3284,7 @@ new Command('shop-update-need', function(appdata,msg,args,t) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			data.need = (args[1].trim()!="") ? args[1].split(' ') : [];
+			data.need = (args[1].trim()!="") ? Command.extractData(args[1]) : [];
 			Command.checkItems(msg,data.need,function(){
 				query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 					msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Shop updated with success!');
@@ -3294,7 +3316,7 @@ new Command('shop-update-needType', function(appdata,msg,args,t) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			data.needType = (args[1].trim()!="") ? args[1].split(' ') : [];
+			data.needType = (args[1].trim()!="") ? Command.extractData(args[1]) : [];
 			Command.checkItems(msg,data.need,function(){
 				query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 					msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Shop updated with success!');
@@ -3326,7 +3348,7 @@ new Command('shop-update-needWeb', function(appdata,msg,args,t) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			data.needWeb = (args[1].trim()!="") ? args[1].split(' ') : [];
+			data.needWeb = (args[1].trim()!="") ? Command.extractData(args[1]) : [];
 			Command.checkItems(msg,data.need,function(){
 				query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 					msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Shop updated with success!');
@@ -3358,7 +3380,7 @@ new Command('shop-update-needWebType', function(appdata,msg,args,t) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			data.needWebType = (args[1].trim()!="") ? args[1].split(' ') : [];
+			data.needWebType = (args[1].trim()!="") ? Command.extractData(args[1]) : [];
 			Command.checkItems(msg,data.need,function(){
 				query('UPDATE shop SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 					msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Shop updated with success!');
