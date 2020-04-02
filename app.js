@@ -226,16 +226,17 @@ class Command {
 			id = test[1];
 			query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\'',function(err,rows){
 				if (rows.length==0) {
-					console.log('???????');
 					var t = msg.guild.members.cache.find(r => r.id == id);
 					if (t) {
+						var user = t.user;
 						var name = user.username + '#' + user.discriminator;
 						callback(id,name);
+					} else {
+						msg.reply('Sorry,'+args[0]+' User doesn\'t exist :cold_sweat:\nType the Name of Character or type `@` then select a user!');
 					}
 					return;
 				}
 				var charname = rows[0].name.substring(rows[0].name.indexOf('_')+1).substring(rows[0].name.substring(rows[0].name.indexOf('_')+1).indexOf('_')+1);
-				console.log((id+'')+charname);
 				callback((id+'')+charname,charname);
 			});
 		}
