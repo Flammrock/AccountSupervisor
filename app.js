@@ -265,7 +265,7 @@ class Command {
 		});
 		
 		var data = await req;
-		
+		console.log(data);
 		data['money-name'] = data['money-name'] || 'Money';
 		//data['money-symbol'] = data['money-symbol'] || 'Money';
 		//data['money-format'] = data['money-format'] || '{amount} {symbol}';
