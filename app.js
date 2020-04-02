@@ -234,8 +234,8 @@ class Command {
 					}
 					return;
 				}
-				console.log((id+'')+charname);
 				var charname = rows[0].name.substring(rows[0].name.indexOf('_')+1).substring(rows[0].name.substring(rows[0].name.indexOf('_')+1).indexOf('_')+1);
+				console.log((id+'')+charname);
 				callback((id+'')+charname,charname);
 			});
 		}
