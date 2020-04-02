@@ -226,6 +226,7 @@ class Command {
 			id = test[1];
 			query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\'',function(err,rows){
 				if (rows.length==0) {
+					console.log('???????');
 					var t = msg.guild.members.cache.find(r => r.id == id);
 					if (t) {
 						var name = user.username + '#' + user.discriminator;
@@ -233,6 +234,7 @@ class Command {
 					}
 					return;
 				}
+				console.log((id+'')+charname);
 				var charname = rows[0].name.substring(rows[0].name.indexOf('_')+1).substring(rows[0].name.substring(rows[0].name.indexOf('_')+1).indexOf('_')+1);
 				callback((id+'')+charname,charname);
 			});
