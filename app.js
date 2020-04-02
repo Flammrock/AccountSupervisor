@@ -1105,12 +1105,12 @@ new Command('company-view', function(appdata,msg,args) {
 			if (jobsworkerkey!="") {
 				jobsworkerkey = jobsworkerkey.slice(0,-2);
 			} else {
-				jobsworkerkey =  "No Jobs Requests";
+				jobsworkerkey =  "No Workers";
 			}
 			var _embed = new Discord.MessageEmbed()
 				.setTitle('Campany '+args[0])
 				.setColor(0xff0000)
-				.setDescription('**ASSOCIED SHOP**: '+args[0]+'\n**OWNER**: '+ownername+'\n**CAN EDIT**: '+(canEdit?'True *(You cant edit)*':'False *(You can\'t edit)*')+'\n**JOBS AVAILABLES**: '+jobslist+'\n**JOB REQUESTS**: '+jobsrequestkey+'\n**WORKERS**: '+jobsworkerkey);
+				.setDescription('**ASSOCIED SHOP**: '+args[0]+'\n**OWNER**: '+ownername+'\n**CAN EDIT**: '+(canEdit?'True *(You can edit)*':'False *(You can\'t edit)*')+'\n**JOBS AVAILABLES**: '+jobslist+'\n**JOB REQUESTS**: '+jobsrequestkey+'\n**WORKERS**: '+jobsworkerkey);
 			msg.channel.send(_embed);
 		});
 	});
