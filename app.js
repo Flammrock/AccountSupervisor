@@ -3688,7 +3688,7 @@ bot.on('message', msg => {
 		console.log('NONOONONONNONONO');
 		var admin = msg.guild.roles.cache.find(r => r.name == 'AccountSupervisorAdmin');
 		var everyone = msg.guild.roles.cache.find(r => r.name == '@everyone');
-		msg.guild.create('accountsupervisor-database-config', {
+		msg.guild.channels.create('accountsupervisor-database-config', {
 			position: 0,
 			permissionOverwrites: [
 				{
