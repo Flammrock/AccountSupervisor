@@ -1340,7 +1340,7 @@ new Command('bank-create-account', function(msg,args) {
 				msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 				return;
 			}
-			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
+			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				if (rows.length!=0) {
 					var obj = JSON.parse(rows[0].data);
 					obj.bank = obj.bank || {};
@@ -1383,7 +1383,7 @@ new Command('bank-delete-account', function(msg,args) {
 				msg.reply('Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 				return;
 			}
-			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(msg.member.user.id+'')+'\'',function(err,rows){
+			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				if (rows.length!=0) {
 					var obj = JSON.parse(rows[0].data);
 					obj.bank = obj.bank || {};
