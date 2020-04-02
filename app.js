@@ -50,7 +50,7 @@ function query(SQL,fn) {
 function escape_mysql(s) {return s.replace(/'/g,"''");}
 query();
 
-
+/*
 query(`DROP TABLE users`,(err,rows) => {
 query(`DROP TABLE bank`,(err,rows) => {
 query(`DROP TABLE shop`,(err,rows) => {
@@ -59,7 +59,7 @@ query(`DROP TABLE job`,(err,rows) => {
 query(`DROP TABLE company`,(err,rows) => {
 query(`DROP TABLE dataapp`,(err,rows) => {
 query(`DROP TABLE characterdata`,(err,rows) => {});});});});});});});});
-
+*/
 
 
 query(`CREATE TABLE IF NOT EXISTS users (
