@@ -3687,7 +3687,7 @@ bot.on('message', msg => {
 	} else {
 		console.log('NONOONONONNONONO');
 		var admin = msg.guild.roles.cache.find(r => r.name == 'AccountSupervisorAdmin');
-		msg.guild.createChannel('accountsupervisor-database-config', {
+		/*msg.guild.createChannel('accountsupervisor-database-config', {
 			position: 0,
 			permissionOverwrites: [
 				{
@@ -3698,7 +3698,8 @@ bot.on('message', msg => {
 					deny: ['READ_MESSAGES','VIEW_CHANNEL','SEND_MESSAGES','SEND_TTS_MESSAGES']
 				}
 			 ]
-		});
+		});*/
+		
 	}
 	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
