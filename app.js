@@ -2504,6 +2504,39 @@ new Command('list-command', function(appdata,msg,args) {
 //////////////////////////////////////
 bot.on('ready', () => {
 	console.log(`Logged in as ${bot.user.tag}!`);
+	var activities_list = [
+		"😀 My Creator is Flammrock#5464 😀", 
+		"😝 I will help u if u send me +help",
+		"I update my database 😎", 
+		"I always listen u",
+		"#stayathome 😐",
+		"#restezchezvous 😐",
+		"Hello",
+		"Hi :)",
+		"It's Muffin Times! 😂",
+		"Yeah Man 😎",
+		"You are my bro 😘",
+		"😴 I just woke up, did I miss something? 😴",
+		"😱😱😱😱😱😱😱😱😱😱",
+		"💩",
+		"🤖 Something is wrong, i can feel it!",
+		"Are u ok?",
+		"I work hard for u! can i have choco 🍫 ??",
+		"About 73,600,000 results (0.57 seconds)",
+		"🤯I am moving though the web!! 🤯🤯",
+		"My Creator is a cool French🇫🇷 Guy 🥖",
+		"I'm cool Bot!! 😆",
+		"I'm in the matrix",
+		"Can u beat me?",
+		"my finger is too big!",
+		"Sleeping......",
+		"oh oh oh...🎅🏻🎅🏻",
+		"👨🏻‍💻"
+    ];
+	setInterval(() => {
+        const index = Math.floor(Math.random() * (activities_list.length - 1) + 1); // generates a random number between 1 and the length of the activities array list (in this case 5).
+        bot.user.setActivity(activities_list[index]); // sets bot's activities to one of the phrases in the arraylist.
+    }, 10000); // Runs this every 10 seconds.
 });
 
 bot.on('message', msg => {
