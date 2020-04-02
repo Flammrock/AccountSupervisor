@@ -276,15 +276,15 @@ class ParserCommand {
 // ADMIN
 new Command('ping', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	query('SELECT * FROM users',function(err,rows){
-		console.log(err);
-		console.log(rows);
-	});
+	msg.channel.send('pong');
 });
 // ADMIN
 new Command('lookup-users', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	
+	query('SELECT * FROM users',function(err,rows){
+		console.log(err);
+		console.log(rows);
+	});
 });
 // ADMIN
 new Command('all-reset-all', function(msg,args) {
