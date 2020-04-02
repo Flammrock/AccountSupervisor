@@ -365,7 +365,7 @@ new Command('ping', function(appdata,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('+'+name)
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Just Ping the bot to known if the bot is really online.', true)
+		.addField('Description', 'Just Ping the bot to known if the bot is really online.', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
