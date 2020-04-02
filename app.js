@@ -152,7 +152,7 @@ class Command {
 	constructor(name,_fn,_fnhelp) {
 		this.name = name || '';
 		this._fn = _fn || function(){};
-		this._fnhelp = _fn || function(){};
+		this._fnhelp = _fnhelp || function(){};
 		Command.List[this.name] = this;
 	}
 	
