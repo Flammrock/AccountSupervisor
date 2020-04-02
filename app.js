@@ -1384,8 +1384,8 @@ new Command('bank-create-account', function(msg,args) {
 						///////temp
 						query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 							
-							console.logs(err);
-							console.logs(rows);
+							console.log(err);
+							console.log(rows);
 							f();
 						});
 						
