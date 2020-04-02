@@ -1353,6 +1353,7 @@ new Command('bank-create-account', function(msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 				return;
 			}
+			console.log('"'+id+'"');
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				if (rows.length!=0) {
 					var obj = JSON.parse(rows[0].data);
