@@ -9,7 +9,7 @@ const DATABASE_URI = process.env.CLEARDB_DATABASE_URL;
 
 //const DATABASE_PARSE = DATABASE_URI.match(/mysql:\/\/([^:]+):([^@]+)@([^\/]+)\/([^\?]+)\??/);
 
-console.log(DATABASE_PARSE);
+//console.log(DATABASE_PARSE);
 
 const PREFIX = '+';
 
