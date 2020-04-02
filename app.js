@@ -363,7 +363,7 @@ new Command('ping', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('+'+name)
+		.setDescription('```dos\n+'+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Just Ping the bot to known if the bot is really online.', false)
 	msg.channel.send(_embed);
