@@ -363,7 +363,7 @@ new Command('ping', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```dos\n+'+name+'\n```')
+		.setDescription('```css\n+'+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Just Ping the bot to known if the bot is really online.', false)
 	msg.channel.send(_embed);
@@ -387,7 +387,7 @@ new Command('all-reset-all', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```dos\n+'+name+'\n```')
+		.setDescription('```css\n+'+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Reset Bank, Users, Shop, Items Systèmes.', false)
 	msg.channel.send(_embed);
@@ -411,7 +411,7 @@ new Command('set-currency-name', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```dos\n+'+name+' <money-name>\n```')
+		.setDescription('```dos\n+'+name+' [money-name]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Change the Money Name, example:\n  +'+name+' Yens\n  +'+name+' "Super Yens"', false)
 	msg.channel.send(_embed);
