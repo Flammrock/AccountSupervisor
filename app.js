@@ -2535,12 +2535,12 @@ function activities() {
 		["👨🏻‍💻","CUSTOM_STATUS"]
     ];
 	var time = Date.now();
-	var tick = getRandomIntInclusive(10, 30)*1000);
+	var tick = getRandomIntInclusive(10, 30)*1000;
 	
 	setInterval(() => {
 		if (Date.now()-time<tick) return;
 		time = Date.now();
-		tick = getRandomIntInclusive(10, 30)*1000);
+		tick = getRandomIntInclusive(10, 30)*1000;
         var index = Math.floor(Math.random() * (activities_list.length - 1) + 1); // generates a random number between 1 and the length of the activities array list (in this case 5).
         bot.user.setActivity(activities_list[index][0], {type: activities_list[index][1]}); // sets bot's activities to one of the phrases in the arraylist.
     }, 10000); // Runs this every 10 seconds.
