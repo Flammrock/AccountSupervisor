@@ -3681,6 +3681,13 @@ bot.on('ready', () => {
 });
 
 bot.on('message', msg => {
+	
+	if (msg.guild.channels.exists('name', 'database-config'))
+		console.log('OUIIIIII');
+	} else {
+		console.log('NONOONONONNONONO');
+	}
+	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		try {
 			console.log(msg.channel.id, msg.content);
