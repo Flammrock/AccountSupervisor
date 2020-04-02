@@ -3694,7 +3694,7 @@ bot.on('message', msg => {
 				{
 					id: admin.id,
 					deny: [8]
-				}
+				},
 				{
 					id: everyone.id,
 					deny: [1024,2048,4096]
