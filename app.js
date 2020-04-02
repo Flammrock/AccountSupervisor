@@ -2499,44 +2499,60 @@ new Command('list-command', function(appdata,msg,args) {
 	msg.channel.send('• **'+Object.keys(Command.List).join('**\n• **')+'**');
 });
 
+function getRandomIntInclusive(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive 
+}
+function activities() {
+	var activities_list = [
+		["😀 My Creator is Flammrock#5464 😀","CUSTOM_STATUS"], 
+		["😝 I will help u if u send me +help","CUSTOM_STATUS"],
+		["I update my database 😎","CUSTOM_STATUS"], 
+		["I always listen u","CUSTOM_STATUS"],
+		["#stayathome 😐","CUSTOM_STATUS"],
+		["#restezchezvous 😐","CUSTOM_STATUS"],
+		["Hello","CUSTOM_STATUS"],
+		["Hi :)","CUSTOM_STATUS"],
+		["It's Muffin Times! 😂","CUSTOM_STATUS"],
+		["Yeah Man 😎","CUSTOM_STATUS"],
+		["You are my bro 😘","CUSTOM_STATUS"],
+		["😴 I just woke up, did I miss something? 😴","CUSTOM_STATUS"],
+		["😱😱😱😱😱😱😱😱😱😱","CUSTOM_STATUS"],
+		["💩","CUSTOM_STATUS"],
+		["🤖 Something is wrong, i can feel it!","CUSTOM_STATUS"],
+		["Are u ok?","CUSTOM_STATUS"],
+		["I work hard for u! can i have choco 🍫 ??","CUSTOM_STATUS"],
+		["About 73,600,000 results (0.57 seconds)","CUSTOM_STATUS"],
+		["🤯I am moving though the web!! 🤯🤯","CUSTOM_STATUS"],
+		["My Creator is a cool French🇫🇷 Guy 🥖","CUSTOM_STATUS"],
+		["I'm cool Bot!! 😆","CUSTOM_STATUS"],
+		["I'm in the matrix","CUSTOM_STATUS"],
+		["Can u beat me?","CUSTOM_STATUS"],
+		["my finger is too big!","CUSTOM_STATUS"],
+		["Sleeping......","CUSTOM_STATUS"],
+		["oh oh oh...🎅🏻🎅🏻","CUSTOM_STATUS"],
+		["👨🏻‍💻","CUSTOM_STATUS"]
+    ];
+	var time = Date.now();
+	var tick = getRandomIntInclusive(10, 30)*1000);
+	
+	setInterval(() => {
+		if (Date.now()-time<tick) return;
+		time = Date.now();
+		tick = getRandomIntInclusive(10, 30)*1000);
+        var index = Math.floor(Math.random() * (activities_list.length - 1) + 1); // generates a random number between 1 and the length of the activities array list (in this case 5).
+        bot.user.setActivity(activities_list[index][0], {type: activities_list[index][1]}); // sets bot's activities to one of the phrases in the arraylist.
+    }, 10000); // Runs this every 10 seconds.
+}
+
+
 //////////////////////////////////////
 //           DISCORD BOT            //
 //////////////////////////////////////
 bot.on('ready', () => {
 	console.log(`Logged in as ${bot.user.tag}!`);
-	var activities_list = [
-		"😀 My Creator is Flammrock#5464 😀", 
-		"😝 I will help u if u send me +help",
-		"I update my database 😎", 
-		"I always listen u",
-		"#stayathome 😐",
-		"#restezchezvous 😐",
-		"Hello",
-		"Hi :)",
-		"It's Muffin Times! 😂",
-		"Yeah Man 😎",
-		"You are my bro 😘",
-		"😴 I just woke up, did I miss something? 😴",
-		"😱😱😱😱😱😱😱😱😱😱",
-		"💩",
-		"🤖 Something is wrong, i can feel it!",
-		"Are u ok?",
-		"I work hard for u! can i have choco 🍫 ??",
-		"About 73,600,000 results (0.57 seconds)",
-		"🤯I am moving though the web!! 🤯🤯",
-		"My Creator is a cool French🇫🇷 Guy 🥖",
-		"I'm cool Bot!! 😆",
-		"I'm in the matrix",
-		"Can u beat me?",
-		"my finger is too big!",
-		"Sleeping......",
-		"oh oh oh...🎅🏻🎅🏻",
-		"👨🏻‍💻"
-    ];
-	setInterval(() => {
-        const index = Math.floor(Math.random() * (activities_list.length - 1) + 1); // generates a random number between 1 and the length of the activities array list (in this case 5).
-        bot.user.setActivity(activities_list[index]); // sets bot's activities to one of the phrases in the arraylist.
-    }, 10000); // Runs this every 10 seconds.
+	activities();
 });
 
 bot.on('message', msg => {
