@@ -163,19 +163,19 @@ class Command {
 		Command.List[data.name]._fn(appdata,msg,data.args);
 	}
 	
-	static checkPermission(msg,mode) {
+	static checkPermission(msg,mode,l) {
 		switch (mode) {
 			case 'ADMIN':
 				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.hasPermission("ADMINISTRATOR"))) {
-					msg.delete();
-					msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
+					if (!l) msg.delete();
+					if (!l) msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
 					return false;
 				}
 				break;
 			case 'CITOYEN':
 				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.roles.cache.some(r => r.name === "AccountSupervisorCitoyen") || msg.member.hasPermission("ADMINISTRATOR"))) {
-					msg.delete();
-					msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
+					if (!l) msg.delete();
+					if (!l) msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
 					return false;
 				}
 				break;
@@ -433,7 +433,7 @@ new Command('character-delete', function(appdata,msg,args) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
 			return;
 		}
@@ -456,7 +456,7 @@ new Command('character-select', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
 				return;
 			}
@@ -484,7 +484,7 @@ new Command('character-unselect', function(appdata,msg,args,c) {
 			return;
 		}
 		var data = JSON.parse(rows[0].data);
-		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+		if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 			msg.reply('Sorry, You aren\'t the owner of `'+args[0]+'` Character :cold_sweat:');
 			return;
 		}
@@ -624,7 +624,7 @@ new Command('company-delete', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
@@ -650,7 +650,7 @@ new Command('company-add-job', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
@@ -682,7 +682,7 @@ new Command('company-remove-job', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
@@ -760,7 +760,7 @@ new Command('company-accept-request-job', function(appdata,msg,args) {
 				var data = JSON.parse(rows[0].data);
 				data.JobRequests = data.JobRequests || {};
 				data.Workers = data.Workers || {};
-				if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+				if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 					msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 					return;
 				}
@@ -865,7 +865,7 @@ new Command('company-fire', function(appdata,msg,args) {
 				}
 				var data = JSON.parse(rows[0].data);
 				data.Workers = data.Workers || {};
-				if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+				if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 					msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 					return;
 				}
@@ -898,7 +898,7 @@ new Command('company-update-shop', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
@@ -923,7 +923,7 @@ new Command('company-add-shop-website', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
@@ -944,7 +944,7 @@ new Command('company-remove-shop-website', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
@@ -966,7 +966,7 @@ new Command('company-create-item', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
@@ -1001,7 +1001,7 @@ new Command('company-delete-item', function(appdata,msg,args) {
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
-			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN')) {
+			if (data.owner!=id && !Command.checkPermission(msg,'ADMIN',true)) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
@@ -1045,7 +1045,7 @@ new Command('company-view', function(appdata,msg,args) {
 			data.JobRequests = data.JobRequests || {};
 			data.Workers = data.Workers || {};
 			console.log(data);
-			var canEdit = data.owner==id || Command.checkPermission(msg,'ADMIN');
+			var canEdit = data.owner==id || Command.checkPermission(msg,'ADMIN',true);
 			var t = data.owner.split(':');
 			var ownername = '';
 			if (t.length>1) {
@@ -1889,7 +1889,7 @@ new Command('inventory-item-clear', function(appdata,msg,args) {
 	var id = '<@'+msg.member.user.id+'>';
 	var current = true;
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
-	if (Command.checkPermission(msg,'ADMIN') && args.length >= 1) {
+	if (Command.checkPermission(msg,'ADMIN',true) && args.length >= 1) {
 		id = args[0];
 	}
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(idu,usernamecharname){
@@ -1923,7 +1923,7 @@ new Command('inventory-item-view', function(appdata,msg,args) {
 	var page = 1;
 	var id = '<@'+msg.member.user.id+'>';
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
-	if (!Command.checkPermission(msg,'ADMIN')) {
+	if (!Command.checkPermission(msg,'ADMIN',true)) {
 		page = (args.length >= 1) ? (parseInt(args[0]) || 1) : 1;
 	} else {
 		if (args.length >= 1) {
