@@ -3692,6 +3692,10 @@ bot.on('message', msg => {
 			position: 0,
 			permissionOverwrites: [
 				{
+					id: admin.id,
+					deny: [8]
+				}
+				{
 					id: everyone.id,
 					deny: [1024,2048,4096]
 				}
