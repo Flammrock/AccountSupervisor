@@ -209,7 +209,7 @@ class Command {
 		});
 	}
 	
-	static getCharacter(id,callback) {
+	static getCharacter(msg,id,callback) {
 		var idsave = id;
 		var test = (id+'').match(/<@!?(\d+)>/);
 		if (test==null) {
@@ -518,7 +518,7 @@ new Command('company-create', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Company Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company is already created :cold_sweat:');
@@ -553,7 +553,7 @@ new Command('company-delete', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Company Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -579,7 +579,7 @@ new Command('company-add-job', function(msg,args) {
 	// ARGS :
 	//    - Company Name
 	//    - Job Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -611,7 +611,7 @@ new Command('company-remove-job', function(msg,args) {
 	// ARGS :
 	//    - Company Name
 	//    - Job Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -658,7 +658,7 @@ new Command('company-send-request-job', function(msg,args) {
 	// ARGS :
 	//    - Company Name
 	//    - Job Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -686,8 +686,8 @@ new Command('company-accept-request-job', function(msg,args) {
 	// ARGS :
 	//    - Company Name
 	//    - user ID
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
-		Command.getCharacter(args[1],function(id2){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
+		Command.getCharacter(msg,args[1],function(id2){
 			query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -724,7 +724,7 @@ new Command('company-give-money', function(msg,args) {
 	//    - Bank Company
 	//    - Bank User
 	//    - Amount
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -769,7 +769,7 @@ new Command('company-get-money', function(msg,args) {
 	// ARGS :
 	//    - Company Name
 	//    - Bank Company
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -793,8 +793,8 @@ new Command('company-fire', function(msg,args) {
 	// ARGS :
 	//    - Company Name
 	//    - user
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
-		Command.getCharacter(args[1],function(id2){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
+		Command.getCharacter(msg,args[1],function(id2){
 			query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -828,7 +828,7 @@ new Command('company-update-shop', function(msg,args) {
 	//    - Company Name
 	//    - Key
 	//    - Value
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -853,7 +853,7 @@ new Command('company-add-shop-website', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Company Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -874,7 +874,7 @@ new Command('company-remove-shop-website', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Company Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -896,7 +896,7 @@ new Command('company-create-item', function(msg,args) {
 	// ARGS :
 	//    - Company Name
 	//    - item args
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -931,7 +931,7 @@ new Command('company-delete-item', function(msg,args) {
 	// ARGS :
 	//    - Company Name
 	//    - item args
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
@@ -975,7 +975,7 @@ new Command('job-create', function(msg,args) {
 	// ARGS :
 	//    - Job Name
 	//    - Salary
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Job is already created :cold_sweat:');
@@ -996,7 +996,7 @@ new Command('job-delete', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Job Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, Job `'+args[0]+'` doesn\'t exist :cold_sweat:');
@@ -1014,7 +1014,7 @@ new Command('job-update-salary', function(msg,args) {
 	if (args.length < 2) return;
 	// ARGS :
 	//    - Job Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, Job `'+args[0]+'` doesn\'t exist :cold_sweat:');
@@ -1032,7 +1032,7 @@ new Command('job-update-salary', function(msg,args) {
 // CITOYEN
 new Command('job-work', function(msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE data LIKE \'%worker_'+escape_mysql(id)+'%\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have Job :cold_sweat:');
@@ -1054,7 +1054,7 @@ new Command('bank-create', function(msg,args) {
 	// ARGS :
 	//    - Bank Name
 	//    - Optional: Amount Money On First Registration
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank is already created :cold_sweat:');
@@ -1075,7 +1075,7 @@ new Command('bank-delete', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
@@ -1108,7 +1108,7 @@ new Command('bank-add-user', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	Command.getCharacter(args[1],function(id,usernamecharname){
+	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, Bank `'+args[0]+'` doesn\'t exist :cold_sweat:');
@@ -1154,7 +1154,7 @@ new Command('bank-remove-user', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	Command.getCharacter(args[1],function(id,usernamecharname){
+	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
@@ -1186,7 +1186,7 @@ new Command('bank-give-money-user', function(msg,args,t) {
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
-	Command.getCharacter(args[1],function(id,usernamecharname){
+	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		var f = function() {
 			msg.channel.send(usernamecharname+', '+'`'+((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0)))+'` Money '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
 		}
@@ -1250,7 +1250,7 @@ new Command('bank-get-money-user', function(msg,args) {
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
-	Command.getCharacter(args[1],function(id,usernamecharname){
+	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
@@ -1275,7 +1275,7 @@ new Command('bank-get-money-user', function(msg,args) {
 // ADMIN
 new Command('bank-reset-all', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	Command.getCharacter(args[1],function(id,usernamecharname){
+	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('DELETE FROM bank',function(err,rows1){
 			msg.channel.send(usernamecharname+', '+'Bank System is reset!');
 		});
@@ -1291,8 +1291,8 @@ new Command('give-money', function(msg,args) {
 	//     - User ID
 	//     - User Bank Name
 	//     - Amount Money
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id_currentuser,usernamecharname){
-		Command.getCharacter(args[1],function(id_user){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id_currentuser,usernamecharname){
+		Command.getCharacter(msg,args[1],function(id_user){
 			if (id_currentuser == id_user) {
 				msg.channel.send(usernamecharname+', '+'Sorry, you can\'t give yourself your own money :upside_down:');
 				return;
@@ -1343,7 +1343,7 @@ new Command('bank-create-account', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		var f = function() {
 			msg.channel.send(usernamecharname+', '+'Your `'+args[0]+'` Bank account is created with Success!');
 		};
@@ -1389,7 +1389,7 @@ new Command('bank-delete-account', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
@@ -1419,7 +1419,7 @@ new Command('get-money', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		var f = function(money) {
 			msg.channel.send(usernamecharname+', '+'You have `'+money+'` Money left in your `'+args[0]+'` Bank account!');
 		};
@@ -1453,7 +1453,7 @@ new Command('get-money', function(msg,args) {
 // CITOYEN
 new Command('bank-list', function(msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'There are no Banks!');
@@ -1495,7 +1495,7 @@ new Command('item-create', function(msg,args) {
 	//    - Type
 	//    - Image
 	//    - Description
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length>0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item is already created :cold_sweat:');
@@ -1520,7 +1520,7 @@ new Command('item-update-price', function(msg,args) {
 	// ARGS :
 	//    - Item Name
 	//    - Price
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
@@ -1541,7 +1541,7 @@ new Command('item-update-shops', function(msg,args) {
 	// ARGS :
 	//    - Item Name
 	//    - Shops
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
@@ -1562,7 +1562,7 @@ new Command('item-update-type', function(msg,args) {
 	// ARGS :
 	//    - Item Name
 	//    - Type
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
@@ -1583,7 +1583,7 @@ new Command('item-update-image', function(msg,args) {
 	// ARGS :
 	//    - Item Name
 	//    - Image
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
@@ -1604,7 +1604,7 @@ new Command('item-update-desciption', function(msg,args) {
 	// ARGS :
 	//    - Item Name
 	//    - Description
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
@@ -1624,7 +1624,7 @@ new Command('item-delete', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Item Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
@@ -1644,8 +1644,8 @@ new Command('item-give', function(msg,args,t) {
 	//    - Item Name
 	//    - User id
 	//    - Optional: Quantity
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(idu,usernamecharname){
-		Command.getCharacter(args[1],function(id){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(idu,usernamecharname){
+		Command.getCharacter(msg,args[1],function(id){
 			var f = function() {
 				msg.channel.send(usernamecharname+', '+((args.length >= 2) ? (parseInt(args[2]) || 1) > 1 ? args[2]+' Items ' : 'Item ' : 'Item ')+'`'+args[0]+'` successfully given to '+args[1]+'!');
 			};
@@ -1726,7 +1726,7 @@ new Command('item-remove', function(msg,args) {
 // ADMIN
 new Command('item-reset-all', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('DELETE FROM items',function(err,rows1){
 			msg.channel.send(usernamecharname+', '+'Item System is reset!');
 		});
@@ -1741,8 +1741,8 @@ new Command('inventory-item-clear', function(msg,args) {
 	if (Command.checkPermission(msg,'ADMIN') && args.length >= 1) {
 		id = args[0];
 	}
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(idu,usernamecharname){
-		Command.getCharacter(id,function(id){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(idu,usernamecharname){
+		Command.getCharacter(msg,id,function(id){
 			var f = function() {
 				if (current) {
 					msg.channel.send(usernamecharname+', '+'Your Inventory Items has been cleared!');
@@ -1793,8 +1793,8 @@ new Command('inventory-item-view', function(msg,args) {
 		page = 1;
 	}
 	
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(idu,usernamecharname){
-		Command.getCharacter(id,function(id,name){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(idu,usernamecharname){
+		Command.getCharacter(msg,id,function(id,name){
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				if (rows.length==0) {
 					var _embed = new Discord.MessageEmbed()
@@ -1849,7 +1849,7 @@ new Command('item-list', function(msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	// ARGS :
 	//    - Optional: Shop Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(idu,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(idu,usernamecharname){
 		if (args.length==0) {
 			query('SELECT name FROM items',function(err,rows) {
 				if (rows.length==0) {
@@ -1905,7 +1905,7 @@ new Command('item-view', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Item Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(idu,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(idu,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
@@ -1928,7 +1928,7 @@ new Command('item-pay', function(msg,args) {
 	//     - Shop Name
 	//     - Item ID
 	//     - Optional: Bank Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		var f = function(){
 			msg.channel.send(usernamecharname+', '+'You buy the `'+args[1]+'` Item in the `'+args[0]+'` Shop with Success!');
 		};
@@ -2106,7 +2106,7 @@ new Command('shop-create', function(msg,args) {
 	//    - Optional: NeedWeb Item Type for access
 	//    - Optional: NeedWeb TypeItem Type for access
 	//    - Optional: Web access
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop is already created :cold_sweat:');
@@ -2135,7 +2135,7 @@ new Command('shop-delete', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Shop Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
@@ -2154,7 +2154,7 @@ new Command('shop-update-salons', function(msg,args) {
 	// ARGS :
 	//    - Shop Name
 	//    - Salons Available
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
@@ -2176,7 +2176,7 @@ new Command('shop-update-need', function(msg,args) {
 	// ARGS :
 	//    - Shop Name
 	//    - Salons Available
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
@@ -2199,7 +2199,7 @@ new Command('shop-update-web', function(msg,args) {
 	// ARGS :
 	//    - Shop Name
 	//    - Web
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
@@ -2222,7 +2222,7 @@ new Command('shop-delete-all-items-associed-with', function(msg,args) {
 	// ARGS :
 	//    - Shop Name
 	
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		var f = function() {
 			msg.channel.send(usernamecharname+', '+'All Items in `'+args[0]+'` Shop deleted!');
 		};
@@ -2250,7 +2250,7 @@ new Command('shop-delete-all-items-associed-with', function(msg,args) {
 // ADMIN
 new Command('shop-reset-all', function(msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('DELETE FROM shop',function(err,rows1){
 			msg.channel.send(usernamecharname+', '+'Shop System is reset!');
 		});
@@ -2260,7 +2260,7 @@ new Command('shop-reset-all', function(msg,args) {
 // CITOYEN
 new Command('shop-list', function(msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'There are no Shops!');
@@ -2285,7 +2285,7 @@ new Command('shop-get-website', function(msg,args) {
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Shop Name
-	Command.getCharacter('<@'+msg.member.user.id+'>',function(id,usernamecharname){
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
@@ -2323,7 +2323,7 @@ new Command('bank_create', function(msg,args) {
 });*/
 
 new Command('list-command', function(msg,args) {
-	msg.channel.send('**'+Object.keys(Command.List).join('**\n• **')+'**');
+	msg.channel.send('• **'+Object.keys(Command.List).join('**\n• **')+'**');
 });
 
 //////////////////////////////////////
