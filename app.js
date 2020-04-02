@@ -218,7 +218,7 @@ class Command {
 		var idsave = id;
 		var test = (id+'').match(/<@!?(\d+)>/);
 		if (test==null) {
-			query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				if (rows.length==0) {
 					msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:\nType the Name of Character or type `@` then select a user!');
 					return;
