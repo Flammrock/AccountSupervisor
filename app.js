@@ -184,7 +184,7 @@ class Command {
 				}
 				break;
 			case 'CITIZEN':
-				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.roles.cache.some(r => r.name === "AccountSupervisorCitoyen") || msg.member.hasPermission("ADMINISTRATOR"))) {
+				if (!(msg.member.roles.cache.some(r => r.name === "AccountSupervisorAdmin") || msg.member.roles.cache.some(r => r.name === "AccountSupervisorCitizen") || msg.member.hasPermission("ADMINISTRATOR"))) {
 					if (!l) msg.delete();
 					if (!l) msg.author.send('Sorry, you don\'t have the permissions :cold_sweat:\nAnd i\'ve decided to delete your message.');
 					return false;
@@ -3686,6 +3686,19 @@ bot.on('message', msg => {
 		console.log('OUIIIIII');
 	} else {
 		console.log('NONOONONONNONONO');
+		var admin = msg.guild.roles.cache.find(r => r.name == 'AccountSupervisorAdmin');
+		msg.guild.createChannel('accountsupervisor-database-config', {
+			position: 0,
+			permissionOverwrites: [
+				{
+					id: admin.id,
+					allow: ['ADMINISTRATOR']
+				}, {
+					id: message.guild.defaultRole.id,
+					deny: ['READ_MESSAGES','VIEW_CHANNEL','SEND_MESSAGES','SEND_TTS_MESSAGES']
+				}
+			 ]
+		});
 	}
 	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
@@ -3695,7 +3708,7 @@ bot.on('message', msg => {
 			var role_citoyen = false;
 			msg.guild.roles.cache.forEach(role => {
 				if (role.name=='AccountSupervisorAdmin') role_admin = true;
-				if (role.name=='AccountSupervisorCitoyen') role_citoyen = true;
+				if (role.name=='AccountSupervisorCitizen') role_citoyen = true;
 			});
 			if (!role_admin) {
 				msg.guild.roles.create({
@@ -3709,7 +3722,7 @@ bot.on('message', msg => {
 			if (!role_citoyen) {
 				msg.guild.roles.create({
 					data: {
-						name: 'AccountSupervisorCitoyen',
+						name: 'AccountSupervisorCitizen',
 						color: 'BLUE',
 					},
 					reason: '',
