@@ -229,7 +229,7 @@ class Command {
 			});
 		} else {
 			id = test[1];
-			query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\'',function(err,rows){
+			query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
 				if (rows.length==0) {
 					var t = msg.guild.members.cache.find(r => r.id == id);
 					if (t) {
@@ -477,7 +477,7 @@ new Command('character-select', function(appdata,msg,args) {
 new Command('character-unselect', function(appdata,msg,args,c) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	var id = msg.member.user.id+'';
-	query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\'',function(err,rows){
+	query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
 		if (rows.length==0) {
 			if (!c) msg.author.send('Character is already unselected!');
 			if (c) c();
@@ -574,6 +574,14 @@ new Command('character-list', function(appdata,msg,args) {
 		}
 	});
 });
+// CITOYEN
+new Command('character-who-i-am', function(appdata,msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
+		msg.reply('you are: '+usernamecharname);
+	});
+});
+
 
 // COMPANY
 // CITOYEN
@@ -724,21 +732,27 @@ new Command('company-send-request-job', function(appdata,msg,args) {
 	//    - Company Name
 	//    - Job Name
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
-		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+		query('SELECT * FROM company WHERE data LIKE \'%worker_'+escape_mysql(id)+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
+			if (rows.length>0) {
+				msg.channel.send(usernamecharname+', '+'Sorry, you already have a job :cold_sweat:');
 				return;
 			}
-			var data = JSON.parse(rows[0].data);
-			query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
+			query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
-					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[1]+'` Job doesn\'t exist :cold_sweat:');
+					Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 					return;
 				}
-				data.JobRequests = data.JobRequests || {};
-				data.JobRequests['request_'+id] = args[1];
-				query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-					msg.channel.send(usernamecharname+', '+'You have send a `'+args[1]+'` Job Request in `'+args[0]+'` Company with Success!');
+				var data = JSON.parse(rows[0].data);
+				query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
+					if (rows.length==0) {
+						msg.channel.send(usernamecharname+', '+'Sorry, `'+args[1]+'` Job doesn\'t exist :cold_sweat:');
+						return;
+					}
+					data.JobRequests = data.JobRequests || {};
+					data.JobRequests['request_'+id] = args[1];
+					query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+						msg.channel.send(usernamecharname+', '+'You have send a `'+args[1]+'` Job Request in `'+args[0]+'` Company with Success!');
+					});
 				});
 			});
 		});
@@ -774,7 +788,7 @@ new Command('company-accept-request-job', function(appdata,msg,args) {
 							msg.channel.send(usernamecharname+', '+'You have accepted the request of '+args[1]+' successfully in `'+args[0]+'` Company!');
 						});
 					};
-					query('SELECT * FROM company WHERE data LIKE \'%request_'+id2+'%\'',function(err,rows){
+					query('SELECT * FROM company WHERE data LIKE \'%request_'+id2+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
 						var _text = "";
 						var _textn = "";
 						for (var i = 0; i < rows.length; i++) {
@@ -1206,7 +1220,7 @@ new Command('job-update-salary', function(appdata,msg,args) {
 new Command('job-work', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
-		query('SELECT * FROM company WHERE data LIKE \'%worker_'+escape_mysql(id)+'%\'',function(err,rows){
+		query('SELECT * FROM company WHERE data LIKE \'%worker_'+escape_mysql(id)+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
 			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have Job :cold_sweat:');
 				return;
@@ -1215,8 +1229,61 @@ new Command('job-work', function(appdata,msg,args) {
 		});
 	});
 });
-
-
+// CITOYEN
+new Command('job-leave', function(appdata,msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
+		var ff = function () {
+			msg.channel.send(usernamecharname+', '+'you left your job with success!');
+		};
+		query('SELECT * FROM company WHERE data LIKE \'%worker_'+escape_mysql(id)+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
+			if (rows.length==0) {
+				msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have Job :cold_sweat:');
+				return;
+			}
+			query('SELECT * FROM company WHERE data LIKE \'%worker_'+id+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
+				var _text = "";
+				var _textn = "";
+				for (var i = 0; i < rows.length; i++) {
+					var datatmp = JSON.parse(rows[i].data);
+					datatmp.Workers['worker_'+id] = null;
+					delete datatmp.Workers['worker_'+id];
+					_text += "WHEN '"+escape_mysql(rows[i].name)+"' THEN '"+escape_mysql(JSON.stringify(datatmp))+"'";
+					_textn += "'"+escape_mysql(rows[i].name)+"',";
+				}
+				if (_text!="") {
+					_text += " END WHERE name IN ("+_textn.slice(0,-1)+")";
+					query('UPDATE company SET data = CASE name '+_text,function(err,rows){
+						ff();
+					});
+				} else {
+					ff();
+				}
+			});
+		});
+	});
+});
+// CITOYEN
+new Command('job-view', function(appdata,msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 1) return;
+	// ARGS :
+	//    - Job Name
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
+		query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			if (rows.length > 0) {
+				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Job doesn\'t exist :cold_sweat:');
+				return;
+			}
+			var data = JSON.parse(rows[0].data);
+			var _embed = new Discord.MessageEmbed()
+				.setTitle('Job '+args[0])
+				.setColor(0xff0000)
+				.setDescription('**SALARY (month)**: '+data.salary+'\n**SALARY (day)**: '+(parseFloat(data.salary)||325000.0)/30);
+			msg.channel.send(_embed);
+		});
+	});
+});
 
 // BANK
 
