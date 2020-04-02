@@ -149,9 +149,10 @@ query(`CREATE TABLE IF NOT EXISTS characterdata (
 //////////////////////////////////////
 class Command {
 	
-	constructor(name,_fn) {
+	constructor(name,_fn,_fnhelp) {
 		this.name = name || '';
 		this._fn = _fn || function(){};
+		this._fnhelp = _fn || function(){};
 		Command.List[this.name] = this;
 	}
 	
@@ -340,10 +341,32 @@ var Speech = {
 };
 
 
+
+// CITOYEN
+new Command('help', function(appdata,msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 1) return;
+	// ARGS :
+	//    - Command Name
+	if (typeof Command.List[args[0]] !== 'undefined') {
+		Command.List[args[0]]._fnhelp(msg,args[0]);
+	}
+},function(msg,name){
+	
+});
+
 // ADMIN
 new Command('ping', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	msg.channel.send('pong');
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('+'+name)
+		.addField('Permission', 'ADMIN', true)
+		.addField('Description', 'Just Ping the bot to known if the bot is really online.', true)
+	msg.channel.send(_embed);
 });
 // ADMIN
 new Command('all-reset-all', function(appdata,msg,args) {
