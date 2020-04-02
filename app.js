@@ -50,7 +50,7 @@ function query(SQL,fn) {
 function escape_mysql(s) {return s.replace(/'/g,"''");}
 query();
 
-/*
+
 query(`DROP TABLE users`,(err,rows) => {
 query(`DROP TABLE bank`,(err,rows) => {
 query(`DROP TABLE shop`,(err,rows) => {
@@ -59,7 +59,7 @@ query(`DROP TABLE job`,(err,rows) => {
 query(`DROP TABLE company`,(err,rows) => {
 query(`DROP TABLE dataapp`,(err,rows) => {
 query(`DROP TABLE characterdata`,(err,rows) => {});});});});});});});});
-*/
+
 
 
 query(`CREATE TABLE IF NOT EXISTS users (
@@ -225,7 +225,7 @@ class Command {
 				}
 				var data = JSON.parse(rows[0].data);
 				var charname = rows[0].name.substring(rows[0].name.indexOf('_')+1).substring(rows[0].name.substring(rows[0].name.indexOf('_')+1).indexOf('_')+1);
-				callback((data.owner+'')+charname,charname);
+				callback((data.owner+':')+charname,charname);
 			});
 		} else {
 			id = test[1];
@@ -242,7 +242,7 @@ class Command {
 					return;
 				}
 				var charname = rows[0].name.substring(rows[0].name.indexOf('_')+1).substring(rows[0].name.substring(rows[0].name.indexOf('_')+1).indexOf('_')+1);
-				callback((id+'')+charname,charname);
+				callback((id+':')+charname,charname);
 			});
 		}
 	}
@@ -378,20 +378,8 @@ new Command('set-currency-name', function(appdata,msg,args) {
 	});
 });
 // ADMIN
-new Command('set-cooldown', function(appdata,msg,args) {
+new Command('set-cooldown-work', function(appdata,msg,args) {
 	
-});
-// ADMIN
-new Command('role-income-add', function(appdata,msg,args) {
-	//add <role> <cash | bank> <amount> <interval> [<channel> <message>]
-});
-// ADMIN
-new Command('role-income-remove', function(appdata,msg,args) {
-	//add <role> <cash | bank> <amount> <interval> [<channel> <message>]
-});
-// ADMIN
-new Command('role-income-list', function(appdata,msg,args) {
-	//add <role> <cash | bank> <amount> <interval> [<channel> <message>]
 });
 
 
@@ -776,7 +764,6 @@ new Command('company-accept-request-job', function(appdata,msg,args) {
 					msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 					return;
 				}
-				console.log('ID-ACCEPT-REQUEST:','"'+id2+'"');
 				if (typeof data.JobRequests[id2] !== 'undefined') {
 					data.Workers['worker_'+id2] = data.JobRequests[id2];
 					data.JobRequests[id2] = null;
@@ -1041,6 +1028,93 @@ new Command('company-delete-item', function(appdata,msg,args) {
 	});
 });
 
+// CITOYEN
+new Command('company-view', function(appdata,msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 1) return;
+	// ARGS :
+	//    - Company Name
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
+		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			if (rows.length==0) {
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				return;
+			}
+			var data = JSON.parse(rows[0].data);
+			data.JobsList = data.JobsList || {};
+			data.JobRequests = data.JobRequests || {};
+			data.Workers = data.Workers || {};
+			var canEdit = data.owner==id || Command.checkPermission(msg,'ADMIN');
+			var t = data.owner.split(':');
+			var ownername = '';
+			if (t.length>1) {
+				ownername = t[1];
+			} else {
+				var t2 = msg.guild.members.cache.find(r => r.id == t[0]);
+				if (t) {
+					var user = t2.user;
+					ownername = user.username + '#' + user.discriminator;
+				} else {
+					ownername = '<@'+t[0]+'>';
+				}
+			}
+			var jobslist = (Object.keys(data.JobsList).length==0)?'No Jobs':Object.keys(data.JobsList).join(', ');
+			var jobsrequestkey = "";
+			for (var i in data.JobRequests) {
+				if (data.JobRequests.hasOwnProperty(i)) {
+					var ownernametmp = '';
+					var t = i.split(':');
+					if (t.length>1) {
+						ownernametmp = t[1];
+					} else {
+						var t2 = msg.guild.members.cache.find(r => r.id == t[0]);
+						if (t) {
+							var user = t2.user;
+							ownernametmp = user.username + '#' + user.discriminator;
+						} else {
+							ownernametmp = '<@'+t[0]+'>';
+						}
+					}
+					jobsrequestkey += ownernametmp+' *('+data.JobRequests[i]+')*, ';
+				}
+			}
+			if (jobsrequestkey!="") {
+				jobsrequestkey = jobsrequestkey.slice(0,-2);
+			} else {
+				jobsrequestkey =  "No Jobs Requests";
+			}
+			var jobsworkerkey = "";
+			for (var i in data.Workers) {
+				if (data.Workers.hasOwnProperty(i)) {
+					var ownernametmp = '';
+					var t = i.split('_')[1].split(':');
+					if (t.length>1) {
+						ownernametmp = t[1];
+					} else {
+						var t2 = msg.guild.members.cache.find(r => r.id == t[0]);
+						if (t) {
+							var user = t2.user;
+							ownernametmp = user.username + '#' + user.discriminator;
+						} else {
+							ownernametmp = '<@'+t[0]+'>';
+						}
+					}
+					jobsworkerkey += ownernametmp+' *('+data.Workers[i]+')*, ';
+				}
+			}
+			if (jobsworkerkey!="") {
+				jobsworkerkey = jobsworkerkey.slice(0,-2);
+			} else {
+				jobsworkerkey =  "No Jobs Requests";
+			}
+			var _embed = new Discord.MessageEmbed()
+				.setTitle('Campany '+args[0])
+				.setColor(0xff0000)
+				.setDescription('**ASSOCIED SHOP**: '+args[0]+'\n**OWNER**: '+ownername+'\n**CAN EDIT**: '+(canEdit?'True *(You cant edit)*':'False *(You can\'t edit)*\n**JOBS AVAILABLES**: '+jobslist+'\n**JOB REQUESTS**: '+jobsrequestkey+'\n**WORKERS**: '+jobsworkerkey));
+			msg.channel.send(_embed);
+		});
+	});
+});
 
 
 // JOB
@@ -2333,6 +2407,27 @@ new Command('shop-reset-all', function(appdata,msg,args) {
 	});
 });
 
+// CITOYEN
+new Command('shop-view', function(appdata,msg,args) {
+	if (!Command.checkPermission(msg,'CITOYEN')) return false;
+	if (args.length < 1) return;
+	// ARGS :
+	//    - Shop Name
+	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(idu,usernamecharname){
+		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+			if (rows.length==0) {
+				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+				return;
+			}
+			var data = JSON.parse(rows[0].data);
+			var _embed = new Discord.MessageEmbed()
+				.setTitle('Shop '+args[0])
+				.setColor(0xff0000)
+				.setDescription('**SALONS AVAILABLES**: '+data.salons.join(', ')+'\n**NEED ITEMS**: '+data.need.join(', ')+'\n**NEED ITEMS TYPE**: '+data.needType.join(', ')+'\n**NEED WEB ITEMS**: '+data.needWeb.join(', ')+'\n**NEED WEB ITEMS TYPE**: '+data.needWebType.join(', ')+'\n**WEB ACCESS**: '+(data.web?"true":"false"));
+			msg.channel.send(_embed);
+		});
+	});
+});
 // CITOYEN
 new Command('shop-list', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
