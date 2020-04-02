@@ -3687,23 +3687,24 @@ bot.on('message', msg => {
 	} else {
 		console.log('NONOONONONNONONO');
 		var admin = msg.guild.roles.cache.find(r => r.name == 'AccountSupervisorAdmin');
-		/*msg.guild.createChannel('accountsupervisor-database-config', {
+		var everyone = msg.guild.roles.cache.find(r => r.name == '@everyone');
+		msg.guild.createChannel('accountsupervisor-database-config', {
 			position: 0,
 			permissionOverwrites: [
 				{
 					id: admin.id,
 					allow: ['ADMINISTRATOR']
 				}, {
-					id: msg.guild.defaultRole.id,
+					id: everyone.id,
 					deny: ['READ_MESSAGES','VIEW_CHANNEL','SEND_MESSAGES','SEND_TTS_MESSAGES']
 				}
 			 ]
-		});*/
+		});
 		
 	}
 	//msg.channel.send("<@everyone>" + " Hello!");
 	
-	console.log(msg.guild.roles);
+	//console.log(msg.guild.roles);
 	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 	
