@@ -254,15 +254,19 @@ class Command {
 				var data = {};
 				for (var i = 0; i < rows.length; i++) {
 					var name = rows[i].name.substring(rows[i].name.indexOf('_')+1).substring(rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_')+1);
-					data[name] = JSON.parse(rows[i].data);
+					try {
+						data[name] = JSON.parse(rows[i].data);
+					} catch (e) {
+						data[name] = rows[i].data;
+					}
 				}
 				resolve(data);
 			});
 		});
-		
+		console.log(data);
 		data['money-name'] = data['money-name'] || 'Money';
-		data['money-symbol'] = data['money-symbol'] || 'Money';
-		data['money-format'] = data['money-format'] || '{amount} {symbol}';
+		//data['money-symbol'] = data['money-symbol'] || 'Money';
+		//data['money-format'] = data['money-format'] || '{amount} {symbol}';
 
 		return await data;
 	}
