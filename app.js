@@ -247,6 +247,25 @@ class Command {
 		}
 	}
 	
+	static async getDataApp(guildid) {
+		
+		var data = new Promise((resolve, reject) => {
+			query('SELECT * FROM dataapp WHERE name LIKE \'%'+guildid+'%\'', function(err,rows) {
+				var data = {};
+				for (var i = 0; i < rows.length; i++) {
+					var name = rows[i].name.substring(rows[i].name.indexOf('_')+1).substring(rows[i].name.substring(rows[i].name.indexOf('_')+1).indexOf('_')+1);
+					data[name] = JSON.parse(rows[i].data);
+				}
+				resolve(data);
+			});
+		});
+		
+		data['money-name'] = data['money-name'] || 'Money';
+		data['money-symbol'] = data['money-symbol'] || 'Money';
+		data['money-format'] = data['money-format'] || '{amount} {symbol}';
+
+		return await data;
+	}
 }
 Command.List = {};
 
@@ -277,22 +296,61 @@ class ParserCommand {
 }
 
 
+var Speech = {
+	
+	"CompanyAlreadyExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Company is already created :cold_sweat:');
+	},
+	"CompanyNotExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+	},
+	
+	"BankAlreadyExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Bank is already created :cold_sweat:');
+	},
+	"BankNotExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
+	},
+	
+	"ShopAlreadyExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Shop is already created :cold_sweat:');
+	},
+	"ShopNotExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+	},
+	
+	"ItemAlreadyExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Item is already created :cold_sweat:');
+	},
+	"ItemNotExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
+	},
+	
+	"JobAlreadyExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Job is already created :cold_sweat:');
+	},
+	"JobNotExist": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Job doesn\'t exist :cold_sweat:');
+	},
+	
+	
+	"NotEnoughtMoney": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, you don\'t have enought '+data['money-name']+' :cold_sweat:');
+	},
+	"NotHaveBankAccount": function(data,msg,name,args) {
+		msg.channel.send(name+', '+'Sorry, you don\'t have an `'+args[2]+'` Bank account :cold_sweat:');
+	}
+	
+};
+
 
 // ADMIN
-new Command('ping', function(msg,args) {
+new Command('ping', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	msg.channel.send('pong');
 });
 // ADMIN
-new Command('lookup-users', function(msg,args) {
-	if (!Command.checkPermission(msg,'ADMIN')) return false;
-	query('SELECT * FROM users',function(err,rows){
-		console.log(err);
-		console.log(rows);
-	});
-});
-// ADMIN
-new Command('all-reset-all', function(msg,args) {
+new Command('all-reset-all', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	query('DELETE FROM users',function(err,rows1){
 		msg.reply('User System is reset!');
@@ -308,34 +366,42 @@ new Command('all-reset-all', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('set-currency', function(msg,args) {
+new Command('set-currency-name', function(appdata,msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 1) return;
+	query('SELECT * FROM dataapp WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql('money-name')+'\'',function(err,rows){
+		if (rows.length > 0) {
+			query('UPDATE dataapp SET data = \''+escape_mysql(args[0])+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql('money-name')+'\'',function(err,rows){
+				msg.channel.send('Currency Name updated with success!');
+			});
+		} else {
+			query('INSERT INTO dataapp(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql('money-name')+'\',\''+escape_mysql(args[0])+'\')',function(err,rows){
+				msg.channel.send('Currency Name updated with success!');
+			});
+		}
+	});
+});
+// ADMIN
+new Command('set-cooldown', function(appdata,msg,args) {
 	
 });
 // ADMIN
-new Command('set-cooldown', function(msg,args) {
-	
-});
-// ADMIN
-new Command('set-money-format', function(msg,args) {
-	
-});
-// ADMIN
-new Command('role-income-add', function(msg,args) {
+new Command('role-income-add', function(appdata,msg,args) {
 	//add <role> <cash | bank> <amount> <interval> [<channel> <message>]
 });
 // ADMIN
-new Command('role-income-remove', function(msg,args) {
+new Command('role-income-remove', function(appdata,msg,args) {
 	//add <role> <cash | bank> <amount> <interval> [<channel> <message>]
 });
 // ADMIN
-new Command('role-income-list', function(msg,args) {
+new Command('role-income-list', function(appdata,msg,args) {
 	//add <role> <cash | bank> <amount> <interval> [<channel> <message>]
 });
 
 
 // USER
 // ADMIN
-new Command('user-reset-all', function(msg,args) {
+new Command('user-reset-all', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	query('DELETE FROM users',function(err,rows1){
 		msg.reply('User System is reset!');
@@ -345,7 +411,7 @@ new Command('user-reset-all', function(msg,args) {
 
 // CHARACTER
 // ADMIN
-new Command('character-create', function(msg,args) {
+new Command('character-create', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -371,7 +437,7 @@ new Command('character-create', function(msg,args) {
 	});
 });
 // CITOYEN+OWNER
-new Command('character-delete', function(msg,args) {
+new Command('character-delete', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -393,13 +459,13 @@ new Command('character-delete', function(msg,args) {
 	});
 });
 // CITOYEN+OWNER
-new Command('character-select', function(msg,args) {
+new Command('character-select', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Character Name
 	var id = msg.member.user.id+'';
-	Command.List['character-unselect']._fn(msg,[],function(){
+	Command.List['character-unselect']._fn(appdata,msg,[],function(){
 		query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
@@ -424,7 +490,7 @@ new Command('character-select', function(msg,args) {
 	});
 });
 // CITOYEN+OWNER
-new Command('character-unselect', function(msg,args,c) {
+new Command('character-unselect', function(appdata,msg,args,c) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	var id = msg.member.user.id+'';
 	query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\'',function(err,rows){
@@ -448,7 +514,7 @@ new Command('character-unselect', function(msg,args,c) {
 	});
 });
 // CITOYEN
-new Command('character-list', function(msg,args) {
+new Command('character-list', function(appdata,msg,args) {
 	
 	var page = 1;
 	var d = false;
@@ -527,7 +593,7 @@ new Command('character-list', function(msg,args) {
 
 // COMPANY
 // CITOYEN
-new Command('company-create', function(msg,args) {
+new Command('company-create', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -535,7 +601,7 @@ new Command('company-create', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company is already created :cold_sweat:');
+				Speech['CompanyAlreadyExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = {
@@ -546,7 +612,7 @@ new Command('company-create', function(msg,args) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company-Shop is already created :cold_sweat:');
 					return;
 				}
-				Command.List['shop-create']._fn(msg,[
+				Command.List['shop-create']._fn(appdata,msg,[
 					args[0],
 					"",
 					"",
@@ -562,7 +628,7 @@ new Command('company-create', function(msg,args) {
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-delete', function(msg,args) {
+new Command('company-delete', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -570,7 +636,7 @@ new Command('company-delete', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -578,7 +644,7 @@ new Command('company-delete', function(msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
-			Command.List['shop-delete']._fn(msg,[args[0]]);
+			Command.List['shop-delete']._fn(appdata,msg,[args[0]]);
 			query('DELETE FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Company deleted with success!');
 			});
@@ -587,7 +653,7 @@ new Command('company-delete', function(msg,args) {
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-add-job', function(msg,args) {
+new Command('company-add-job', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -596,7 +662,7 @@ new Command('company-add-job', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -606,7 +672,7 @@ new Command('company-add-job', function(msg,args) {
 			}
 			query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
 				if (rows.length==0) {
-					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Job doesn\'t exist :cold_sweat:');
+					Speech['JobNotExist'](appdata,msg,usernamecharname,args);
 					return;
 				}
 				data.JobsList = data.JobsList || {};
@@ -619,7 +685,7 @@ new Command('company-add-job', function(msg,args) {
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-remove-job', function(msg,args) {
+new Command('company-remove-job', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -628,7 +694,7 @@ new Command('company-remove-job', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -638,7 +704,7 @@ new Command('company-remove-job', function(msg,args) {
 			}
 			query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
 				if (rows.length==0) {
-					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Job doesn\'t exist :cold_sweat:');
+					Speech['JobNotExist'](appdata,msg,usernamecharname,args);
 					return;
 				}
 				data.JobsList = data.JobsList || {};
@@ -666,7 +732,7 @@ new Command('company-remove-job', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('company-send-request-job', function(msg,args) {
+new Command('company-send-request-job', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -675,7 +741,7 @@ new Command('company-send-request-job', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
@@ -694,7 +760,7 @@ new Command('company-send-request-job', function(msg,args) {
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-accept-request-job', function(msg,args) {
+new Command('company-accept-request-job', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -704,7 +770,7 @@ new Command('company-accept-request-job', function(msg,args) {
 		Command.getCharacter(msg,args[1],function(id2){
 			query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
-					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+					Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 					return;
 				}
 				var data = JSON.parse(rows[0].data);
@@ -730,7 +796,7 @@ new Command('company-accept-request-job', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('company-give-money', function(msg,args) {
+new Command('company-give-money', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 4) return;
 	// ARGS :
@@ -741,7 +807,7 @@ new Command('company-give-money', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -752,24 +818,24 @@ new Command('company-give-money', function(msg,args) {
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				if (rows.length==0) {
-					msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have enought money :cold_sweat:');
+					Speech['NotEnoughtMoney'](appdata,msg,usernamecharname);
 					return;
 				}
 				var userdata = JSON.parse(rows[0].data);
 				userdata.bank = data.bank || {};
 				if (typeof userdata.bank[args[2]] === 'undefined') {
-					msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have an `'+args[2]+'` Bank account :cold_sweat:');
+					Speech['NotHaveBankAccount'](appdata,msg,usernamecharname,args);
 					return;
 				}
 				if ((parseFloat(userdata.bank[args[2]])||0.0) < Math.abs(parseFloat(args[3])||0.0)) {
-					msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have enought money :cold_sweat:');
+					Speech['NotEnoughtMoney'](appdata,msg,usernamecharname);
 					return;
 				}
 				userdata.bank[args[2]] = (parseFloat(userdata.bank[args[2]])||0.0) - Math.abs(parseFloat(args[3])||0.0);
 				data.bank[args[1]] = (parseFloat(data.bank[args[1]])||0.0) + Math.abs(parseFloat(args[3])||0.0);
 				query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 					query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
-						msg.channel.send(usernamecharname+', '+'You give `'+args[3]+'` Money to `'+args[0]+'` Company!\n{ <@'+id+'>\'s `'+args[2]+'` Bank account ----> `'+args[0]+'`\'s `'+args[1]+'` Bank account }');
+						msg.channel.send(usernamecharname+', '+'You give `'+args[3]+'` '+appdata['money-name']+' to `'+args[0]+'` Company!\n{ <@'+id+'>\'s `'+args[2]+'` Bank account ----> `'+args[0]+'`\'s `'+args[1]+'` Bank account }');
 					});
 				});
 			});
@@ -777,7 +843,7 @@ new Command('company-give-money', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('company-get-money', function(msg,args) {
+new Command('company-get-money', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -786,7 +852,7 @@ new Command('company-get-money', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -795,13 +861,13 @@ new Command('company-get-money', function(msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t have an `'+args[1]+'` Bank account :cold_sweat:');
 				return;
 			} else {
-				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Company have '+data.bank[args[1]]+' Money in `'+args[1]+'` Bank account');
+				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Company have `'+data.bank[args[1]]+'` '+appdata['money-name']+' in `'+args[1]+'` Bank account');
 			}
 		});
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-fire', function(msg,args) {
+new Command('company-fire', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -811,7 +877,7 @@ new Command('company-fire', function(msg,args) {
 		Command.getCharacter(msg,args[1],function(id2){
 			query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
-					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+					Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 					return;
 				}
 				var data = JSON.parse(rows[0].data);
@@ -835,7 +901,7 @@ new Command('company-fire', function(msg,args) {
 	});
 }); 
 // ADMIN/CITOYEN+OWNER
-new Command('company-update-shop', function(msg,args) {
+new Command('company-update-shop', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -845,7 +911,7 @@ new Command('company-update-shop', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -857,12 +923,12 @@ new Command('company-update-shop', function(msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, This Settings doesn\'t exist :cold_sweat:');
 				return;
 			}
-			Command.List['shop-update-'+args[1]].fn(msg,[args[0],args[2]]);
+			Command.List['shop-update-'+args[1]].fn(appdata,msg,[args[0],args[2]]);
 		});
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-add-shop-website', function(msg,args) {
+new Command('company-add-shop-website', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -870,7 +936,7 @@ new Command('company-add-shop-website', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -878,12 +944,12 @@ new Command('company-add-shop-website', function(msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
-			Command.List['shop-update-web']._fn(msg,[args[0],"true"]);
+			Command.List['shop-update-web']._fn(appdata,msg,[args[0],"true"]);
 		});
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-remove-shop-website', function(msg,args) {
+new Command('company-remove-shop-website', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -891,7 +957,7 @@ new Command('company-remove-shop-website', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -899,12 +965,12 @@ new Command('company-remove-shop-website', function(msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
-			Command.List['shop-update-web']._fn(msg,[args[0],"false"]);
+			Command.List['shop-update-web']._fn(appdata,msg,[args[0],"false"]);
 		});
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-create-item', function(msg,args) {
+new Command('company-create-item', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -913,7 +979,7 @@ new Command('company-create-item', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -934,12 +1000,12 @@ new Command('company-create-item', function(msg,args) {
 			} else if (newargs.length>2) {
 				newargs[2] = shopname;
 			}
-			Command.List['item-create']._fn(msg,newargs);
+			Command.List['item-create']._fn(appdata,msg,newargs);
 		});
 	});
 });
 // ADMIN/CITOYEN+OWNER
-new Command('company-delete-item', function(msg,args) {
+new Command('company-delete-item', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -948,7 +1014,7 @@ new Command('company-delete-item', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
+				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -973,7 +1039,7 @@ new Command('company-delete-item', function(msg,args) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item isn\'t created by the `'+args[0]+'` Company :cold_sweat:');
 					return;
 				}
-				Command.List['item-delete']._fn(msg,[args[1]]);
+				Command.List['item-delete']._fn(appdata,msg,[args[1]]);
 			});
 		});
 	});
@@ -983,7 +1049,7 @@ new Command('company-delete-item', function(msg,args) {
 
 // JOB
 // ADMIN
-new Command('job-create', function(msg,args) {
+new Command('job-create', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -992,7 +1058,7 @@ new Command('job-create', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Job is already created :cold_sweat:');
+				Speech['JobAlreadyExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = {
@@ -1005,7 +1071,7 @@ new Command('job-create', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('job-delete', function(msg,args) {
+new Command('job-delete', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1023,7 +1089,7 @@ new Command('job-delete', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('job-update-salary', function(msg,args) {
+new Command('job-update-salary', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1044,7 +1110,7 @@ new Command('job-update-salary', function(msg,args) {
 });
 
 // CITOYEN
-new Command('job-work', function(msg,args) {
+new Command('job-work', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE data LIKE \'%worker_'+escape_mysql(id)+'%\'',function(err,rows){
@@ -1062,7 +1128,7 @@ new Command('job-work', function(msg,args) {
 // BANK
 
 // ADMIN
-new Command('bank-create', function(msg,args) {
+new Command('bank-create', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1071,7 +1137,7 @@ new Command('bank-create', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank is already created :cold_sweat:');
+				Speech['BankAlreadyExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = {
@@ -1084,7 +1150,7 @@ new Command('bank-create', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('bank-delete', function(msg,args) {
+new Command('bank-delete', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1116,7 +1182,7 @@ new Command('bank-delete', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('bank-add-user', function(msg,args) {
+new Command('bank-add-user', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1162,7 +1228,7 @@ new Command('bank-add-user', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('bank-remove-user', function(msg,args) {
+new Command('bank-remove-user', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1171,7 +1237,7 @@ new Command('bank-remove-user', function(msg,args) {
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
+				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -1193,7 +1259,7 @@ new Command('bank-remove-user', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('bank-give-money-user', function(msg,args,t) {
+new Command('bank-give-money-user', function(appdata,msg,args,t) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
@@ -1202,11 +1268,11 @@ new Command('bank-give-money-user', function(msg,args,t) {
 	//     - Amount Money
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		var f = function() {
-			msg.channel.send(usernamecharname+', '+'`'+((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0)))+'` Money '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
+			msg.channel.send(usernamecharname+', '+'`'+((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0)))+'` '+appdata['money-name']+' '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
 		}
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
+				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -1237,7 +1303,7 @@ new Command('bank-give-money-user', function(msg,args,t) {
 	});
 });
 // ADMIN
-new Command('bank-remove_money_user', function(msg,args) {
+new Command('bank-remove_money_user', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
@@ -1245,20 +1311,20 @@ new Command('bank-remove_money_user', function(msg,args) {
 	//     - User ID
 	//     - Amount Money
 	args[2] = (parseFloat(args[2]) || 0.0)*-1;
-	Command.List['bank-give-money-user']._fn(msg,args);
+	Command.List['bank-give-money-user']._fn(appdata,msg,args);
 });
 // ADMIN
-new Command('bank-set-money-user', function(msg,args) {
+new Command('bank-set-money-user', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
-	Command.List['bank-give-money-user']._fn(msg,args,true);
+	Command.List['bank-give-money-user']._fn(appdata,msg,args,true);
 });
 // ADMIN
-new Command('bank-get-money-user', function(msg,args) {
+new Command('bank-get-money-user', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1267,7 +1333,7 @@ new Command('bank-get-money-user', function(msg,args) {
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
+				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -1276,7 +1342,7 @@ new Command('bank-get-money-user', function(msg,args) {
 					obj.bank = obj.bank || {};
 					try {
 						if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
-							msg.channel.send(usernamecharname+', '+'User '+args[1]+' have `'+obj.bank[escape_mysql(args[0])]+'` Money Left in his `'+args[0]+'` Bank account!');
+							msg.channel.send(usernamecharname+', '+'User '+args[1]+' have `'+obj.bank[escape_mysql(args[0])]+'` '+appdata['money-name']+' Left in his `'+args[0]+'` Bank account!');
 							return;
 						} else {}
 					} catch (e) {}
@@ -1287,7 +1353,7 @@ new Command('bank-get-money-user', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('bank-reset-all', function(msg,args) {
+new Command('bank-reset-all', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('DELETE FROM bank',function(err,rows1){
@@ -1297,7 +1363,7 @@ new Command('bank-reset-all', function(msg,args) {
 });
 
 // CITOYEN
-new Command('give-money', function(msg,args) {
+new Command('give-money', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 4) return;
 	// ARGS :
@@ -1308,7 +1374,7 @@ new Command('give-money', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id_currentuser,usernamecharname){
 		Command.getCharacter(msg,args[1],function(id_user){
 			if (id_currentuser == id_user) {
-				msg.channel.send(usernamecharname+', '+'Sorry, you can\'t give yourself your own money :upside_down:');
+				msg.channel.send(usernamecharname+', '+'Sorry, you can\'t give yourself your own '+appdata['money-name']+' :upside_down:');
 				return;
 			}
 			query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
@@ -1322,7 +1388,7 @@ new Command('give-money', function(msg,args) {
 						obju.bank = obju.bank || {};
 						if (typeof obju.bank[escape_mysql(args[0])] !== 'undefined') {
 							if ((parseFloat(obju.bank[escape_mysql(args[0])])||0) < Math.abs((parseFloat(args[3])||0))) {
-								msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have enought money in your `'+args[0]+'` Bank account!');
+								msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have enought '+appdata['money-name']+' in your `'+args[0]+'` Bank account!');
 								return;
 							}
 							query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id_user)+'\'',function(err,rows){
@@ -1334,7 +1400,7 @@ new Command('give-money', function(msg,args) {
 										obj.bank[escape_mysql(args[2])] = (parseFloat(obj.bank[escape_mysql(args[2])])||0) + Math.abs((parseFloat(args[3])||0));
 										query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obju))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id_currentuser)+'\'',function(err,rows){
 											query('UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id_user)+'\'',function(err,rows){
-												msg.channel.send(usernamecharname+', '+'You give `'+args[3]+'` Money to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account }');
+												msg.channel.send(usernamecharname+', '+'You give `'+args[3]+'` '+appdata['money-name']+' to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account }');
 											});
 										});
 										return;
@@ -1352,7 +1418,7 @@ new Command('give-money', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('bank-create-account', function(msg,args) {
+new Command('bank-create-account', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1363,7 +1429,7 @@ new Command('bank-create-account', function(msg,args) {
 		};
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
+				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -1398,7 +1464,7 @@ new Command('bank-create-account', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('bank-delete-account', function(msg,args) {
+new Command('bank-delete-account', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1406,7 +1472,7 @@ new Command('bank-delete-account', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
+				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -1428,18 +1494,18 @@ new Command('bank-delete-account', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('get-money', function(msg,args) {
+new Command('get-money', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//     - Bank Name
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		var f = function(money) {
-			msg.channel.send(usernamecharname+', '+'You have `'+money+'` Money left in your `'+args[0]+'` Bank account!');
+			msg.channel.send(usernamecharname+', '+'You have `'+money+'` '+appdata['money-name']+' left in your `'+args[0]+'` Bank account!');
 		};
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
+				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -1465,7 +1531,7 @@ new Command('get-money', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('bank-list', function(msg,args) {
+new Command('bank-list', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank',function(err,rows){
@@ -1487,11 +1553,11 @@ new Command('bank-list', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('bank-deposit', function(msg,args) {
+new Command('bank-deposit', function(appdata,msg,args) {
 	
 });
 // CITOYEN
-new Command('bank-withdraw', function(msg,args) {
+new Command('bank-withdraw', function(appdata,msg,args) {
 	
 });
 
@@ -1499,7 +1565,7 @@ new Command('bank-withdraw', function(msg,args) {
 
 // Item
 // ADMIN
-new Command('item-create', function(msg,args) {
+new Command('item-create', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1512,7 +1578,7 @@ new Command('item-create', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length>0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item is already created :cold_sweat:');
+				Speech['ItemAlreadyExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = {};
@@ -1528,7 +1594,7 @@ new Command('item-create', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('item-update-price', function(msg,args) {
+new Command('item-update-price', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1549,7 +1615,7 @@ new Command('item-update-price', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('item-update-shops', function(msg,args) {
+new Command('item-update-shops', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1570,7 +1636,7 @@ new Command('item-update-shops', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('item-update-type', function(msg,args) {
+new Command('item-update-type', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1591,7 +1657,7 @@ new Command('item-update-type', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('item-update-image', function(msg,args) {
+new Command('item-update-image', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1612,7 +1678,7 @@ new Command('item-update-image', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('item-update-desciption', function(msg,args) {
+new Command('item-update-desciption', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1633,7 +1699,7 @@ new Command('item-update-desciption', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('item-delete', function(msg,args) {
+new Command('item-delete', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1651,7 +1717,7 @@ new Command('item-delete', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('item-give', function(msg,args,t) {
+new Command('item-give', function(appdata,msg,args,t) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1728,17 +1794,17 @@ new Command('item-give', function(msg,args,t) {
 	});
 });
 // ADMIN
-new Command('item-remove', function(msg,args) {
+new Command('item-remove', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//    - Item Name
 	//    - User id
 	//    - Optional: Quantity
-	Command.List['item-give']._fn(msg,args,true);
+	Command.List['item-give']._fn(appdata,msg,args,true);
 });
 // ADMIN
-new Command('item-reset-all', function(msg,args) {
+new Command('item-reset-all', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('DELETE FROM items',function(err,rows1){
@@ -1748,7 +1814,7 @@ new Command('item-reset-all', function(msg,args) {
 });
 
 // ADMIN/CITOYEN
-new Command('inventory-item-clear', function(msg,args) {
+new Command('inventory-item-clear', function(appdata,msg,args) {
 	var id = '<@'+msg.member.user.id+'>';
 	var current = true;
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
@@ -1782,7 +1848,7 @@ new Command('inventory-item-clear', function(msg,args) {
 	});
 });
 // ADMIN/CITOYEN
-new Command('inventory-item-view', function(msg,args) {
+new Command('inventory-item-view', function(appdata,msg,args) {
 	var page = 1;
 	var id = '<@'+msg.member.user.id+'>';
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
@@ -1859,7 +1925,7 @@ new Command('inventory-item-view', function(msg,args) {
 });
 
 // CITOYEN
-new Command('item-list', function(msg,args) {
+new Command('item-list', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	// ARGS :
 	//    - Optional: Shop Name
@@ -1884,7 +1950,7 @@ new Command('item-list', function(msg,args) {
 		} else {
 			query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
-					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+					Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
 					return;
 				}
 				query('SELECT * FROM items',function(err,rows) {
@@ -1914,7 +1980,7 @@ new Command('item-list', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('item-view', function(msg,args) {
+new Command('item-view', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1935,7 +2001,7 @@ new Command('item-view', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('item-pay', function(msg,args) {
+new Command('item-pay', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1949,7 +2015,7 @@ new Command('item-pay', function(msg,args) {
 		var chan = '<#'+msg.channel.id+'>';
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var tempdata = JSON.parse(rows[0].data);
@@ -1958,7 +2024,7 @@ new Command('item-pay', function(msg,args) {
 				if (tempdata.web) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop is only accessible through the web :cold_sweat:\nLink to the online shop: https://accountsupervisorwebinterface.herokuapp.com/guild/'+msg.guild.id+'/shop/'+encodeURIComponent(args[0]));
 				} else {
-					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+					Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
 				}
 				return;
 			} else {
@@ -1993,7 +2059,7 @@ new Command('item-pay', function(msg,args) {
 				if (isin) {
 					query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 						if (rows.length==0) {
-							msg.channel.send(usernamecharname+', '+'Sorry, you haven\'t enought money :cold_sweat:');
+							msg.channel.send(usernamecharname+', '+'Sorry, you haven\'t enought '+appdata['money-name']+' :cold_sweat:');
 							return;
 						}
 						var userdata = JSON.parse(rows[0].data);
@@ -2044,7 +2110,7 @@ new Command('item-pay', function(msg,args) {
 									msg.channel.send(usernamecharname+', '+'Sorry, you don\'t have a `'+args[2]+'` Bank account!');
 								} else {
 									if ((parseFloat(userdata.bank[escape_mysql(args[2])]) || 0.0) < Math.abs(parseFloat(data.price) || 0.0)) {
-										msg.channel.send(usernamecharname+', '+'Sorry, you haven\'t enought money :cold_sweat:');
+										msg.channel.send(usernamecharname+', '+'Sorry, you haven\'t enought '+appdata['money-name']+' :cold_sweat:');
 									} else {
 										userdata.bank[escape_mysql(args[2])] = (parseFloat(userdata.bank[escape_mysql(args[2])]) || 0.0) - Math.abs(parseFloat(data.price) || 0.0);
 										
@@ -2069,7 +2135,7 @@ new Command('item-pay', function(msg,args) {
 						} else {
 							userdata.money = parseFloat(userdata.money) || 0.0;
 							if ((parseFloat(userdata.money) || 0.0) < Math.abs(parseFloat(data.price) || 0.0)) {
-								msg.channel.send(usernamecharname+', '+'Sorry, you haven\'t enought money :cold_sweat:');
+								msg.channel.send(usernamecharname+', '+'Sorry, you haven\'t enought '+appdata['money-name']+' :cold_sweat:');
 							} else {
 								userdata.money = (parseFloat(userdata.money) || 0.0) - Math.abs(parseFloat(data.price) || 0.0);
 								userdata.inventory = userdata.inventory || {};
@@ -2100,7 +2166,7 @@ new Command('item-pay', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('item-eat', function(msg,args) {
+new Command('item-eat', function(appdata,msg,args) {
 	
 });
 
@@ -2109,7 +2175,7 @@ new Command('item-eat', function(msg,args) {
 // SHOP
 
 // ADMIN
-new Command('shop-create', function(msg,args) {
+new Command('shop-create', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2123,7 +2189,7 @@ new Command('shop-create', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop is already created :cold_sweat:');
+				Speech['ShopAlreadyExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = {
@@ -2144,7 +2210,7 @@ new Command('shop-create', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('shop-delete', function(msg,args) {
+new Command('shop-delete', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2152,7 +2218,7 @@ new Command('shop-delete', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			query('DELETE FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
@@ -2162,7 +2228,7 @@ new Command('shop-delete', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('shop-update-salons', function(msg,args) {
+new Command('shop-update-salons', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2171,7 +2237,7 @@ new Command('shop-update-salons', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -2184,7 +2250,7 @@ new Command('shop-update-salons', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('shop-update-need', function(msg,args) {
+new Command('shop-update-need', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2193,7 +2259,7 @@ new Command('shop-update-need', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -2207,7 +2273,7 @@ new Command('shop-update-need', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('shop-update-web', function(msg,args) {
+new Command('shop-update-web', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2216,7 +2282,7 @@ new Command('shop-update-web', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -2230,7 +2296,7 @@ new Command('shop-update-web', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('shop-delete-all-items-associed-with', function(msg,args) {
+new Command('shop-delete-all-items-associed-with', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2262,7 +2328,7 @@ new Command('shop-delete-all-items-associed-with', function(msg,args) {
 	});
 });
 // ADMIN
-new Command('shop-reset-all', function(msg,args) {
+new Command('shop-reset-all', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('DELETE FROM shop',function(err,rows1){
@@ -2272,7 +2338,7 @@ new Command('shop-reset-all', function(msg,args) {
 });
 
 // CITOYEN
-new Command('shop-list', function(msg,args) {
+new Command('shop-list', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop',function(err,rows){
@@ -2294,7 +2360,7 @@ new Command('shop-list', function(msg,args) {
 	});
 });
 // CITOYEN
-new Command('shop-get-website', function(msg,args) {
+new Command('shop-get-website', function(appdata,msg,args) {
 	if (!Command.checkPermission(msg,'CITOYEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2302,7 +2368,7 @@ new Command('shop-get-website', function(msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
+				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -2336,7 +2402,7 @@ new Command('bank_create', function(msg,args) {
 	//msg.channel.send('wesh comment ça va?');
 });*/
 
-new Command('list-command', function(msg,args) {
+new Command('list-command', function(appdata,msg,args) {
 	msg.channel.send('• **'+Object.keys(Command.List).join('**\n• **')+'**');
 });
 
@@ -2375,10 +2441,11 @@ bot.on('message', msg => {
 			});
 		}
 	} catch(e) {}
+	var appdata = Command.getDataApp(msg.guild.id);
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
-			Command.execute(msg,data);
+			Command.execute(appdata,msg,data);
 		}
 	}
 });
