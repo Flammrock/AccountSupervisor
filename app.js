@@ -1380,7 +1380,15 @@ new Command('bank-create-account', function(msg,args) {
 						obj.bank[escape_mysql(args[0])] = 0.0;
 					}
 					query('INSERT INTO users(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(obj))+'\')',function(err,rows){
-						f();
+						
+						///////temp
+						query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
+							
+							console.logs(err);
+							console.logs(rows);
+							f();
+						});
+						
 					});
 				}
 			});
