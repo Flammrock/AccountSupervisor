@@ -249,7 +249,7 @@ class Command {
 	
 	static async getDataApp(guildid) {
 		
-		var data = new Promise((resolve, reject) => {
+		var req = new Promise((resolve, reject) => {
 			query('SELECT * FROM dataapp WHERE name LIKE \'%'+guildid+'%\'', function(err,rows) {
 				var data = {};
 				for (var i = 0; i < rows.length; i++) {
@@ -263,12 +263,14 @@ class Command {
 				resolve(data);
 			});
 		});
-		console.log(data);
+		
+		var data = await req;
+		
 		data['money-name'] = data['money-name'] || 'Money';
 		//data['money-symbol'] = data['money-symbol'] || 'Money';
 		//data['money-format'] = data['money-format'] || '{amount} {symbol}';
 
-		return await data;
+		return req;
 	}
 }
 Command.List = {};
