@@ -3703,7 +3703,11 @@ bot.on('message', msg => {
 	}
 	//msg.channel.send("<@everyone>" + " Hello!");
 	
+	console.log(msg.guild);
+	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
+	
+		
 		try {
 			console.log(msg.channel.id, msg.content);
 			var role_admin = false;
