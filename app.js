@@ -3690,7 +3690,7 @@ bot.on('message', msg => {
 		var everyone = msg.guild.roles.cache.find(r => r.name == '@everyone');
 		msg.guild.channels.create('accountsupervisor-database-config', {
 			position: 0,
-			permissionOverwrites: [
+			/*permissionOverwrites: [
 				{
 					id: admin.id,
 					allow: ['ADMINISTRATOR']
@@ -3698,7 +3698,7 @@ bot.on('message', msg => {
 					id: everyone.id,
 					deny: ['READ_MESSAGES','VIEW_CHANNEL','SEND_MESSAGES','SEND_TTS_MESSAGES']
 				}
-			 ]
+			 ]*/
 		});
 		
 	}
