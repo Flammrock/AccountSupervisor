@@ -728,12 +728,12 @@ new Command('company-send-request-job', function(appdata,msg,args) {
 				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
 				return;
 			}
+			var data = JSON.parse(rows[0].data);
 			query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
 				if (rows.length==0) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[1]+'` Job doesn\'t exist :cold_sweat:');
 					return;
 				}
-				var data = JSON.parse(rows[0].data);
 				data.JobRequests = data.JobRequests || {};
 				data.JobRequests[id] = args[1];
 				query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
