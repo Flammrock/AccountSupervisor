@@ -736,7 +736,7 @@ new Command('company-send-request-job', function(appdata,msg,args) {
 					return;
 				}
 				data.JobRequests = data.JobRequests || {};
-				data.JobRequests[id] = args[1];
+				data.JobRequests['request_'+id] = args[1];
 				query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 					msg.channel.send(usernamecharname+', '+'You have send a `'+args[1]+'` Job Request in `'+args[0]+'` Company with Success!');
 				});
@@ -765,12 +765,33 @@ new Command('company-accept-request-job', function(appdata,msg,args) {
 					msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 					return;
 				}
-				if (typeof data.JobRequests[id2] !== 'undefined') {
-					data.Workers['worker_'+id2] = data.JobRequests[id2];
-					data.JobRequests[id2] = null;
-					delete data.JobRequests[id2];
-					query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-						msg.channel.send(usernamecharname+', '+'You have accepted the request of '+args[1]+' successfully in `'+args[0]+'` Company!');
+				if (typeof data.JobRequests['request_'+id2] !== 'undefined') {
+					data.Workers['worker_'+id2] = data.JobRequests['request_'+id2];
+					data.JobRequests['request_'+id2] = null;
+					delete data.JobRequests['request_'+id2];
+					var ff = function () {
+						query('UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
+							msg.channel.send(usernamecharname+', '+'You have accepted the request of '+args[1]+' successfully in `'+args[0]+'` Company!');
+						});
+					};
+					query('SELECT * FROM company WHERE data LIKE \'%request_'+id2+'%\'',function(err,rows){
+						var _text = "";
+						var _textn = "";
+						for (var i = 0; i < rows.length; i++) {
+							var datatmp = JSON.parse(rows[i].data);
+							datatmp.JobRequests['request_'+id2] = null;
+							delete datatmp.JobRequests['request_'+id2];
+							_text += "WHEN '"+escape_mysql(rows[i].name)+"' THEN '"+escape_mysql(JSON.stringify(datatmp))+"'";
+							_textn += "'"+escape_mysql(rows[i].name)+"',";
+						}
+						if (_text!="") {
+							_text += " END WHERE name IN ("+_textn.slice(0,-1)+")";
+							query('UPDATE company SET data = CASE name '+_text,function(err,rows){
+								ff();
+							});
+						} else {
+							ff();
+						}
 					});
 				} else {
 					msg.channel.send(usernamecharname+', '+'Sorry, '+args[1]+' didn\'t send request to the `'+args[0]+'` Company :cold_sweat:');
@@ -1065,7 +1086,7 @@ new Command('company-view', function(appdata,msg,args) {
 			for (var i in data.JobRequests) {
 				if (data.JobRequests.hasOwnProperty(i)) {
 					var ownernametmp = '';
-					var t = i.split(':');
+					var t = i.split('_')[1].split(':');
 					if (t.length>1) {
 						ownernametmp = t[1];
 					} else {
@@ -2536,8 +2557,12 @@ function activities() {
     ];
 	var status_list = [
 		"dnd",
+		"dnd",
+		"invisible",
 		"online",
 		"invisible",
+		"idle",
+		"idle",
 		"idle"
 	];
 	var time = Date.now();
