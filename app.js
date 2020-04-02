@@ -270,7 +270,7 @@ class Command {
 		//data['money-symbol'] = data['money-symbol'] || 'Money';
 		//data['money-format'] = data['money-format'] || '{amount} {symbol}';
 
-		return req;
+		return data;
 	}
 }
 Command.List = {};
