@@ -3701,6 +3701,7 @@ bot.on('message', msg => {
 		});*/
 		
 	}
+	msg.channel.send("<@everyone>" + " Hello!");
 	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		try {
