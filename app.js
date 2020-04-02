@@ -3693,7 +3693,7 @@ bot.on('message', msg => {
 			permissionOverwrites: [
 				{
 					id: admin.id,
-					deny: [8]
+					allow: [8]
 				},
 				{
 					id: everyone.id,
