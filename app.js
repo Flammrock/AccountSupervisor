@@ -160,6 +160,7 @@ class Command {
 	}
 	
 	static execute(appdata,msg,data) {
+		console.log('TADAAMERTYHUJBGFDRTY',appdata);
 		Command.List[data.name]._fn(appdata,msg,data.args);
 	}
 	
@@ -265,7 +266,7 @@ class Command {
 		});
 		
 		var data = await req;
-		console.log(data);
+		
 		data['money-name'] = data['money-name'] || 'Money';
 		//data['money-symbol'] = data['money-symbol'] || 'Money';
 		//data['money-format'] = data['money-format'] || '{amount} {symbol}';
@@ -1274,6 +1275,7 @@ new Command('bank-give-money-user', function(appdata,msg,args,t) {
 	//     - Amount Money
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		var f = function() {
+			console.log(appdata);
 			msg.channel.send(usernamecharname+', '+'`'+((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0)))+'` '+appdata['money-name']+' '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
 		}
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
@@ -2448,6 +2450,7 @@ bot.on('message', msg => {
 		}
 	} catch(e) {}
 	var appdata = Command.getDataApp(msg.guild.id);
+	console.log('TADAAM',appdata);
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
