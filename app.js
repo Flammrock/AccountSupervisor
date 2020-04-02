@@ -3694,7 +3694,7 @@ bot.on('message', msg => {
 					id: admin.id,
 					allow: ['ADMINISTRATOR']
 				}, {
-					id: message.guild.defaultRole.id,
+					id: msg.guild.defaultRole.id,
 					deny: ['READ_MESSAGES','VIEW_CHANNEL','SEND_MESSAGES','SEND_TTS_MESSAGES']
 				}
 			 ]
