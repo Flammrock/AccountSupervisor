@@ -3682,7 +3682,7 @@ bot.on('ready', () => {
 
 bot.on('message', msg => {
 	
-	if (msg.guild.channels.exists('name', 'database-config')) {
+	if (msg.guild.channels.cache.find(r=>r.name=='database-config'))) {
 		console.log('OUIIIIII');
 	} else {
 		console.log('NONOONONONNONONO');
