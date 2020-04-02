@@ -383,6 +383,14 @@ new Command('all-reset-all', function(appdata,msg,args) {
 	query('DELETE FROM items',function(err,rows1){
 		msg.reply('Item System is reset!');
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```dos\n+'+name+'\n```')
+		.addField('Permission', 'ADMIN', true)
+		.addField('Description', 'Reset Bank, Users, Shop, Items Systèmes.', false)
+	msg.channel.send(_embed);
 });
 // ADMIN
 new Command('set-currency-name', function(appdata,msg,args) {
@@ -399,6 +407,14 @@ new Command('set-currency-name', function(appdata,msg,args) {
 			});
 		}
 	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```dos\n+'+name+' <money-name>\n```')
+		.addField('Permission', 'ADMIN', true)
+		.addField('Description', 'Change the Money Name, example:\n  +'+name+' Yens\n  +'+name+' "Super Yens"', false)
+	msg.channel.send(_embed);
 });
 
 
