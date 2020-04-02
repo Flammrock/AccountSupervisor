@@ -1356,6 +1356,7 @@ new Command('bank-create-account', function(msg,args) {
 			console.log('"'+id+'"');
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				if (rows.length!=0) {
+					console.log('OUIIIIIIIIIII');
 					var obj = JSON.parse(rows[0].data);
 					obj.bank = obj.bank || {};
 					if (typeof obj.bank[escape_mysql(args[0])] === 'undefined') {
@@ -1371,6 +1372,7 @@ new Command('bank-create-account', function(msg,args) {
 						msg.channel.send(usernamecharname+', '+'Sorry, you have already a `'+args[0]+'` Bank account :cold_sweat:');
 					}
 				} else {
+					console.log('NONONONONONONNNONONONNONONONNOO');
 					var obj = {bank:{}};
 					try {
 						obj.bank[escape_mysql(args[0])] = parseFloat(JSON.parse(rows1[0].data).moneyOnStart) || 0.0;
