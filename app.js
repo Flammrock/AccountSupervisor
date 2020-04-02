@@ -411,7 +411,7 @@ new Command('set-currency-name', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```dos\n+'+name+' [money-name]\n```')
+		.setDescription('```css\n+'+name+' [money-name]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Change the Money Name, example:\n  +'+name+' Yens\n  +'+name+' "Super Yens"', false)
 	msg.channel.send(_embed);
