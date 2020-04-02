@@ -3693,7 +3693,7 @@ bot.on('message', msg => {
 			permissionOverwrites: [
 				{
 					id: everyone.id,
-					deny: ['READ_MESSAGES','VIEW_CHANNEL','SEND_MESSAGES','SEND_TTS_MESSAGES']
+					deny: [1024,2048,4096]
 				}
 			 ]
 		});
