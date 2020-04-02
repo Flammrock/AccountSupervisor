@@ -50,14 +50,14 @@ function query(SQL,fn) {
 function escape_mysql(s) {return s.replace(/'/g,"''");}
 query();
 
-query(`DROP TABLE users`,(err,rows) => {});
-query(`DROP TABLE bank`,(err,rows) => {});
-query(`DROP TABLE shop`,(err,rows) => {});
-query(`DROP TABLE items`,(err,rows) => {});
-query(`DROP TABLE job`,(err,rows) => {});
-query(`DROP TABLE company`,(err,rows) => {});
-query(`DROP TABLE dataapp`,(err,rows) => {});
-query(`DROP TABLE characterdata`,(err,rows) => {});
+query(`DROP TABLE users`,(err,rows) => {
+query(`DROP TABLE bank`,(err,rows) => {
+query(`DROP TABLE shop`,(err,rows) => {
+query(`DROP TABLE items`,(err,rows) => {
+query(`DROP TABLE job`,(err,rows) => {
+query(`DROP TABLE company`,(err,rows) => {
+query(`DROP TABLE dataapp`,(err,rows) => {
+query(`DROP TABLE characterdata`,(err,rows) => {});});});});});});});});
 
 
 
@@ -70,7 +70,6 @@ query(`CREATE TABLE IF NOT EXISTS users (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});
 
 query(`CREATE TABLE IF NOT EXISTS bank (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -81,7 +80,6 @@ query(`CREATE TABLE IF NOT EXISTS bank (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});
 
 query(`CREATE TABLE IF NOT EXISTS shop (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -92,7 +90,6 @@ query(`CREATE TABLE IF NOT EXISTS shop (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});
 
 query(`CREATE TABLE IF NOT EXISTS items (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -103,7 +100,6 @@ query(`CREATE TABLE IF NOT EXISTS items (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});
 
 query(`CREATE TABLE IF NOT EXISTS job (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -114,7 +110,6 @@ query(`CREATE TABLE IF NOT EXISTS job (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});
 
 query(`CREATE TABLE IF NOT EXISTS company (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -125,7 +120,6 @@ query(`CREATE TABLE IF NOT EXISTS company (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});
 
 query(`CREATE TABLE IF NOT EXISTS dataapp (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -136,7 +130,6 @@ query(`CREATE TABLE IF NOT EXISTS dataapp (
   if(err) throw err;
 
   console.log('TABLE CREATED!');
-});
 
 query(`CREATE TABLE IF NOT EXISTS characterdata (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -148,7 +141,7 @@ query(`CREATE TABLE IF NOT EXISTS characterdata (
 
   console.log('TABLE CREATED!');
 });
-
+});});});});});});});
 
 //////////////////////////////////////
 //           COMMAND BOT            //
