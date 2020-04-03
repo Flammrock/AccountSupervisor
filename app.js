@@ -532,9 +532,9 @@ new Command('help', function(appdata,commandname,msg,args) {
 			.addField('Description', 'With this Bot, you can easly manage a RP Game Server. Just type `'+PREFIX+'list-command` to view all availables Command!\nIn Addition, there are a Interactive Web Interface to emulate Shop Website.', false)
 			.addField('Hosted On', 'https://www.heroku.com/', false)
 			.addField('GitHub Worker', 'https://github.com/Flammrock/AccountSupervisor', true)
-			.addField('GitHub Web', 'https://github.com/Flammrock/AccountSupervisorWebInterface', false)
+			.addField('GitHub Web', 'https://github.com/Flammrock/AccountSupervisorWebInterface', true)
 			.addField('Creator', 'Flammrock', true)
-			.addField('License', 'MIT', false)
+			.addField('License', 'MIT', true)
 		msg.channel.send(_embed);
 		return;
 	}
