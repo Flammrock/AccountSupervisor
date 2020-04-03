@@ -1,26 +1,10 @@
 const Discord = require('discord.js');
-const mysql = require("mysql");
+const mysql = require('mysql');
 const bot = new Discord.Client();
 
-
 const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.Xob0gA.ttUiIXzN_Ez7YcsUySDvoAklyxA';
-const DATABASE_URI = process.env.CLEARDB_DATABASE_URL;
 const TOKENINIT = 'qSlZyUk-w0-aOWJHuInzBA';
-
-
-//const DATABASE_PARSE = DATABASE_URI.match(/mysql:\/\/([^:]+):([^@]+)@([^\/]+)\/([^\?]+)\??/);
-
-//console.log(DATABASE_PARSE);
-
 const PREFIX = '+';
-
-/*const DATABASE = {
-	host:       DATABASE_PARSE[3],
-	user:       DATABASE_PARSE[1],
-	password:   DATABASE_PARSE[2],
-	database:   DATABASE_PARSE[4]
-};*/
-
 var DATABASE = {};
 
 
