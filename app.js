@@ -426,10 +426,10 @@ function getDatabaseInfo(msg) {
 			});
 			console.log(m);
 			DATABASE = {
-				host:       m[1],
-				user:       m[2],
-				password:   m[3],
-				database:   m[4]
+				host:       m[0][1],
+				user:       m[1][2],
+				password:   m[2][3],
+				database:   m[3][4]
 			};
 			console.log(DATABASE);
 		});
