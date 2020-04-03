@@ -1909,7 +1909,7 @@ new Command('job-view', function(appdata,commandname,msg,args) {
 			var _embed = new Discord.MessageEmbed()
 				.setTitle('Job '+args[0])
 				.setColor(0xff0000)
-				.setDescription('**SALARY (month)**: '+currencyFormat(data.salary,appdata['money-symbole'],appdata['money-format'])+'\n**SALARY (day)**: '+currencyFormat((parseFloat(data.salary)||325000.0)/30,appdata['money-symbole'],appdata['money-format']);
+				.setDescription('**SALARY (month)**: '+currencyFormat(data.salary,appdata['money-symbole'],appdata['money-format'])+'\n**SALARY (day)**: '+currencyFormat((parseFloat(data.salary)||325000.0)/30,appdata['money-symbole'],appdata['money-format']));
 			msg.channel.send(_embed);
 		});
 	});
