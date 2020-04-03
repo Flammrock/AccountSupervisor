@@ -407,10 +407,12 @@ function tryConnect(args,callback) {
 	connection.on('error', function() {connection.end();callback(false);});
 }
 function getDatabaseInfo(msg) {
+	console.log('SEARCHING...');
 	var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
 	var filter = m => m.content.includes(TOKENINIT);
-	var collector = configChannel.createMessageCollector(filter, { max:1 });
+	var collector = configChannel.createMessageCollector(filter);
 	collector.on('end', collected => {
+		console.log('SEARCHING...OKKK');
 		if (collected.size==0) {
 			msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+' to reinit the configuration!`\n```');
 			return;
