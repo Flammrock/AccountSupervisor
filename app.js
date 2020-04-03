@@ -409,7 +409,7 @@ function tryConnect(args,callback) {
 function getDatabaseInfo(msg) {
 	console.log('SEARCHING...');
 	var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
-	var filter = m => m.content.includes(TOKENINIT);
+	var filter = m => m.content.includes('HOST');
 	var collector = configChannel.createMessageCollector(filter, {time:5000});
 	collector.on('end', (collected, reason) => {
 		console.log('SEARCHING...OKKK');
