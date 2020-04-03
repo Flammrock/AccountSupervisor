@@ -523,7 +523,20 @@ new Command('init', function(appdata,commandname,msg,args) {
 // CITIZEN
 new Command('help', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
-	if (args.length < 1) return;
+	if (args.length < 1) {
+		var _embed = new Discord.MessageEmbed()
+			.setTitle('HELP')
+			.setColor('#0099ff')
+			.setDescription('`AccountSupervisor` is a bot allowing to simulate a more advanced economy specialized in RP Games *(Role-playing Games)*\n')
+			.addField('List of Available Systems', '• Users System\n• Character System\n• Bank System\n• Company System\n• Job System\n• Shop System\n• Items System', false)
+			.addField('Description', 'With this Bot, you can easly manage a RP Game Server. Just type `'+PREFIX+'list-command` to view all availables Command!\nIn Addition, there are a Interactive Web Interface to emulate Shop Website.', false)
+			.addField('Creator', 'Flammrock', true)
+			.addField('Hosted On', 'https://www.heroku.com/', false)
+			.addField('GitHub Worker', 'https://github.com/Flammrock/AccountSupervisor', true)
+			.addField('GitHub Web', 'https://github.com/Flammrock/AccountSupervisorWebInterface', true)
+		msg.channel.send(_embed);
+		return;
+	}
 	// ARGS :
 	//    - Command Name
 	if (typeof Command.List[args[0]] !== 'undefined') {
