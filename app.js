@@ -414,13 +414,14 @@ function getDatabaseInfo(msg) {
 	collector.on('end', (collected, reason) => {
 		console.log('SEARCHING...OKKK');
 		if (collected.size==0) {
-			msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+' to reinit the configuration!`\n```');
+			console.log('NO MESSAGE FOUND!');
+			msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+'` to reinit the configuration!\n```');
 			return;
 		}
 		collected.each(function(item){
 			var m = item.content.match(/HOST: ([^\n])\n|USERNAME: ([^\n])\n|PASSWORD: ([^\n])\n|DATABASE: ([^\n])\n/g);
 			if (m==null) {
-				msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+' to reinit the configuration!`\n```');
+				msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+'` to reinit the configuration!\n```');
 				return;
 			}
 			m = m.map(function(m){
