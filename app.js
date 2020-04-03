@@ -21,11 +21,11 @@ const PREFIX = '+';
 	database:   DATABASE_PARSE[4]
 };*/
 
-const DATABASE = {
-	host:       'remotemysql.com',
-	user:       'shZoWU2Fm6',
-	password:   'yQfVte9k3s',
-	database:   'shZoWU2Fm6'
+var DATABASE = {
+	host:       null,
+	user:       null,
+	password:   null,
+	database:  null
 };
 
 
@@ -72,16 +72,19 @@ query(`DROP TABLE dataapp`,(err,rows) => {
 query(`DROP TABLE characterdata`,(err,rows) => {});});});});});});});});
 */
 
-
-query(`CREATE TABLE IF NOT EXISTS users (
+function createTables(msg,callback) {
+	query(`CREATE TABLE IF NOT EXISTS users (
   id int(11) NOT NULL AUTO_INCREMENT,
   name text,
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
-  if(err) throw err;
+  if (err) {
+	  if (msg) msg.channel.send('```diff\n-Error when creating/updating users table: '+err.toString()+'\n```');
+	  else throw err;
+  }
 
-  console.log('TABLE CREATED!');
+  if (msg) msg.channel.send('```css\n   - [users] table created/updated with Success!\n```');
 
 query(`CREATE TABLE IF NOT EXISTS bank (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -89,9 +92,12 @@ query(`CREATE TABLE IF NOT EXISTS bank (
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
-  if(err) throw err;
+  if (err) {
+	  if (msg) msg.channel.send('```diff\n-Error when creating/updating bank table: '+err.toString()+'\n```');
+	  else throw err;
+  }
 
-  console.log('TABLE CREATED!');
+  if (msg) msg.channel.send('```css\n   - [bank] table created/updated with Success!\n```');
 
 query(`CREATE TABLE IF NOT EXISTS shop (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -99,9 +105,12 @@ query(`CREATE TABLE IF NOT EXISTS shop (
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
-  if(err) throw err;
+  if (err) {
+	  if (msg) msg.channel.send('```diff\n-Error when creating/updating shop table: '+err.toString()+'\n```');
+	  else throw err;
+  }
 
-  console.log('TABLE CREATED!');
+  if (msg) msg.channel.send('```css\n   - [shop] table created/updated with Success!\n```');
 
 query(`CREATE TABLE IF NOT EXISTS items (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -109,9 +118,12 @@ query(`CREATE TABLE IF NOT EXISTS items (
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
-  if(err) throw err;
+  if (err) {
+	  if (msg) msg.channel.send('```diff\n-Error when creating/updating items table: '+err.toString()+'\n```');
+	  else throw err;
+  }
 
-  console.log('TABLE CREATED!');
+  if (msg) msg.channel.send('```css\n   - [items] table created/updated with Success!\n```');
 
 query(`CREATE TABLE IF NOT EXISTS job (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -119,9 +131,12 @@ query(`CREATE TABLE IF NOT EXISTS job (
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
-  if(err) throw err;
+  if (err) {
+	  if (msg) msg.channel.send('```diff\n-Error when creating/updating job table: '+err.toString()+'\n```');
+	  else throw err;
+  }
 
-  console.log('TABLE CREATED!');
+  if (msg) msg.channel.send('```css\n   - [job] table created/updated with Success!\n```');
 
 query(`CREATE TABLE IF NOT EXISTS company (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -129,9 +144,12 @@ query(`CREATE TABLE IF NOT EXISTS company (
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
-  if(err) throw err;
+  if (err) {
+	  if (msg) msg.channel.send('```diff\n-Error when creating/updating company table: '+err.toString()+'\n```');
+	  else throw err;
+  }
 
-  console.log('TABLE CREATED!');
+  if (msg) msg.channel.send('```css\n   - [company] table created/updated with Success!\n```');
 
 query(`CREATE TABLE IF NOT EXISTS dataapp (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -139,9 +157,12 @@ query(`CREATE TABLE IF NOT EXISTS dataapp (
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
-  if(err) throw err;
+  if (err) {
+	  if (msg) msg.channel.send('```diff\n-Error when creating/updating dataapp table: '+err.toString()+'\n```');
+	  else throw err;
+  }
 
-  console.log('TABLE CREATED!');
+  if (msg) msg.channel.send('```css\n   - [shop] dataapp created/updated with Success!\n```');
 
 query(`CREATE TABLE IF NOT EXISTS characterdata (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -149,11 +170,18 @@ query(`CREATE TABLE IF NOT EXISTS characterdata (
   data text,
   PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;`, (err,rows) => {
-  if(err) throw err;
+  if (err) {
+	  if (msg) msg.channel.send('```diff\n-Error when creating/updating characterdata table: '+err.toString()+'\n```');
+	  else throw err;
+  }
 
-  console.log('TABLE CREATED!');
+  if (msg) msg.channel.send('```css\n   - [characterdata] table created/updated with Success!\n```');
+  callback();
 });
 });});});});});});});
+
+}
+
 
 //////////////////////////////////////
 //           COMMAND BOT            //
@@ -419,7 +447,10 @@ new Command('init', function(appdata,commandname,msg,args) {
 					var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
 					configChannel.send('```\n['+TOKENINIT+'] Configuration:\n   • HOST: '+args[0]+'\n   • USERNAME: '+args[1]+'\n   • PASSWORD: '+args[2]+'\n   • DATABASE: '+args[3]+'\n```');
 					msg.channel.send('```css\n   - Data saved with Success!\n```');
-					msg.channel.send('```css\nUse `'+PREFIX+commandname+'` to change the configuration!\n```');
+					msg.channel.send('```css\nCreate tables..\n```');
+					createTables(msg,function(){
+						msg.channel.send('```css\nUse `'+PREFIX+commandname+'` to change the configuration!\n```');
+					});
 				})
 				.catch(function(e){
 					msg.channel.send('```diff\n-Error: '+e.toString()+'\n```');
