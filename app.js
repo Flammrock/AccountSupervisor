@@ -412,7 +412,7 @@ function getDatabaseInfo(msg) {
 	var filter = m => m.content.includes(TOKENINIT);
 	
 	console.log(bot.user.id);
-	var collector = new discord.MessageCollector(configChannel, m => m.author.id === bot.user.id, { time: 30000 });
+	var collector = new Discord.MessageCollector(configChannel, m => m.author.id === bot.user.id, { time: 30000 });
 	collector.on('collect', m => {
 		console.log(m.content);
 	});
