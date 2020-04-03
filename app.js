@@ -3811,7 +3811,7 @@ bot.on('message', msg => {
 	
 		if (msg.content.substring(0,PREFIX.length+4)==PREFIX+'init') {
 			var data = new ParserCommand(msg.content);
-			Command.execute(appdata,msg,data);
+			Command.execute({},msg,data);
 			return;
 		}
 	
