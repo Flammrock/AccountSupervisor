@@ -373,7 +373,7 @@ function tryConnect(args,callback) {
 		database:   args[3]
 	});
 	connection.connect((err) => {
-		if (err) {connection.end();callback(false);};
+		if (err) {connection.end();callback(false);return;};
 		connection.end();
 		callback(true);
 	});
