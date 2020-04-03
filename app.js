@@ -423,6 +423,12 @@ new Command('init', function(appdata,commandname,msg,args) {
 	msg.delete();
 	var f = function() {
 		tryConnect(args,function(r){
+			DATABASE = {
+				host:       args[0],
+				user:       args[1],
+				password:   args[2],
+				database:   args[3]
+			};
 			if (r) {
 				msg.reply('```css\nConnected to the MySQL Remote Server with Success!\n```');
 				msg.channel.send('```css\nSaving data..\n```');
