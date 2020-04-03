@@ -3750,31 +3750,6 @@ bot.on('ready', () => {
 
 bot.on('message', msg => {
 	
-	if (msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config')) {
-		console.log('OUIIIIII');
-	} else {
-		console.log('NONOONONONNONONO');
-		var admin = msg.guild.roles.cache.find(r => r.name == 'AccountSupervisorAdmin');
-		var everyone = msg.guild.roles.cache.find(r => r.name == '@everyone');
-		msg.guild.channels.create('accountsupervisor-database-config', {
-			position: 0,
-			permissionOverwrites: [
-				{
-					id: admin.id,
-					allow: [8,1024,2048,4096]
-				},
-				{
-					id: everyone.id,
-					deny: [1024,2048,4096]
-				}
-			 ]
-		});
-		
-	}
-	//msg.channel.send("<@everyone>" + " Hello!");
-	
-	//console.log(msg.guild.roles);
-	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 	
 		if (msg.content.substring(0,PREFIX.length+4)==PREFIX+'init') {
