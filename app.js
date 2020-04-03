@@ -414,7 +414,7 @@ function getDatabaseInfo(msg) {
 	configChannel.messages.fetch()
 	.then(function(messages){
 		messages = messages.filter(m => m.author.id == bot.user.id);
-		messages = messages.content.includes(TOKENINIT);
+		messages = messages.filter(m => m.content.includes(TOKENINIT));
 		messages.each(function(item){
 			var m = item.content.match(/HOST: ([^\n])\n|USERNAME: ([^\n])\n|PASSWORD: ([^\n])\n|DATABASE: ([^\n])\n/g);
 			if (m==null) {
