@@ -406,6 +406,35 @@ function tryConnect(args,callback) {
 	});
 	connection.on('error', function() {connection.end();callback(false);});
 }
+function getDatabaseInfo(msg) {
+	var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
+	var filter = m => m.content.includes(TOKENINIT);
+	var collector = configChannel.createMessageCollector(filter, { max:1 });
+	collector.on('end', collected => {
+		if (collected.size==0) {
+			msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+' to reinit the configuration!`\n```');
+			return;
+		}
+		collected.each(function(item){
+			var m = item.content.match(/HOST: ([^\n])\n|USERNAME: ([^\n])\n|PASSWORD: ([^\n])\n|DATABASE: ([^\n])\n/g);
+			if (m==null) {
+				msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+' to reinit the configuration!`\n```');
+				return;
+			}
+			m = m.map(function(m){
+				return m.match(/HOST: ([^\n])\n|USERNAME: ([^\n])\n|PASSWORD: ([^\n])\n|DATABASE: ([^\n])\n/);
+			});
+			console.log(m);
+			DATABASE = {
+				host:       m[1],
+				user:       m[2],
+				password:   m[3],
+				database:   m[4]
+			};
+			console.log(DATABASE);
+		});
+	});
+}
 
 
 // ADMIN
@@ -3853,8 +3882,7 @@ bot.on('message', msg => {
 			return;
 		}
 		
-		
-		console.log(msg.channel.id, msg.content);
+		getDatabaseInfo(msg);
 		
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
