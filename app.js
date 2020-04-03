@@ -362,7 +362,7 @@ var Speech = {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
 	},
 	
-	"JobAlreadyExist": function(data,cname,cname,msg,name,args) {
+	"JobAlreadyExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Job is already created :cold_sweat:');
 	},
 	"JobNotExist": function(data,cname,msg,name,args) {
