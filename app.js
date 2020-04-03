@@ -5,6 +5,7 @@ const bot = new Discord.Client();
 
 const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoLXNQ.hFJvWBxgMR3gd7_A6iHSEOcDZwU';
 const DATABASE_URI = process.env.CLEARDB_DATABASE_URL;
+const TOKENINIT = 'qSlZyUk-w0-aOWJHuInzBA';
 
 
 //const DATABASE_PARSE = DATABASE_URI.match(/mysql:\/\/([^:]+):([^@]+)@([^\/]+)\/([^\?]+)\??/);
@@ -171,7 +172,7 @@ class Command {
 	}
 	
 	static execute(appdata,msg,data) {
-		Command.List[data.name]._fn(appdata,msg,data.args);
+		Command.List[data.name]._fn(appdata,data.name,msg,data.args);
 	}
 	
 	static checkPermission(msg,mode,l) {
@@ -317,46 +318,46 @@ class ParserCommand {
 
 var Speech = {
 	
-	"CompanyAlreadyExist": function(data,msg,name,args) {
+	"CompanyAlreadyExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Company is already created :cold_sweat:');
 	},
-	"CompanyNotExist": function(data,msg,name,args) {
+	"CompanyNotExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Company doesn\'t exist :cold_sweat:');
 	},
 	
-	"BankAlreadyExist": function(data,msg,name,args) {
+	"BankAlreadyExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Bank is already created :cold_sweat:');
 	},
-	"BankNotExist": function(data,msg,name,args) {
+	"BankNotExist": function(data,msg,cname,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Bank doesn\'t exist :cold_sweat:');
 	},
 	
-	"ShopAlreadyExist": function(data,msg,name,args) {
+	"ShopAlreadyExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Shop is already created :cold_sweat:');
 	},
-	"ShopNotExist": function(data,msg,name,args) {
+	"ShopNotExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Shop doesn\'t exist :cold_sweat:');
 	},
 	
-	"ItemAlreadyExist": function(data,msg,name,args) {
+	"ItemAlreadyExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Item is already created :cold_sweat:');
 	},
-	"ItemNotExist": function(data,msg,name,args) {
+	"ItemNotExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Item doesn\'t exist :cold_sweat:');
 	},
 	
-	"JobAlreadyExist": function(data,msg,name,args) {
+	"JobAlreadyExist": function(data,cname,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Job is already created :cold_sweat:');
 	},
-	"JobNotExist": function(data,msg,name,args) {
+	"JobNotExist": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, `'+args[0]+'` Job doesn\'t exist :cold_sweat:');
 	},
 	
 	
-	"NotEnoughtMoney": function(data,msg,name,args) {
+	"NotEnoughtMoney": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, you don\'t have enought '+data['money-name']+' :cold_sweat:');
 	},
-	"NotHaveBankAccount": function(data,msg,name,args) {
+	"NotHaveBankAccount": function(data,cname,msg,name,args) {
 		msg.channel.send(name+', '+'Sorry, you don\'t have an `'+args[2]+'` Bank account :cold_sweat:');
 	}
 	
@@ -364,8 +365,75 @@ var Speech = {
 
 
 
+function tryConnect(args) {
+	var connection = mysql.createConnection({
+		host:       args[0],
+		user:       args[1],
+		password:   args[2],
+		database:   args[3]
+	});
+	connection.connect((err) => {
+		if (err) {connection.end();throw 1;};
+		connection.end();
+	});
+	connection.on('error', function() {connection.end();throw 2;});
+}
+
+
+// ADMIN
+new Command('init', function(appdata,commandname,msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 4) {
+		msg.reply('BAD ARGUMENTS\nPlease use `'+PREFIX+'help '+commandname+'` for help.');
+		return;
+	}
+	// ARGS :
+	//    - Host
+	//    - User
+	//    - Password
+	//    - Database
+	try {
+		tryConnect(args);
+		msg.reply('```css\nConnected to the MySQL Remote Server with Success!\n```');
+		msg.channel.send('```css\nSaving data..\n```');
+		var admin = msg.guild.roles.cache.find(r => r.name == 'AccountSupervisorAdmin');
+		var everyone = msg.guild.roles.cache.find(r => r.name == '@everyone');
+		msg.guild.channels.create('accountsupervisor-database-config', {
+			position: 0,
+			permissionOverwrites: [
+				{
+					id: admin.id,
+					allow: [8,1024,2048,4096]
+				},
+				{
+					id: everyone.id,
+					deny: [1024,2048,4096]
+				}
+			 ]
+		})
+		.then(function(){
+			msg.channel.send('```css\n   - `accountsupervisor-database-config` Text Channel created with Success!\n```');
+			var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
+			configChannel.send('```\n['+TOKENINIT+'] Configuration:\n   • **HOST**: '+args[0]+'\n   • **USERNAME**: '+args[1]+'\n   • **PASSWORD**: '+args[2]+'\n   • **DATABASE**: '+args[3]+'\n```');
+			msg.channel.send('```css\n   - Data saved with Success!\n```');
+			msg.channel.send('```css\nUse `'+PREFIX+'help '+commandname+'` to change the configuration!\n```');
+		})
+		.catch(function(){
+			msg.channel.send('```diff\n-Error: '+e.toString()+'\n```');
+		});
+	} catch (e) {
+		msg.reply('```diff\n-Error when attempting to connect to the MySQL Remote Server!\nPlese check if the host, user, password and database name are good!\n```');
+	}
+},function(msg,name){
+	
+});
+
+
+
+
+
 // CITIZEN
-new Command('help', function(appdata,msg,args) {
+new Command('help', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -378,20 +446,20 @@ new Command('help', function(appdata,msg,args) {
 });
 
 // ADMIN
-new Command('ping', function(appdata,msg,args) {
+new Command('ping', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	msg.channel.send('pong');
 },function(msg,name){
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Just Ping the bot to known if the bot is really online.', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('all-reset-all', function(appdata,msg,args) {
+new Command('all-reset-all', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	query('DELETE FROM users',function(err,rows1){
 		msg.reply('User System is reset!');
@@ -409,13 +477,13 @@ new Command('all-reset-all', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Reset Bank, Users, Shop, Items Systèmes.', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('set-currency-name', function(appdata,msg,args) {
+new Command('set-currency-name', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	query('SELECT * FROM dataapp WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql('money-name')+'\'',function(err,rows){
@@ -433,7 +501,7 @@ new Command('set-currency-name', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [money-name]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [money-name]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Change the Money Name, example:\n  +'+name+' Yens\n  +'+name+' "Super Yens"', false)
 	msg.channel.send(_embed);
@@ -441,7 +509,7 @@ new Command('set-currency-name', function(appdata,msg,args) {
 
 
 // ADMIN
-new Command('destroy-data', function(appdata,msg,args) {
+new Command('destroy-data', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	query(`DROP TABLE users`,(err,rows) => {
 	query(`DROP TABLE bank`,(err,rows) => {
@@ -536,7 +604,7 @@ new Command('destroy-data', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'This Command destroy all data.', false)
 	msg.channel.send(_embed);
@@ -545,7 +613,7 @@ new Command('destroy-data', function(appdata,msg,args) {
 
 // USER
 // ADMIN
-new Command('user-reset-all', function(appdata,msg,args) {
+new Command('user-reset-all', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	query('DELETE FROM users',function(err,rows1){
 		msg.reply('User System is reset!');
@@ -554,7 +622,7 @@ new Command('user-reset-all', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Reset Users Système.', false)
 	msg.channel.send(_embed);
@@ -563,7 +631,7 @@ new Command('user-reset-all', function(appdata,msg,args) {
 
 // CHARACTER
 // ADMIN
-new Command('character-create', function(appdata,msg,args) {
+new Command('character-create', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -591,13 +659,13 @@ new Command('character-create', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [Character Name] [User]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [Character Name] [User]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Create a Character for the targeted user. Example:\n  +'+name+' "Bob Le Bricoleur" @Flammrock#5464', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN+OWNER
-new Command('character-delete', function(appdata,msg,args) {
+new Command('character-delete', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -621,19 +689,19 @@ new Command('character-delete', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [Character Name]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [Character Name]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN-OWNER', true)
 		.addField('Description', 'Delete a Character by name. Example:\n  +'+name+' "Bob Le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN+OWNER
-new Command('character-select', function(appdata,msg,args) {
+new Command('character-select', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
 	//    - Character Name
 	var id = msg.member.user.id+'';
-	Command.List['character-unselect']._fn(appdata,msg,[],function(){
+	Command.List['character-unselect']._fn(appdata,commandname,msg,[],function(){
 		query('SELECT * FROM characterdata WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
 				msg.reply('Sorry,`'+args[0]+'` Character doesn\'t exist :cold_sweat:');
@@ -660,13 +728,13 @@ new Command('character-select', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [Character Name]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [Character Name]\n```')
 		.addField('Permission', 'CITIZEN-OWNER', true)
 		.addField('Description', 'Select a Character by name. Only the Owner of the Character can select it! Example:\n  +'+name+' "Bob Le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN+OWNER
-new Command('character-unselect', function(appdata,msg,args,c) {
+new Command('character-unselect', function(appdata,commandname,msg,args,c) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	var id = msg.member.user.id+'';
 	query('SELECT * FROM characterdata WHERE data LIKE \'%selected_'+escape_mysql(id)+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
@@ -692,13 +760,13 @@ new Command('character-unselect', function(appdata,msg,args,c) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN-OWNER', true)
 		.addField('Description', 'Unselect the Character selected if the User have a selected Character. Only the Owner of the Character can unselect it! Example:\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('character-list', function(appdata,msg,args) {
+new Command('character-list', function(appdata,commandname,msg,args) {
 	
 	var page = 1;
 	var d = false;
@@ -777,13 +845,13 @@ new Command('character-list', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' {User} {Page}\n```\n        OR\n```css\n+'+name+' {Page}\n```')
+		.setDescription('```css\n'+PREFIX+name+' {User} {Page}\n```\n        OR\n```css\n'+PREFIX+name+' {Page}\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Get the list of all Character if no User is specified. Else, it will display the list Characters of specified User. Example:\n  +'+name+' 2\n  +'+name+' @Flammrock#5464\n  +'+name+' @Flammrock#5464 3', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('character-who-i-am', function(appdata,msg,args) {
+new Command('character-who-i-am', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		msg.reply('you are: '+usernamecharname);
@@ -792,7 +860,7 @@ new Command('character-who-i-am', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Get the current name of the Character selected. Example:\n  +'+name, false)
 	msg.channel.send(_embed);
@@ -801,7 +869,7 @@ new Command('character-who-i-am', function(appdata,msg,args) {
 
 // COMPANY
 // CITIZEN
-new Command('company-create', function(appdata,msg,args) {
+new Command('company-create', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -809,7 +877,7 @@ new Command('company-create', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
-				Speech['CompanyAlreadyExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyAlreadyExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = {
@@ -820,7 +888,7 @@ new Command('company-create', function(appdata,msg,args) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company-Shop is already created :cold_sweat:');
 					return;
 				}
-				Command.List['shop-create']._fn(appdata,msg,[
+				Command.List['shop-create']._fn(appdata,commandname,msg,[
 					args[0],
 					"",
 					"",
@@ -839,13 +907,13 @@ new Command('company-create', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Create company by name. Example:\n  +'+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-delete', function(appdata,msg,args) {
+new Command('company-delete', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -853,7 +921,7 @@ new Command('company-delete', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -861,7 +929,7 @@ new Command('company-delete', function(appdata,msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
-			Command.List['shop-delete']._fn(appdata,msg,[args[0]]);
+			Command.List['shop-delete']._fn(appdata,commandname,msg,[args[0]]);
 			query('DELETE FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Company deleted with success!');
 			});
@@ -872,13 +940,13 @@ new Command('company-delete', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Description', 'Delete company by name. Example:\n  +'+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-add-job', function(appdata,msg,args) {
+new Command('company-add-job', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -887,7 +955,7 @@ new Command('company-add-job', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -897,7 +965,7 @@ new Command('company-add-job', function(appdata,msg,args) {
 			}
 			query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
 				if (rows.length==0) {
-					Speech['JobNotExist'](appdata,msg,usernamecharname,args);
+					Speech['JobNotExist'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				data.JobsList = data.JobsList || {};
@@ -912,14 +980,14 @@ new Command('company-add-job', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [JobName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [JobName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Need', 'The Job must exist. Use `+help job-create` for more details.', true)
 		.addField('Description', 'Add Job to the Company. Example:\n  +'+name+' "Flammrock Corporation" "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-remove-job', function(appdata,msg,args) {
+new Command('company-remove-job', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -928,7 +996,7 @@ new Command('company-remove-job', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -938,7 +1006,7 @@ new Command('company-remove-job', function(appdata,msg,args) {
 			}
 			query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[1])+'\'',function(err,rows){
 				if (rows.length==0) {
-					Speech['JobNotExist'](appdata,msg,usernamecharname,args);
+					Speech['JobNotExist'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				data.JobsList = data.JobsList || {};
@@ -968,14 +1036,14 @@ new Command('company-remove-job', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [JobName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [JobName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Need', 'The Job must exist. Use `+help job-create` for more details.', true)
 		.addField('Description', 'Remove Job to the Company.\n__**WARN: **This Command will fire all User in the Company who have the specified Job.__\nExample:\n  +'+name+' "Flammrock Corporation" "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('company-send-request-job', function(appdata,msg,args) {
+new Command('company-send-request-job', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -989,7 +1057,7 @@ new Command('company-send-request-job', function(appdata,msg,args) {
 			}
 			query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
-					Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+					Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				var data = JSON.parse(rows[0].data);
@@ -1011,14 +1079,14 @@ new Command('company-send-request-job', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [JobName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [JobName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Need', 'The Job must exist. Use `+help job-create` for more details.', true)
 		.addField('Description', 'Send a request Job for the specified Company. Example:\n  +'+name+' "Flammrock Corporation" "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-accept-request-job', function(appdata,msg,args) {
+new Command('company-accept-request-job', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1028,7 +1096,7 @@ new Command('company-accept-request-job', function(appdata,msg,args) {
 		Command.getCharacter(msg,args[1],function(id2){
 			query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
-					Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+					Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				var data = JSON.parse(rows[0].data);
@@ -1076,13 +1144,13 @@ new Command('company-accept-request-job', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [User]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [User]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Description', 'Accept the request Job of a User/Character for the specified Company. Example:\n  +'+name+' "Flammrock Corporation" @Flammrock#5464\n  +'+name+' "Flammrock Corporation" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('company-give-money', function(appdata,msg,args) {
+new Command('company-give-money', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 4) return;
 	// ARGS :
@@ -1093,7 +1161,7 @@ new Command('company-give-money', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -1104,17 +1172,17 @@ new Command('company-give-money', function(appdata,msg,args) {
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
 				if (rows.length==0) {
-					Speech['NotEnoughtMoney'](appdata,msg,usernamecharname);
+					Speech['NotEnoughtMoney'](appdata,commandname,msg,usernamecharname);
 					return;
 				}
 				var userdata = JSON.parse(rows[0].data);
 				userdata.bank = data.bank || {};
 				if (typeof userdata.bank[args[2]] === 'undefined') {
-					Speech['NotHaveBankAccount'](appdata,msg,usernamecharname,args);
+					Speech['NotHaveBankAccount'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				if ((parseFloat(userdata.bank[args[2]])||0.0) < Math.abs(parseFloat(args[3])||0.0)) {
-					Speech['NotEnoughtMoney'](appdata,msg,usernamecharname);
+					Speech['NotEnoughtMoney'](appdata,commandname,msg,usernamecharname);
 					return;
 				}
 				userdata.bank[args[2]] = (parseFloat(userdata.bank[args[2]])||0.0) - Math.abs(parseFloat(args[3])||0.0);
@@ -1131,14 +1199,14 @@ new Command('company-give-money', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [BankCompany] [BankUser] [AmountMoney]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [BankCompany] [BankUser] [AmountMoney]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Need', 'The Bank must exist. Use `+help bank-create` for more details.', true)
 		.addField('Description', 'Give some money for the specified Company. Example:\n  +'+name+' "Flammrock Corporation" "My Bank Example" "My Bank Example" 500.0\n  +'+name+' "Flammrock Corporation" "Bank of the Company" "Bank of the User" 10.75', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('company-get-money', function(appdata,msg,args) {
+new Command('company-get-money', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1147,7 +1215,7 @@ new Command('company-get-money', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -1164,14 +1232,14 @@ new Command('company-get-money', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [BankCompany]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [BankCompany]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Need', 'The Bank must exist. Use `+help bank-create` for more details.', true)
 		.addField('Description', 'Get money of specified Bank for the specified Company. Example:\n  +'+name+' "Flammrock Corporation" "My Bank Example"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-fire', function(appdata,msg,args) {
+new Command('company-fire', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1181,7 +1249,7 @@ new Command('company-fire', function(appdata,msg,args) {
 		Command.getCharacter(msg,args[1],function(id2){
 			query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
-					Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+					Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				var data = JSON.parse(rows[0].data);
@@ -1207,13 +1275,13 @@ new Command('company-fire', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [User]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [User]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Description', 'Fire User of the Company. Example:\n  +'+name+' "Flammrock Corporation" @Flammrock#5464\n  +'+name+' "Flammrock Corporation" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 }); 
 // ADMIN/CITIZEN+OWNER
-new Command('company-update-shop', function(appdata,msg,args) {
+new Command('company-update-shop', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1223,7 +1291,7 @@ new Command('company-update-shop', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -1235,21 +1303,21 @@ new Command('company-update-shop', function(appdata,msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, This Settings doesn\'t exist :cold_sweat:');
 				return;
 			}
-			Command.List['shop-update-'+args[1]].fn(appdata,msg,[args[0],args[2]],true);
+			Command.List['shop-update-'+args[1]].fn(appdata,commandname,msg,[args[0],args[2]],true);
 		});
 	});
 },function(msg,name){
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [salons | need | web] [new-value]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [salons | need | web] [new-value]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Information', 'You should type `+help shop-create` to see more details.', true)
 		.addField('Description', 'Update the Value of the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation" salons #general\n  +'+name+' "Flammrock Corporation" web true\n  +'+name+' "Flammrock Corporation" salons "#general #autre-salon"\n  +'+name+' "Flammrock Corporation" need "item1 item2"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-add-shop-website', function(appdata,msg,args) {
+new Command('company-add-shop-website', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1257,7 +1325,7 @@ new Command('company-add-shop-website', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -1265,21 +1333,21 @@ new Command('company-add-shop-website', function(appdata,msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
-			Command.List['shop-update-web']._fn(appdata,msg,[args[0],"true"],true);
+			Command.List['shop-update-web']._fn(appdata,commandname,msg,[args[0],"true"],true);
 		});
 	});
 },function(msg,name){
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Information', 'You should type `+help shop-create` to see more details.', true)
 		.addField('Description', 'Enable Website of the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-remove-shop-website', function(appdata,msg,args) {
+new Command('company-remove-shop-website', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1287,7 +1355,7 @@ new Command('company-remove-shop-website', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -1295,21 +1363,21 @@ new Command('company-remove-shop-website', function(appdata,msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, You aren\'t the owner of `'+args[0]+'` Company :cold_sweat:');
 				return;
 			}
-			Command.List['shop-update-web']._fn(appdata,msg,[args[0],"false"],true);
+			Command.List['shop-update-web']._fn(appdata,commandname,msg,[args[0],"false"],true);
 		});
 	});
 },function(msg,name){
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Information', 'You should type `+help shop-create` to see more details.', true)
 		.addField('Description', 'Disable Website of the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-create-item', function(appdata,msg,args) {
+new Command('company-create-item', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1318,7 +1386,7 @@ new Command('company-create-item', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -1339,21 +1407,21 @@ new Command('company-create-item', function(appdata,msg,args) {
 			} else if (newargs.length>2) {
 				newargs[2] = shopname;
 			}
-			Command.List['item-create']._fn(appdata,msg,newargs,true);
+			Command.List['item-create']._fn(appdata,commandname,msg,newargs,true);
 		});
 	});
 },function(msg,name){
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] {{{Item Argument}}}\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] {{{Item Argument}}}\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Information', 'You should type `+help item-create` to see more details.', true)
 		.addField('Description', 'Create an item and add it in the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation" "My Item" 4.99 "" "type of item" "http://link-to-image.jpg" "My Description"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
-new Command('company-delete-item', function(appdata,msg,args) {
+new Command('company-delete-item', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1362,7 +1430,7 @@ new Command('company-delete-item', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -1387,7 +1455,7 @@ new Command('company-delete-item', function(appdata,msg,args) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Item isn\'t created by the `'+args[0]+'` Company :cold_sweat:');
 					return;
 				}
-				Command.List['item-delete']._fn(appdata,msg,[args[1]],true);
+				Command.List['item-delete']._fn(appdata,commandname,msg,[args[1]],true);
 			});
 		});
 	});
@@ -1395,7 +1463,7 @@ new Command('company-delete-item', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName] [ItemName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [ItemName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Need', 'The Item must exist. Use `+help item-create` for more details.', true)
 		.addField('Description', 'Delete the specified item and remove it from the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation" "My Item"', false)
@@ -1403,7 +1471,7 @@ new Command('company-delete-item', function(appdata,msg,args) {
 });
 
 // CITIZEN
-new Command('company-view', function(appdata,msg,args) {
+new Command('company-view', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1411,7 +1479,7 @@ new Command('company-view', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['CompanyNotExist'](appdata,msg,usernamecharname,args);
+				Speech['CompanyNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -1493,7 +1561,7 @@ new Command('company-view', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [CompanyName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'View data of the specified company. Example:\n  +'+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
@@ -1502,7 +1570,7 @@ new Command('company-view', function(appdata,msg,args) {
 
 // JOB
 // ADMIN
-new Command('job-create', function(appdata,msg,args) {
+new Command('job-create', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1511,7 +1579,7 @@ new Command('job-create', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
-				Speech['JobAlreadyExist'](appdata,msg,usernamecharname,args);
+				Speech['JobAlreadyExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = {
@@ -1526,13 +1594,13 @@ new Command('job-create', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [JobName] [Salary]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [JobName] [Salary]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Create a Job with the monthly salary. Example:\n  +'+name+' "Informatic Engineer" 3000.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('job-delete', function(appdata,msg,args) {
+new Command('job-delete', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1552,13 +1620,13 @@ new Command('job-delete', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [JobName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [JobName]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Delete a Job with the monthly salary. Example:\n  +'+name+' "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('job-update-salary', function(appdata,msg,args) {
+new Command('job-update-salary', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1580,14 +1648,14 @@ new Command('job-update-salary', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [JobName] [Salary]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [JobName] [Salary]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Update salary of the specified Job with the new monthly salary. Example:\n  +'+name+' "Informatic Engineer" 3200.0', false)
 	msg.channel.send(_embed);
 });
 
 // CITIZEN
-new Command('job-work', function(appdata,msg,args) {
+new Command('job-work', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM company WHERE data LIKE \'%worker_'+escape_mysql(id)+'%\' AND name LIKE \''+escape_mysql('name_'+msg.guild.id+'_')+'%\'',function(err,rows){
@@ -1652,13 +1720,13 @@ new Command('job-work', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'This Command will succed if you have a Job. You can work only once a day. Example:\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('job-leave', function(appdata,msg,args) {
+new Command('job-leave', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		var ff = function () {
@@ -1694,13 +1762,13 @@ new Command('job-leave', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'This Command will succed if you have a Job. You left your Job. Example:\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('job-view', function(appdata,msg,args) {
+new Command('job-view', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1723,7 +1791,7 @@ new Command('job-view', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [JobName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [JobName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'View data of the specified Job. Example:\n  +'+name+' "Informatic Engineer"', false)
 	msg.channel.send(_embed);
@@ -1732,7 +1800,7 @@ new Command('job-view', function(appdata,msg,args) {
 // BANK
 
 // ADMIN
-new Command('bank-create', function(appdata,msg,args) {
+new Command('bank-create', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1741,7 +1809,7 @@ new Command('bank-create', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
-				Speech['BankAlreadyExist'](appdata,msg,usernamecharname,args);
+				Speech['BankAlreadyExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = {
@@ -1756,13 +1824,13 @@ new Command('bank-create', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] {onCreateAmountMoney}\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] {onCreateAmountMoney}\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Create a Bank with the starter money amount. Example:\n  +'+name+' "Flammrock Bank" 100.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('bank-delete', function(appdata,msg,args) {
+new Command('bank-delete', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -1796,13 +1864,13 @@ new Command('bank-delete', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Delete a Bank by name. Example:\n  +'+name+' "Flammrock Bank"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('bank-add-user', function(appdata,msg,args) {
+new Command('bank-add-user', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1850,13 +1918,13 @@ new Command('bank-add-user', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [User]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [User]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Add a User/Character to a Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('bank-remove-user', function(appdata,msg,args) {
+new Command('bank-remove-user', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1865,7 +1933,7 @@ new Command('bank-remove-user', function(appdata,msg,args) {
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
+				Speech['BankNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -1889,13 +1957,13 @@ new Command('bank-remove-user', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [User]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [User]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Remove a User/Character to a Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('bank-give-money-user', function(appdata,msg,args,t) {
+new Command('bank-give-money-user', function(appdata,commandname,msg,args,t) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
@@ -1908,7 +1976,7 @@ new Command('bank-give-money-user', function(appdata,msg,args,t) {
 		}
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
+				Speech['BankNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -1941,13 +2009,13 @@ new Command('bank-give-money-user', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [User] [AmountMoney]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [User] [AmountMoney]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Add money to the specified User/Character to the specified Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464 1000.0\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur" 9.99', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('bank-remove_money_user', function(appdata,msg,args) {
+new Command('bank-remove_money_user', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
@@ -1955,36 +2023,36 @@ new Command('bank-remove_money_user', function(appdata,msg,args) {
 	//     - User ID
 	//     - Amount Money
 	args[2] = (parseFloat(args[2]) || 0.0)*-1;
-	Command.List['bank-give-money-user']._fn(appdata,msg,args);
+	Command.List['bank-give-money-user']._fn(appdata,commandname,msg,args);
 },function(msg,name){
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [User] [AmountMoney]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [User] [AmountMoney]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Remove money to the specified User/Character to the specified Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464 10.5\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur" 2.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('bank-set-money-user', function(appdata,msg,args) {
+new Command('bank-set-money-user', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 3) return;
 	// ARGS :
 	//     - Bank Name
 	//     - User ID
 	//     - Amount Money
-	Command.List['bank-give-money-user']._fn(appdata,msg,args,true);
+	Command.List['bank-give-money-user']._fn(appdata,commandname,msg,args,true);
 },function(msg,name){
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [User] [AmountMoney]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [User] [AmountMoney]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Set money to the specified User/Character to the specified Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464 5000.0\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur" 500.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('bank-get-money-user', function(appdata,msg,args) {
+new Command('bank-get-money-user', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -1993,7 +2061,7 @@ new Command('bank-get-money-user', function(appdata,msg,args) {
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
+				Speech['BankNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -2015,13 +2083,13 @@ new Command('bank-get-money-user', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [User]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [User]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Get money to the specified User/Character to the specified Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('bank-reset-all', function(appdata,msg,args) {
+new Command('bank-reset-all', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		query('DELETE FROM bank',function(err,rows1){
@@ -2032,14 +2100,14 @@ new Command('bank-reset-all', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Reset Bank System. Example:\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 
 // CITIZEN
-new Command('give-money', function(appdata,msg,args) {
+new Command('give-money', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 4) return;
 	// ARGS :
@@ -2096,13 +2164,13 @@ new Command('give-money', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [User] [UserBankName] [AmountMoney]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [User] [UserBankName] [AmountMoney]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Give Money to another user with specified Banks name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464 "Flammrock Bank" 500.0\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur" "Flammrock Bank" 1000.0', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('bank-create-account', function(appdata,msg,args) {
+new Command('bank-create-account', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2113,7 +2181,7 @@ new Command('bank-create-account', function(appdata,msg,args) {
 		};
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
+				Speech['BankNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -2150,13 +2218,13 @@ new Command('bank-create-account', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Create a Bank Account in the specified Bank. Example:\n  +'+name+' "Flammrock Bank"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('bank-delete-account', function(appdata,msg,args) {
+new Command('bank-delete-account', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2164,7 +2232,7 @@ new Command('bank-delete-account', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
+				Speech['BankNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -2188,13 +2256,13 @@ new Command('bank-delete-account', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Delete a Bank Account in the specified Bank. Example:\n  +'+name+' "Flammrock Bank"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('get-money', function(appdata,msg,args) {
+new Command('get-money', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2218,7 +2286,7 @@ new Command('get-money', function(appdata,msg,args) {
 		}
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
+				Speech['BankNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -2246,13 +2314,13 @@ new Command('get-money', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' {BankName}\n```')
+		.setDescription('```css\n'+PREFIX+name+' {BankName}\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'If a Bank is specified, the Amount Money in the Bank account is displayed else the Cash Money Amount is dispayed. Example:\n  +'+name+' "Flammrock Bank"\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('bank-list', function(appdata,msg,args) {
+new Command('bank-list', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank',function(err,rows){
@@ -2276,13 +2344,13 @@ new Command('bank-list', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'List all Banks. Example:\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('bank-deposit', function(appdata,msg,args) {
+new Command('bank-deposit', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	// ARGS :
 	//     - Bank Name
@@ -2290,7 +2358,7 @@ new Command('bank-deposit', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
+				Speech['BankNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -2307,7 +2375,7 @@ new Command('bank-deposit', function(appdata,msg,args) {
 				}
 				userdata.bank[escape_mysql(args[0])] = parseFloat(userdata.bank[escape_mysql(args[0])]) || 0.0;
 				if (userdata.money < Math.abs(parseFloat(args[1])||0.0)) {
-					Speech['NotEnoughtMoney'](appdata,msg,usernamecharname,args);
+					Speech['NotEnoughtMoney'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				userdata.money -= Math.abs(parseFloat(args[1])||0.0);
@@ -2322,13 +2390,13 @@ new Command('bank-deposit', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [AmountMoney]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [AmountMoney]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Deposit your cash money in your Bank account. Example:\n  +'+name+' "Flammrock Bank" 500.0', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('bank-withdraw', function(appdata,msg,args) {
+new Command('bank-withdraw', function(appdata,commandname,msg,args) {
 		if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	// ARGS :
 	//     - Bank Name
@@ -2336,7 +2404,7 @@ new Command('bank-withdraw', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
-				Speech['BankNotExist'](appdata,msg,usernamecharname,args);
+				Speech['BankNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -2353,7 +2421,7 @@ new Command('bank-withdraw', function(appdata,msg,args) {
 				}
 				userdata.bank[escape_mysql(args[0])] = parseFloat(userdata.bank[escape_mysql(args[0])]) || 0.0;
 				if (userdata.bank[escape_mysql(args[0])] < Math.abs(parseFloat(args[1])||0.0)) {
-					Speech['NotEnoughtMoney'](appdata,msg,usernamecharname,args);
+					Speech['NotEnoughtMoney'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				userdata.money += Math.abs(parseFloat(args[1])||0.0);
@@ -2368,7 +2436,7 @@ new Command('bank-withdraw', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [BankName] [AmountMoney]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [BankName] [AmountMoney]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Withdraw your money in your Bank account. Example:\n  +'+name+' "Flammrock Bank" 500.0', false)
 	msg.channel.send(_embed);
@@ -2378,7 +2446,7 @@ new Command('bank-withdraw', function(appdata,msg,args) {
 
 // Item
 // ADMIN
-new Command('item-create', function(appdata,msg,args,t) {
+new Command('item-create', function(appdata,commandname,msg,args,t) {
 	if (!t) if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2391,7 +2459,7 @@ new Command('item-create', function(appdata,msg,args,t) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM items WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length>0) {
-				Speech['ItemAlreadyExist'](appdata,msg,usernamecharname,args);
+				Speech['ItemAlreadyExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = {};
@@ -2409,13 +2477,13 @@ new Command('item-create', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName] {Price} {Shops} {Type} {Image} {Description}\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName] {Price} {Shops} {Type} {Image} {Description}\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Create a Item. Example:\n  +'+name+' "A Super Item" 9.99 "[Flammrock Shop]" "" "http://image.jpg" "It\'s a super item!"\n  +'+name+' "Apple" 2.0 "[Flammrock Shop] [Shop 2]" "[food]" "http://image.jpg" "You can eat with \'+item-eat Apple\'"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-update-price', function(appdata,msg,args) {
+new Command('item-update-price', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2438,13 +2506,13 @@ new Command('item-update-price', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName] [Price]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Price]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Update the price of the specified Item. Example:\n  +'+name+' "A Super Item" 15.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-update-shops', function(appdata,msg,args) {
+new Command('item-update-shops', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2467,13 +2535,13 @@ new Command('item-update-shops', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName] [Shops]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Shops]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Update the shops of the specified Item. Example:\n  +'+name+' "A Super Item" "[Flammrock Shop] [Shop 2]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-update-type', function(appdata,msg,args) {
+new Command('item-update-type', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2496,13 +2564,13 @@ new Command('item-update-type', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName] [Type]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Type]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Update the Types of the specified Item. Example:\n  +'+name+' "A Super Item" "[food] [device]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-update-image', function(appdata,msg,args) {
+new Command('item-update-image', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2525,13 +2593,13 @@ new Command('item-update-image', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName] [Image]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Image]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Update the Image of the specified Item. Example:\n  +'+name+' "A Super Item" "http://image.jpg"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-update-desciption', function(appdata,msg,args) {
+new Command('item-update-desciption', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2554,13 +2622,13 @@ new Command('item-update-desciption', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName] [Description]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Description]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Update the Description of the specified Item. Example:\n  +'+name+' "A Super Item" "Amazing Item"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-delete', function(appdata,msg,args,t) {
+new Command('item-delete', function(appdata,commandname,msg,args,t) {
 	if (!t) if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2580,13 +2648,13 @@ new Command('item-delete', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Delete the specified Item. Example:\n  +'+name+' "A Super Item"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-give', function(appdata,msg,args,t) {
+new Command('item-give', function(appdata,commandname,msg,args,t) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2665,31 +2733,31 @@ new Command('item-give', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName] [User] {Quantity}\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName] [User] {Quantity}\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Give the specified Item to a User/Character. Example:\n  +'+name+' "A Super Item" @Flammrock#5464\n  +'+name+' "A Super Item" "Bob le Bricoleur" 6', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-remove', function(appdata,msg,args) {
+new Command('item-remove', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
 	//    - Item Name
 	//    - User id
 	//    - Optional: Quantity
-	Command.List['item-give']._fn(appdata,msg,args,true);
+	Command.List['item-give']._fn(appdata,commandname,msg,args,true);
 },function(msg,name){
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName] [User] {Quantity}\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName] [User] {Quantity}\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Remove the specified Item to a User/Character. Example:\n  +'+name+' "A Super Item" @Flammrock#5464\n  +'+name+' "A Super Item" "Bob le Bricoleur" 6', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('item-reset-all', function(appdata,msg,args) {
+new Command('item-reset-all', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('DELETE FROM items',function(err,rows1){
@@ -2700,14 +2768,14 @@ new Command('item-reset-all', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Reset Items System. Example:\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 
 // ADMIN/CITIZEN
-new Command('inventory-item-clear', function(appdata,msg,args) {
+new Command('inventory-item-clear', function(appdata,commandname,msg,args) {
 	var id = '<@'+msg.member.user.id+'>';
 	var current = true;
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
@@ -2743,13 +2811,13 @@ new Command('inventory-item-clear', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN / CITIZEN', true)
 		.addField('Description', 'Clear the Inventory, Admin can clear the Inventory of other user. Example:\n  +'+name+'\n If you are a admin:\n  +'+name+' @Flammrock#5464\n  +'+name+' "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN
-new Command('inventory-item-view', function(appdata,msg,args) {
+new Command('inventory-item-view', function(appdata,commandname,msg,args) {
 	var page = 1;
 	var id = '<@'+msg.member.user.id+'>';
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
@@ -2827,14 +2895,14 @@ new Command('inventory-item-view', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' {Page}\n```')
+		.setDescription('```css\n'+PREFIX+name+' {Page}\n```')
 		.addField('Permission', 'ADMIN / CITIZEN', true)
 		.addField('Description', 'Get the Inventory, Admin can see the Inventory of other user. Example:\n  +'+name+'\n If you are a admin:\n  +'+name+' @Flammrock#5464\n  +'+name+' "Bob le Bricoleur" 3', false)
 	msg.channel.send(_embed);
 });
 
 // CITIZEN
-new Command('item-list', function(appdata,msg,args) {
+new Command('item-list', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	// ARGS :
 	//    - Optional: Shop Name
@@ -2859,7 +2927,7 @@ new Command('item-list', function(appdata,msg,args) {
 		} else {
 			query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 				if (rows.length==0) {
-					Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+					Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 					return;
 				}
 				query('SELECT * FROM items',function(err,rows) {
@@ -2891,13 +2959,13 @@ new Command('item-list', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' {ShopName}\n```')
+		.setDescription('```css\n'+PREFIX+name+' {ShopName}\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'If a Shop is specified, that list all items in the shop else that list all items. Example:\n  +'+name+'\n  +'+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('item-view', function(appdata,msg,args) {
+new Command('item-view', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -2920,13 +2988,13 @@ new Command('item-view', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'View data of the specified Item. Example:\n  +'+name+' "A Super Item"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('item-pay', function(appdata,msg,args) {
+new Command('item-pay', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -2940,7 +3008,7 @@ new Command('item-pay', function(appdata,msg,args) {
 		var chan = '<#'+msg.channel.id+'>';
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var tempdata = JSON.parse(rows[0].data);
@@ -2949,7 +3017,7 @@ new Command('item-pay', function(appdata,msg,args) {
 				if (tempdata.web) {
 					msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Shop is only accessible through the web :cold_sweat:\nLink to the online shop: https://accountsupervisorwebinterface.herokuapp.com/guild/'+msg.guild.id+'/shop/'+encodeURIComponent(args[0]));
 				} else {
-					Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+					Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				}
 				return;
 			} else {
@@ -3093,14 +3161,14 @@ new Command('item-pay', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName] [ItemName] {BankName}\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName] [ItemName] {BankName}\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Need', 'The Shop must exist. Use `+help shop-create` for more details.', true)
 		.addField('Description', 'Pay Item in specified Shop, if not bank specified, the cash is used to pay item. Example:\n  +'+name+' "Flammrock Shop" "A Super Item" "Flammrock Bank"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('item-eat', function(appdata,msg,args) {
+new Command('item-eat', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	// ARGS :
 	//    - Item Name
@@ -3160,7 +3228,7 @@ new Command('item-eat', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ItemName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ItemName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Eat the specified Item if the Item is food type. Example:\n  +'+name+' "A Super Item"', false)
 	msg.channel.send(_embed);
@@ -3171,7 +3239,7 @@ new Command('item-eat', function(appdata,msg,args) {
 // SHOP
 
 // ADMIN
-new Command('shop-create', function(appdata,msg,args) {
+new Command('shop-create', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -3185,7 +3253,7 @@ new Command('shop-create', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length > 0) {
-				Speech['ShopAlreadyExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopAlreadyExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = {
@@ -3208,14 +3276,14 @@ new Command('shop-create', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName] {SalonsAvailables} {NeedItems} {NeedTypeItems} {NeedWebItems} {NeedWebTypeItems} {WebAccess}\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName] {SalonsAvailables} {NeedItems} {NeedTypeItems} {NeedWebItems} {NeedWebTypeItems} {WebAccess}\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
 		.addField('Description', 'Create a Shop. Example:\n  +'+name+' "Flammrock Shop" "#general #other-salon" "[A Super Item] [other item name]" "[food] [device]" "" "" "true"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-delete', function(appdata,msg,args) {
+new Command('shop-delete', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -3223,7 +3291,7 @@ new Command('shop-delete', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			query('DELETE FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
@@ -3235,13 +3303,13 @@ new Command('shop-delete', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Delete a Shop by name. Example:\n  +'+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-update-salons', function(appdata,msg,args,t) {
+new Command('shop-update-salons', function(appdata,commandname,msg,args,t) {
 	if (!t) if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -3250,7 +3318,7 @@ new Command('shop-update-salons', function(appdata,msg,args,t) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -3265,13 +3333,13 @@ new Command('shop-update-salons', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName] [SalonsAvailables]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName] [SalonsAvailables]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Update Salons Availables of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "#general #other-salon"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-update-need', function(appdata,msg,args,t) {
+new Command('shop-update-need', function(appdata,commandname,msg,args,t) {
 	if (!t) if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -3280,7 +3348,7 @@ new Command('shop-update-need', function(appdata,msg,args,t) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -3296,14 +3364,14 @@ new Command('shop-update-need', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName] [NeedItems]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
 		.addField('Description', 'Update Need Items of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "[A Super Item] [other item name]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-update-needType', function(appdata,msg,args,t) {
+new Command('shop-update-needType', function(appdata,commandname,msg,args,t) {
 	if (!t) if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -3312,7 +3380,7 @@ new Command('shop-update-needType', function(appdata,msg,args,t) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -3328,14 +3396,14 @@ new Command('shop-update-needType', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName] [NeedTypeItems]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedTypeItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
 		.addField('Description', 'Update Need Items Type of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "[food] [device]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-update-needWeb', function(appdata,msg,args,t) {
+new Command('shop-update-needWeb', function(appdata,commandname,msg,args,t) {
 	if (!t) if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -3344,7 +3412,7 @@ new Command('shop-update-needWeb', function(appdata,msg,args,t) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -3360,14 +3428,14 @@ new Command('shop-update-needWeb', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName] [NeedItems]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
 		.addField('Description', 'Update Need Web Items of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "[A Super Item] [other item name]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-update-needWebType', function(appdata,msg,args,t) {
+new Command('shop-update-needWebType', function(appdata,commandname,msg,args,t) {
 	if (!t) if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -3376,7 +3444,7 @@ new Command('shop-update-needWebType', function(appdata,msg,args,t) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -3392,14 +3460,14 @@ new Command('shop-update-needWebType', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName] [NeedWebTypeItems]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedWebTypeItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
 		.addField('Description', 'Update Need Web Items Type of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "[food] [device]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-update-web', function(appdata,msg,args,t) {
+new Command('shop-update-web', function(appdata,commandname,msg,args,t) {
 	if (!t) if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 2) return;
 	// ARGS :
@@ -3408,7 +3476,7 @@ new Command('shop-update-web', function(appdata,msg,args,t) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -3424,13 +3492,13 @@ new Command('shop-update-web', function(appdata,msg,args,t) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName] [NeedWebTypeItems]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedWebTypeItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Update Web Access of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "true"\n  +'+name+' "Flammrock Shop" "false"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-delete-all-items-associed-with', function(appdata,msg,args) {
+new Command('shop-delete-all-items-associed-with', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -3464,14 +3532,14 @@ new Command('shop-delete-all-items-associed-with', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+' [ShopName]\n```')
+		.setDescription('```css\n'+PREFIX+name+' [ShopName]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Information', 'You should type `+help item-create` to see more details.', true)
 		.addField('Description', 'Delete all Items associated with the specified Shop. Example:\n  +'+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
-new Command('shop-reset-all', function(appdata,msg,args) {
+new Command('shop-reset-all', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'ADMIN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('DELETE FROM shop',function(err,rows1){
@@ -3482,14 +3550,14 @@ new Command('shop-reset-all', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Reset Shop System. Example:\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 
 // CITIZEN
-new Command('shop-view', function(appdata,msg,args) {
+new Command('shop-view', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -3512,13 +3580,13 @@ new Command('shop-view', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'View data of the specified Shop. Example:\n  +'+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('shop-list', function(appdata,msg,args) {
+new Command('shop-list', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop',function(err,rows){
@@ -3542,13 +3610,13 @@ new Command('shop-list', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'List all Shops. Example:\n  +'+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
-new Command('shop-get-website', function(appdata,msg,args) {
+new Command('shop-get-website', function(appdata,commandname,msg,args) {
 	if (!Command.checkPermission(msg,'CITIZEN')) return false;
 	if (args.length < 1) return;
 	// ARGS :
@@ -3556,7 +3624,7 @@ new Command('shop-get-website', function(appdata,msg,args) {
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query('SELECT * FROM shop WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 			if (rows.length==0) {
-				Speech['ShopNotExist'](appdata,msg,usernamecharname,args);
+				Speech['ShopNotExist'](appdata,commandname,msg,usernamecharname,args);
 				return;
 			}
 			var data = JSON.parse(rows[0].data);
@@ -3572,7 +3640,7 @@ new Command('shop-get-website', function(appdata,msg,args) {
 	var _embed = new Discord.MessageEmbed()
 		.setTitle('Command `'+name+'`')
 		.setColor('#0099ff')
-		.setDescription('```css\n+'+name+'\n```')
+		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Description', 'Get the Website of the specified Shop if it exist. Example:\n  +'+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
@@ -3598,7 +3666,7 @@ new Command('bank_create', function(msg,args) {
 	//msg.channel.send('wesh comment ça va?');
 });*/
 
-new Command('list-command', function(appdata,msg,args) {
+new Command('list-command', function(appdata,commandname,msg,args) {
 	msg.channel.send('• **'+Object.keys(Command.List).join('**\n• **')+'**');
 });
 
@@ -3709,9 +3777,14 @@ bot.on('message', msg => {
 	
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 	
-		
+		if (msg.content.substring(0,PREFIX.length+4)==PREFIX+'init') {
+			Command.getDataApp(msg.guild.id,function(appdata){
+				Command.execute(appdata,msg,data);
+			});
+			return;
+		}
+	
 		try {
-			console.log(msg.channel.id, msg.content);
 			var role_admin = false;
 			var role_citoyen = false;
 			msg.guild.roles.cache.forEach(role => {
@@ -3737,6 +3810,15 @@ bot.on('message', msg => {
 				});
 			}
 		} catch(e) {}
+	
+		if (!msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config')) {
+			msg.reply('Sorry, i\'m not yet initialized!\nIf you are a Administrator, use the command `+init`');
+			return;
+		}
+		
+		
+		console.log(msg.channel.id, msg.content);
+		
 		var data = new ParserCommand(msg.content);
 		if (Command.isExist(data.name)) {
 			Command.getDataApp(msg.guild.id,function(appdata){
