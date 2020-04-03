@@ -59,7 +59,6 @@ function query(SQL,fn) {
 	
 }
 function escape_mysql(s) {return s.replace(/'/g,"''");}
-query();
 
 /*
 query(`DROP TABLE users`,(err,rows) => {
