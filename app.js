@@ -409,11 +409,12 @@ function tryConnect(args,callback) {
 function getDatabaseInfo(msg) {
 	
 	var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
-	var filter = m => m.content.includes(TOKENINIT);
 	
+	console.log('OK MASTER!!!!');
 	configChannel.messages.fetch()
 	.then(function(messages){
-		messages = messages.filter(m => m.author.id == bot.user.id);
+		console.log(messages);
+		/*messages = messages.filter(m => m.author.id == bot.user.id);
 		messages = messages.filter(m => m.content.includes(TOKENINIT));
 		messages.each(function(item){
 			var m = item.content.match(/HOST: ([^\n])\n|USERNAME: ([^\n])\n|PASSWORD: ([^\n])\n|DATABASE: ([^\n])\n/g);
@@ -432,7 +433,7 @@ function getDatabaseInfo(msg) {
 				database:   m[4]
 			};
 			console.log(DATABASE);
-		});
+		});*/
 	})
 	.catch(function(){
 		msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+'` to reinit the configuration!\n```');
