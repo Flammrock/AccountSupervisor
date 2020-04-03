@@ -3072,7 +3072,7 @@ new Command('item-view', function(appdata,commandname,msg,args) {
 			var _embed = new Discord.MessageEmbed()
 				.setTitle('Item '+args[0])
 				.setColor(0xff0000)
-				.setDescription('**PRICE**: '+data.price+'\n**SHOPS**: '+data.shops.join(', ')+'\n**TYPE**: '+data.type+'\n**Image**: '+data.image+'\n**Description**: '+data.description);
+				.setDescription('**PRICE**: '+data.price+'\n**SHOPS**: '+data.shops.join(', ')+'\n**TYPE**: '+data.type.join(', ')+'\n**Image**: '+data.image+'\n**Description**: '+data.description);
 			msg.channel.send(_embed);
 		});
 	});
