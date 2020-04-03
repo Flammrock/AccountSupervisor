@@ -392,37 +392,49 @@ new Command('init', function(appdata,commandname,msg,args) {
 	//    - User
 	//    - Password
 	//    - Database
-	try {
-		tryConnect(args);
-		msg.reply('```css\nConnected to the MySQL Remote Server with Success!\n```');
-		msg.channel.send('```css\nSaving data..\n```');
-		var admin = msg.guild.roles.cache.find(r => r.name == 'AccountSupervisorAdmin');
-		var everyone = msg.guild.roles.cache.find(r => r.name == '@everyone');
-		msg.guild.channels.create('accountsupervisor-database-config', {
-			position: 0,
-			permissionOverwrites: [
-				{
-					id: admin.id,
-					allow: [8,1024,2048,4096]
-				},
-				{
-					id: everyone.id,
-					deny: [1024,2048,4096]
-				}
-			 ]
-		})
-		.then(function(){
-			msg.channel.send('```css\n   - `accountsupervisor-database-config` Text Channel created with Success!\n```');
-			var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
-			configChannel.send('```\n['+TOKENINIT+'] Configuration:\n   • **HOST**: '+args[0]+'\n   • **USERNAME**: '+args[1]+'\n   • **PASSWORD**: '+args[2]+'\n   • **DATABASE**: '+args[3]+'\n```');
-			msg.channel.send('```css\n   - Data saved with Success!\n```');
-			msg.channel.send('```css\nUse `'+PREFIX+'help '+commandname+'` to change the configuration!\n```');
-		})
-		.catch(function(){
-			msg.channel.send('```diff\n-Error: '+e.toString()+'\n```');
+	msg.delete();
+	var f = function() {
+		try {
+			tryConnect(args);
+			msg.reply('```css\nConnected to the MySQL Remote Server with Success!\n```');
+			msg.channel.send('```css\nSaving data..\n```');
+			var admin = msg.guild.roles.cache.find(r => r.name == 'AccountSupervisorAdmin');
+			var everyone = msg.guild.roles.cache.find(r => r.name == '@everyone');
+			msg.guild.channels.create('accountsupervisor-database-config', {
+				position: 0,
+				permissionOverwrites: [
+					{
+						id: admin.id,
+						allow: [8,1024,2048,4096]
+					},
+					{
+						id: everyone.id,
+						deny: [1024,2048,4096]
+					}
+				 ]
+			})
+			.then(function(){
+				msg.channel.send('```css\n   - `accountsupervisor-database-config` Text Channel created with Success!\n```');
+				var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
+				configChannel.send('```\n['+TOKENINIT+'] Configuration:\n   • HOST: '+args[0]+'\n   • USERNAME: '+args[1]+'\n   • PASSWORD: '+args[2]+'\n   • DATABASE: '+args[3]+'\n```');
+				msg.channel.send('```css\n   - Data saved with Success!\n```');
+				msg.channel.send('```css\nUse `'+PREFIX+commandname+'` to change the configuration!\n```');
+			})
+			.catch(function(e){
+				msg.channel.send('```diff\n-Error: '+e.toString()+'\n```');
+			});
+		} catch (e) {
+			msg.channel.send('```diff\n-Error when attempting to connect to the MySQL Remote Server!\nPlese check if the host, user, password and database name are good!\n```');
+		}
+	};
+	if (msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config')) {
+		msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config').delete().then(function(){
+			f();
+		}).catch(function(e){
+			msg.channel.send('```diff\n-Error: '+e+'\n```');
 		});
-	} catch (e) {
-		msg.reply('```diff\n-Error when attempting to connect to the MySQL Remote Server!\nPlese check if the host, user, password and database name are good!\n```');
+	} else {
+		f();
 	}
 },function(msg,name){
 	
