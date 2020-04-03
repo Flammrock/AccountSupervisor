@@ -409,7 +409,15 @@ function tryConnect(args,callback) {
 function getDatabaseInfo(msg) {
 	console.log('SEARCHING...');
 	var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
-	var filter = m => m.content.includes('HOST');
+	var filter = m => m.content.includes(TOKENINIT);
+	
+	console.log(bot.user.id);
+	var collector = new discord.MessageCollector(configChannel, m => m.author.id === bot.user.id, { time: 30000 });
+	collector.on('collect', m => {
+		console.log(m.content);
+	});
+	
+	/*
 	var collector = configChannel.createMessageCollector(filter, {time:5000});
 	collector.on('end', (collected, reason) => {
 		console.log('SEARCHING...OKKK');
@@ -436,7 +444,7 @@ function getDatabaseInfo(msg) {
 			};
 			console.log(DATABASE);
 		});
-	});
+	});*/
 }
 
 
