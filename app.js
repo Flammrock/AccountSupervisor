@@ -407,38 +407,15 @@ function tryConnect(args,callback) {
 	connection.on('error', function() {connection.end();callback(false);});
 }
 function getDatabaseInfo(msg) {
-	console.log('SEARCHING...');
 	
-	const filter = m => m.content.includes('discord');
-const collector = msg.channel.createMessageCollector(filter, { time: 15000 });
-
-collector.on('collect', m => {
-	console.log(`Collected ${m.content}`);
-});
-
-collector.on('end', collected => {
-	console.log(`Collected ${collected.size} items`);
-});
-	/*
 	var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
 	var filter = m => m.content.includes(TOKENINIT);
 	
-	console.log(bot.user.id);
-	var collector = new Discord.MessageCollector(configChannel, m => m.author.id == bot.user.id, { time: 30000 });
-	collector.on('collect', m => {
-		console.log(m.content);
-	});
-	
-	/*
-	var collector = configChannel.createMessageCollector(filter, {time:5000});
-	collector.on('end', (collected, reason) => {
-		console.log('SEARCHING...OKKK');
-		if (collected.size==0) {
-			console.log('NO MESSAGE FOUND!');
-			msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+'` to reinit the configuration!\n```');
-			return;
-		}
-		collected.each(function(item){
+	configChannel.messages.fetch()
+	.then(function(messages){
+		messages = messages.filter(m => m.author.id == bot.user.id);
+		messages = messages.content.includes(TOKENINIT);
+		messages.each(function(item){
 			var m = item.content.match(/HOST: ([^\n])\n|USERNAME: ([^\n])\n|PASSWORD: ([^\n])\n|DATABASE: ([^\n])\n/g);
 			if (m==null) {
 				msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+'` to reinit the configuration!\n```');
@@ -456,7 +433,10 @@ collector.on('end', collected => {
 			};
 			console.log(DATABASE);
 		});
-	});*/
+	})
+	.catch(function(){
+		msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+'` to reinit the configuration!\n```');
+	});
 }
 
 
