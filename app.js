@@ -3,7 +3,7 @@ const mysql = require("mysql");
 const bot = new Discord.Client();
 
 
-const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.XoLXNQ.hFJvWBxgMR3gd7_A6iHSEOcDZwU';
+const TOKEN = 'NjkzODI1MzM0ODM1MTUwOTE4.Xob0gA.ttUiIXzN_Ez7YcsUySDvoAklyxA';
 const DATABASE_URI = process.env.CLEARDB_DATABASE_URL;
 const TOKENINIT = 'qSlZyUk-w0-aOWJHuInzBA';
 
