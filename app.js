@@ -1901,7 +1901,7 @@ new Command('job-view', function(appdata,commandname,msg,args) {
 	//    - Job Name
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		query(msg.guild.id+'','SELECT * FROM job WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
-			if (rows.length > 0) {
+			if (rows.length==0) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Job doesn\'t exist :cold_sweat:');
 				return;
 			}
