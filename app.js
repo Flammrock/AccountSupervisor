@@ -161,6 +161,14 @@ query(msg.guild.id+'',`CREATE TABLE IF NOT EXISTS characterdata (
 }
 
 
+function currencyFormat(_number,_symbole,_format) {
+	var formatter = new Intl.NumberFormat(_format, {
+	  style: 'currency',
+	  currency: 'USD',
+	});
+	return formatter.format(parseFloat(_number)||0.0).replace('$',_symbole);
+}
+
 //////////////////////////////////////
 //           COMMAND BOT            //
 //////////////////////////////////////
@@ -277,6 +285,8 @@ class Command {
 				}
 			}
 			data['money-name'] = data['money-name'] || 'Money';
+			data['money-symbole'] = data['money-symbole'] || 'M';
+			data['money-format'] = data['money-format'] || 'en-US';
 			callback(data);
 		});
 	}
@@ -596,6 +606,30 @@ new Command('set-currency-name', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [money-name]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Description', 'Change the Money Name, example:\n  '+PREFIX+name+' Yens\n  '+PREFIX+name+' "Super Yens"', false)
+	msg.channel.send(_embed);
+});
+// ADMIN
+new Command('set-currency-symbole', function(appdata,commandname,msg,args) {
+	if (!Command.checkPermission(msg,'ADMIN')) return false;
+	if (args.length < 1) return;
+	query(msg.guild.id+'','SELECT * FROM dataapp WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql('money-symbole')+'\'',function(err,rows){
+		if (rows.length > 0) {
+			query(msg.guild.id+'','UPDATE dataapp SET data = \''+escape_mysql(args[0])+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql('money-symbole')+'\'',function(err,rows){
+				msg.channel.send('Currency Symbole updated with success!');
+			});
+		} else {
+			query(msg.guild.id+'','INSERT INTO dataapp(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql('money-symbole')+'\',\''+escape_mysql(args[0])+'\')',function(err,rows){
+				msg.channel.send('Currency Symbole updated with success!');
+			});
+		}
+	});
+},function(msg,name){
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n'+PREFIX+name+' [money-symbole]\n```')
+		.addField('Permission', 'ADMIN', true)
+		.addField('Description', 'Change the Money Symbole, example:\n  '+PREFIX+name+' £\n  '+PREFIX+name+' $\n  '+PREFIX+name+' €\n  '+PREFIX+name+' ¥', false)
 	msg.channel.send(_embed);
 });
 
@@ -1281,7 +1315,7 @@ new Command('company-give-money', function(appdata,commandname,msg,args) {
 				data.bank[args[1]] = (parseFloat(data.bank[args[1]])||0.0) + Math.abs(parseFloat(args[3])||0.0);
 				query(msg.guild.id+'','UPDATE company SET data = \''+escape_mysql(JSON.stringify(data))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows){
 					query(msg.guild.id+'','UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
-						msg.channel.send(usernamecharname+', '+'You give `'+args[3]+'` '+appdata['money-name']+' to `'+args[0]+'` Company!\n{ <@'+id+'>\'s `'+args[2]+'` Bank account ----> `'+args[0]+'`\'s `'+args[1]+'` Bank account }');
+						msg.channel.send(usernamecharname+', '+'You give `'+currencyFormat(args[3],appdata['money-symbole'],appdata['money-format'])+'` to `'+args[0]+'` Company!\n{ <@'+id+'>\'s `'+args[2]+'` Bank account ----> `'+args[0]+'`\'s `'+args[1]+'` Bank account }');
 					});
 				});
 			});
@@ -1316,7 +1350,7 @@ new Command('company-get-money', function(appdata,commandname,msg,args) {
 				msg.channel.send(usernamecharname+', '+'Sorry, `'+args[0]+'` Company doesn\'t have an `'+args[1]+'` Bank account :cold_sweat:');
 				return;
 			} else {
-				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Company have `'+data.bank[args[1]]+'` '+appdata['money-name']+' in `'+args[1]+'` Bank account');
+				msg.channel.send(usernamecharname+', '+'`'+args[0]+'` Company have `'+currencyFormat(data.bank[args[1]],appdata['money-symbole'],appdata['money-format'])+'` in `'+args[1]+'` Bank account');
 			}
 		});
 	});
@@ -1773,7 +1807,7 @@ new Command('job-work', function(appdata,commandname,msg,args) {
 					if (rows.length==0) {
 						var userdata = {money:salary,timework:Date.now()};
 						query(msg.guild.id+'','INSERT INTO users(name,data) VALUES (\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\',\''+escape_mysql(JSON.stringify(userdata))+'\')',function(err,rows){
-							msg.channel.send(usernamecharname+', '+'you work with success!\nYou earn: `'+salary+'` '+appdata['money-name']+'!');
+							msg.channel.send(usernamecharname+', '+'you work with success!\nYou earn: `'+currencyFormat(salary,appdata['money-symbole'],appdata['money-format'])+'`!');
 						});
 					} else {
 						var userdata = JSON.parse(rows[0].data);
@@ -1801,7 +1835,7 @@ new Command('job-work', function(appdata,commandname,msg,args) {
 							userdata.money = (parseFloat(userdata.money) || 0.0) + salary;
 						}
 						query(msg.guild.id+'','UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
-							msg.channel.send(usernamecharname+', '+'you work with success!\nYou earn: `'+salary+'` '+appdata['money-name']+'!');
+							msg.channel.send(usernamecharname+', '+'you work with success!\nYou earn: `'+currencyFormat(salary,appdata['money-symbole'],appdata['money-format'])+'`!');
 						});
 					}
 				});
@@ -2064,7 +2098,7 @@ new Command('bank-give-money-user', function(appdata,commandname,msg,args,t) {
 	//     - Amount Money
 	Command.getCharacter(msg,args[1],function(id,usernamecharname){
 		var f = function() {
-			msg.channel.send(usernamecharname+', '+'`'+((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0)))+'` '+appdata['money-name']+' '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
+			msg.channel.send(usernamecharname+', '+'`'+currencyFormat(((typeof t !== 'undefined')?(parseFloat(args[2])||0.0):Math.abs((parseFloat(args[2])||0.0))),appdata['money-symbole'],appdata['money-format'])+'` '+((typeof t !== 'undefined')?'set':(parseFloat(args[2]) || 0.0)<0?'removed':'added')+' to the '+args[1]+'\'s account in the `'+args[0]+'` Bank with Success!');	
 		}
 		query(msg.guild.id+'','SELECT * FROM bank WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(args[0])+'\'',function(err,rows1){
 			if (rows1.length==0) {
@@ -2162,7 +2196,7 @@ new Command('bank-get-money-user', function(appdata,commandname,msg,args) {
 					obj.bank = obj.bank || {};
 					try {
 						if (typeof obj.bank[escape_mysql(args[0])] !== 'undefined') {
-							msg.channel.send(usernamecharname+', '+'User '+args[1]+' have `'+obj.bank[escape_mysql(args[0])]+'` '+appdata['money-name']+' Left in his `'+args[0]+'` Bank account!');
+							msg.channel.send(usernamecharname+', '+'User '+args[1]+' have `'+currencyFormat(obj.bank[escape_mysql(args[0])],appdata['money-symbole'],appdata['money-format'])+'` Left in his `'+args[0]+'` Bank account!');
 							return;
 						} else {}
 					} catch (e) {}
@@ -2236,7 +2270,7 @@ new Command('give-money', function(appdata,commandname,msg,args) {
 										obj.bank[escape_mysql(args[2])] = (parseFloat(obj.bank[escape_mysql(args[2])])||0) + Math.abs((parseFloat(args[3])||0));
 										query(msg.guild.id+'','UPDATE users SET data = \''+escape_mysql(JSON.stringify(obju))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id_currentuser)+'\'',function(err,rows){
 											query(msg.guild.id+'','UPDATE users SET data = \''+escape_mysql(JSON.stringify(obj))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id_user)+'\'',function(err,rows){
-												msg.channel.send(usernamecharname+', '+'You give `'+args[3]+'` '+appdata['money-name']+' to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account }');
+												msg.channel.send(usernamecharname+', '+'You give `'+currencyFormat(args[3],appdata['money-symbole'],appdata['money-format'])+'` to '+args[1]+'!\n{ <@'+id_currentuser+'>\'s `'+args[0]+'` Bank account ----> '+args[1]+'\'s `'+args[2]+'` Bank account }');
 											});
 										});
 										return;
@@ -2361,7 +2395,7 @@ new Command('get-money', function(appdata,commandname,msg,args) {
 	//     - Optional: Bank Name
 	Command.getCharacter(msg,'<@'+msg.member.user.id+'>',function(id,usernamecharname){
 		var f = function(money) {
-			msg.channel.send(usernamecharname+', '+'You have `'+money+'` '+appdata['money-name']+' left in your `'+args[0]+'` Bank account!');
+			msg.channel.send(usernamecharname+', '+'You have `'+currencyFormat(money,appdata['money-symbole'],appdata['money-format'])+'` left in your `'+args[0]+'` Bank account!');
 		};
 		if (args.length==0) {
 			query(msg.guild.id+'','SELECT * FROM users WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
@@ -2371,7 +2405,7 @@ new Command('get-money', function(appdata,commandname,msg,args) {
 				} else {
 					var obj = JSON.parse(rows[0].data);
 					obj.money = parseFloat(obj.money) || 0.0;
-					msg.channel.send(usernamecharname+', '+'You have `'+obj.money+'` '+appdata['money-name']+' cash left!');
+					msg.channel.send(usernamecharname+', '+'You have `'+currencyFormat(obj.money,appdata['money-symbole'],appdata['money-format'])+'` cash left!');
 				}
 			});
 			return;
@@ -2473,7 +2507,7 @@ new Command('bank-deposit', function(appdata,commandname,msg,args) {
 				userdata.money -= Math.abs(parseFloat(args[1])||0.0);
 				userdata.bank[escape_mysql(args[0])] += Math.abs(parseFloat(args[1])||0.0);
 				query(msg.guild.id+'','UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
-					msg.channel.send(usernamecharname+', '+'you deposited `'+args[1]+'` '+appdata['money-name']+' into your `'+args[0]+'` Bank account');
+					msg.channel.send(usernamecharname+', '+'you deposited `'+currencyFormat(args[1],appdata['money-symbole'],appdata['money-format'])+'` into your `'+args[0]+'` Bank account');
 				});
 			});
 		});
@@ -2519,7 +2553,7 @@ new Command('bank-withdraw', function(appdata,commandname,msg,args) {
 				userdata.money += Math.abs(parseFloat(args[1])||0.0);
 				userdata.bank[escape_mysql(args[0])] -= Math.abs(parseFloat(args[1])||0.0);
 				query(msg.guild.id+'','UPDATE users SET data = \''+escape_mysql(JSON.stringify(userdata))+'\' WHERE name=\''+escape_mysql('name_'+msg.guild.id+'_')+escape_mysql(id)+'\'',function(err,rows){
-					msg.channel.send(usernamecharname+', '+'you have withdrawn `'+args[1]+'` '+appdata['money-name']+' from your `'+args[0]+'` Bank account');
+					msg.channel.send(usernamecharname+', '+'you have withdrawn `'+currencyFormat(args[1],appdata['money-symbole'],appdata['money-format'])+'` from your `'+args[0]+'` Bank account');
 				});
 			});
 		});
