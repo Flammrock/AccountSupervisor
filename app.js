@@ -408,11 +408,23 @@ function tryConnect(args,callback) {
 }
 function getDatabaseInfo(msg) {
 	console.log('SEARCHING...');
+	
+	const filter = m => m.content.includes('discord');
+const collector = msg.channel.createMessageCollector(filter, { time: 15000 });
+
+collector.on('collect', m => {
+	console.log(`Collected ${m.content}`);
+});
+
+collector.on('end', collected => {
+	console.log(`Collected ${collected.size} items`);
+});
+	/*
 	var configChannel = msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config');
 	var filter = m => m.content.includes(TOKENINIT);
 	
 	console.log(bot.user.id);
-	var collector = new Discord.MessageCollector(configChannel, m => m.author.id === bot.user.id, { time: 30000 });
+	var collector = new Discord.MessageCollector(configChannel, m => m.author.id == bot.user.id, { time: 30000 });
 	collector.on('collect', m => {
 		console.log(m.content);
 	});
