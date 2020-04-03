@@ -429,7 +429,7 @@ function getDatabaseInfo(msg,callback) {
 					return;
 				}
 				callback();
-			}
+			});
 		});
 	})
 	.catch(function(){
