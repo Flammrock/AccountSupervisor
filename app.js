@@ -287,7 +287,7 @@ class Command {
 			content = content.slice(1,-1);
 		}
 		content.replace(/\[[^\[\]]*\]|[^ ]+/g,function(m){
-			data.push(m.match(/^\[?([^"]*)\]?/)[1]);
+			data.push(m.match(/^\[?([^\[\]]*)\]?/)[1]);
 			return m;
 		});
 		return data;
