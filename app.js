@@ -425,7 +425,7 @@ new Command('init', function(appdata,commandname,msg,args) {
 					msg.channel.send('```diff\n-Error: '+e.toString()+'\n```');
 				});
 			} else {
-				msg.channel.send('```diff\n-Error when attempting to connect to the MySQL Remote Server!\nPlese check if the host, user, password and database name are good!\n```');
+				msg.reply('```diff\n-Error when attempting to connect to the MySQL Remote Server!\nPlese check if the host, user, password and database name are good!\n```');
 			}
 		});
 	};
@@ -433,7 +433,7 @@ new Command('init', function(appdata,commandname,msg,args) {
 		msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config').delete().then(function(){
 			f();
 		}).catch(function(e){
-			msg.channel.send('```diff\n-Error: '+e+'\n```');
+			msg.reply('```diff\n-Error: '+e+'\n```');
 		});
 	} else {
 		f();
