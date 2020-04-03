@@ -416,14 +416,13 @@ function getDatabaseInfo(msg) {
 		messages = messages.filter(m => m.author.id == bot.user.id);
 		messages = messages.filter(m => m.content.includes(TOKENINIT));
 		messages.each(function(item){
-			console.log(item.content);
 			var m = item.content.match(/HOST: ([^\n]+)\n|USERNAME: ([^\n]+)\n|PASSWORD: ([^\n]+)\n|DATABASE: ([^\n]+)\n/g);
 			if (m==null) {
 				msg.reply('```diff\n-Error When Initialize...Can\'t find configuration in #accountsupervisor-database-config\n-Please use `'+PREFIX+'init'+'` to reinit the configuration!\n```');
 				return;
 			}
 			m = m.map(function(m){
-				return m.match(/HOST: ([^\n])\n|USERNAME: ([^\n])\n|PASSWORD: ([^\n])\n|DATABASE: ([^\n])\n/);
+				return m.match(/HOST: ([^\n]+)\n|USERNAME: ([^\n]+)\n|PASSWORD: ([^\n]+)\n|DATABASE: ([^\n]+)\n/);
 			});
 			console.log(m);
 			DATABASE = {
