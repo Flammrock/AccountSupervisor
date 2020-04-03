@@ -425,7 +425,7 @@ new Command('init', function(appdata,commandname,msg,args) {
 					msg.channel.send('```diff\n-Error: '+e.toString()+'\n```');
 				});
 			} else {
-				msg.reply('```diff\n-Error when attempting to connect to the MySQL Remote Server!\nPlese check if the host, user, password and database name are good!\n```');
+				msg.reply('```diff\n-Error when attempting to connect to the MySQL Remote Server!\n-Please check if the host, user, password and database name are good!\n```');
 			}
 		});
 	};
