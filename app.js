@@ -3753,6 +3753,7 @@ bot.on('message', msg => {
 	if (msg.content.substring(0,PREFIX.length)==PREFIX) {
 	
 		if (msg.content.substring(0,PREFIX.length+4)==PREFIX+'init') {
+			var data = new ParserCommand(msg.content);
 			Command.getDataApp(msg.guild.id,function(appdata){
 				Command.execute(appdata,msg,data);
 			});
@@ -3787,7 +3788,7 @@ bot.on('message', msg => {
 		} catch(e) {}
 	
 		if (!msg.guild.channels.cache.find(r=>r.name=='accountsupervisor-database-config')) {
-			msg.reply('Sorry, i\'m not yet initialized!\nIf you are a Administrator, use the command `+init`');
+			msg.reply('Sorry, i\'m not yet initialized!\nIf you are a Administrator, use the command `'+PREFIX+'init`');
 			return;
 		}
 		
