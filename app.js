@@ -439,7 +439,14 @@ new Command('init', function(appdata,commandname,msg,args) {
 		f();
 	}
 },function(msg,name){
-	
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n'+PREFIX+name+' [HOST] [USERNAME] [PASSWORD] [DATABASE-NAME]\n```')
+		.addField('Permission', 'ADMIN', true)
+		.addField('Need', 'The specified MySQL Server must allow remote access!', true)
+		.addField('Description', 'This Bot use a Database to save all data and we give you the possibility to use your own database 😁', false)
+	msg.channel.send(_embed);
 });
 
 
@@ -456,7 +463,13 @@ new Command('help', function(appdata,commandname,msg,args) {
 		Command.List[args[0]]._fnhelp(msg,args[0]);
 	}
 },function(msg,name){
-	
+	var _embed = new Discord.MessageEmbed()
+		.setTitle('Command `'+name+'`')
+		.setColor('#0099ff')
+		.setDescription('```css\n'+PREFIX+name+' [CommandName]\n```')
+		.addField('Permission', 'CITIZEN', true)
+		.addField('Description', 'Get more information about the specified Command. Example:\n  '+PREFIX+name+' ping', false)
+	msg.channel.send(_embed);
 });
 
 // ADMIN
@@ -517,7 +530,7 @@ new Command('set-currency-name', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [money-name]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Change the Money Name, example:\n  +'+name+' Yens\n  +'+name+' "Super Yens"', false)
+		.addField('Description', 'Change the Money Name, example:\n  '+PREFIX+name+' Yens\n  '+PREFIX+name+' "Super Yens"', false)
 	msg.channel.send(_embed);
 });
 
@@ -675,7 +688,7 @@ new Command('character-create', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [Character Name] [User]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Create a Character for the targeted user. Example:\n  +'+name+' "Bob Le Bricoleur" @Flammrock#5464', false)
+		.addField('Description', 'Create a Character for the targeted user. Example:\n  '+PREFIX+name+' "Bob Le Bricoleur" @Flammrock#5464', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN+OWNER
@@ -705,7 +718,7 @@ new Command('character-delete', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [Character Name]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN-OWNER', true)
-		.addField('Description', 'Delete a Character by name. Example:\n  +'+name+' "Bob Le Bricoleur"', false)
+		.addField('Description', 'Delete a Character by name. Example:\n  '+PREFIX+name+' "Bob Le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN+OWNER
@@ -744,7 +757,7 @@ new Command('character-select', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [Character Name]\n```')
 		.addField('Permission', 'CITIZEN-OWNER', true)
-		.addField('Description', 'Select a Character by name. Only the Owner of the Character can select it! Example:\n  +'+name+' "Bob Le Bricoleur"', false)
+		.addField('Description', 'Select a Character by name. Only the Owner of the Character can select it! Example:\n  '+PREFIX+name+' "Bob Le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN+OWNER
@@ -776,7 +789,7 @@ new Command('character-unselect', function(appdata,commandname,msg,args,c) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN-OWNER', true)
-		.addField('Description', 'Unselect the Character selected if the User have a selected Character. Only the Owner of the Character can unselect it! Example:\n  +'+name+'', false)
+		.addField('Description', 'Unselect the Character selected if the User have a selected Character. Only the Owner of the Character can unselect it! Example:\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -861,7 +874,7 @@ new Command('character-list', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' {User} {Page}\n```\n        OR\n```css\n'+PREFIX+name+' {Page}\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Get the list of all Character if no User is specified. Else, it will display the list Characters of specified User. Example:\n  +'+name+' 2\n  +'+name+' @Flammrock#5464\n  +'+name+' @Flammrock#5464 3', false)
+		.addField('Description', 'Get the list of all Character if no User is specified. Else, it will display the list Characters of specified User. Example:\n  '+PREFIX+name+' 2\n  '+PREFIX+name+' @Flammrock#5464\n  '+PREFIX+name+' @Flammrock#5464 3', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -923,7 +936,7 @@ new Command('company-create', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Create company by name. Example:\n  +'+name+' "Flammrock Corporation"', false)
+		.addField('Description', 'Create company by name. Example:\n  '+PREFIX+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -956,7 +969,7 @@ new Command('company-delete', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
-		.addField('Description', 'Delete company by name. Example:\n  +'+name+' "Flammrock Corporation"', false)
+		.addField('Description', 'Delete company by name. Example:\n  '+PREFIX+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -997,7 +1010,7 @@ new Command('company-add-job', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [JobName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Need', 'The Job must exist. Use `+help job-create` for more details.', true)
-		.addField('Description', 'Add Job to the Company. Example:\n  +'+name+' "Flammrock Corporation" "Informatic Engineer"', false)
+		.addField('Description', 'Add Job to the Company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -1053,7 +1066,7 @@ new Command('company-remove-job', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [JobName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Need', 'The Job must exist. Use `+help job-create` for more details.', true)
-		.addField('Description', 'Remove Job to the Company.\n__**WARN: **This Command will fire all User in the Company who have the specified Job.__\nExample:\n  +'+name+' "Flammrock Corporation" "Informatic Engineer"', false)
+		.addField('Description', 'Remove Job to the Company.\n__**WARN: **This Command will fire all User in the Company who have the specified Job.__\nExample:\n  '+PREFIX+name+' "Flammrock Corporation" "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -1096,7 +1109,7 @@ new Command('company-send-request-job', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [JobName]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Need', 'The Job must exist. Use `+help job-create` for more details.', true)
-		.addField('Description', 'Send a request Job for the specified Company. Example:\n  +'+name+' "Flammrock Corporation" "Informatic Engineer"', false)
+		.addField('Description', 'Send a request Job for the specified Company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -1160,7 +1173,7 @@ new Command('company-accept-request-job', function(appdata,commandname,msg,args)
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [User]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
-		.addField('Description', 'Accept the request Job of a User/Character for the specified Company. Example:\n  +'+name+' "Flammrock Corporation" @Flammrock#5464\n  +'+name+' "Flammrock Corporation" "Bob le Bricoleur"', false)
+		.addField('Description', 'Accept the request Job of a User/Character for the specified Company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" @Flammrock#5464\n  '+PREFIX+name+' "Flammrock Corporation" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -1216,7 +1229,7 @@ new Command('company-give-money', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [BankCompany] [BankUser] [AmountMoney]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Need', 'The Bank must exist. Use `+help bank-create` for more details.', true)
-		.addField('Description', 'Give some money for the specified Company. Example:\n  +'+name+' "Flammrock Corporation" "My Bank Example" "My Bank Example" 500.0\n  +'+name+' "Flammrock Corporation" "Bank of the Company" "Bank of the User" 10.75', false)
+		.addField('Description', 'Give some money for the specified Company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" "My Bank Example" "My Bank Example" 500.0\n  '+PREFIX+name+' "Flammrock Corporation" "Bank of the Company" "Bank of the User" 10.75', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -1249,7 +1262,7 @@ new Command('company-get-money', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [BankCompany]\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Need', 'The Bank must exist. Use `+help bank-create` for more details.', true)
-		.addField('Description', 'Get money of specified Bank for the specified Company. Example:\n  +'+name+' "Flammrock Corporation" "My Bank Example"', false)
+		.addField('Description', 'Get money of specified Bank for the specified Company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" "My Bank Example"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -1291,7 +1304,7 @@ new Command('company-fire', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [User]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
-		.addField('Description', 'Fire User of the Company. Example:\n  +'+name+' "Flammrock Corporation" @Flammrock#5464\n  +'+name+' "Flammrock Corporation" "Bob le Bricoleur"', false)
+		.addField('Description', 'Fire User of the Company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" @Flammrock#5464\n  '+PREFIX+name+' "Flammrock Corporation" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 }); 
 // ADMIN/CITIZEN+OWNER
@@ -1327,7 +1340,7 @@ new Command('company-update-shop', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [salons | need | web] [new-value]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Information', 'You should type `+help shop-create` to see more details.', true)
-		.addField('Description', 'Update the Value of the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation" salons #general\n  +'+name+' "Flammrock Corporation" web true\n  +'+name+' "Flammrock Corporation" salons "#general #autre-salon"\n  +'+name+' "Flammrock Corporation" need "item1 item2"', false)
+		.addField('Description', 'Update the Value of the Shop associed with the company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" salons #general\n  '+PREFIX+name+' "Flammrock Corporation" web true\n  '+PREFIX+name+' "Flammrock Corporation" salons "#general #autre-salon"\n  '+PREFIX+name+' "Flammrock Corporation" need "item1 item2"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -1357,7 +1370,7 @@ new Command('company-add-shop-website', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Information', 'You should type `+help shop-create` to see more details.', true)
-		.addField('Description', 'Enable Website of the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation"', false)
+		.addField('Description', 'Enable Website of the Shop associed with the company. Example:\n  '+PREFIX+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -1387,7 +1400,7 @@ new Command('company-remove-shop-website', function(appdata,commandname,msg,args
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Information', 'You should type `+help shop-create` to see more details.', true)
-		.addField('Description', 'Disable Website of the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation"', false)
+		.addField('Description', 'Disable Website of the Shop associed with the company. Example:\n  '+PREFIX+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -1431,7 +1444,7 @@ new Command('company-create-item', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] {{{Item Argument}}}\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Information', 'You should type `+help item-create` to see more details.', true)
-		.addField('Description', 'Create an item and add it in the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation" "My Item" 4.99 "" "type of item" "http://link-to-image.jpg" "My Description"', false)
+		.addField('Description', 'Create an item and add it in the Shop associed with the company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" "My Item" 4.99 "" "type of item" "http://link-to-image.jpg" "My Description"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN+OWNER
@@ -1480,7 +1493,7 @@ new Command('company-delete-item', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName] [ItemName]\n```')
 		.addField('Permission', 'ADMIN / CITIZEN+OWNER', true)
 		.addField('Need', 'The Item must exist. Use `+help item-create` for more details.', true)
-		.addField('Description', 'Delete the specified item and remove it from the Shop associed with the company. Example:\n  +'+name+' "Flammrock Corporation" "My Item"', false)
+		.addField('Description', 'Delete the specified item and remove it from the Shop associed with the company. Example:\n  '+PREFIX+name+' "Flammrock Corporation" "My Item"', false)
 	msg.channel.send(_embed);
 });
 
@@ -1577,7 +1590,7 @@ new Command('company-view', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [CompanyName]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'View data of the specified company. Example:\n  +'+name+' "Flammrock Corporation"', false)
+		.addField('Description', 'View data of the specified company. Example:\n  '+PREFIX+name+' "Flammrock Corporation"', false)
 	msg.channel.send(_embed);
 });
 
@@ -1610,7 +1623,7 @@ new Command('job-create', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [JobName] [Salary]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Create a Job with the monthly salary. Example:\n  +'+name+' "Informatic Engineer" 3000.0', false)
+		.addField('Description', 'Create a Job with the monthly salary. Example:\n  '+PREFIX+name+' "Informatic Engineer" 3000.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -1636,7 +1649,7 @@ new Command('job-delete', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [JobName]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Delete a Job with the monthly salary. Example:\n  +'+name+' "Informatic Engineer"', false)
+		.addField('Description', 'Delete a Job with the monthly salary. Example:\n  '+PREFIX+name+' "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -1664,7 +1677,7 @@ new Command('job-update-salary', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [JobName] [Salary]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Update salary of the specified Job with the new monthly salary. Example:\n  +'+name+' "Informatic Engineer" 3200.0', false)
+		.addField('Description', 'Update salary of the specified Job with the new monthly salary. Example:\n  '+PREFIX+name+' "Informatic Engineer" 3200.0', false)
 	msg.channel.send(_embed);
 });
 
@@ -1736,7 +1749,7 @@ new Command('job-work', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'This Command will succed if you have a Job. You can work only once a day. Example:\n  +'+name+'', false)
+		.addField('Description', 'This Command will succed if you have a Job. You can work only once a day. Example:\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -1778,7 +1791,7 @@ new Command('job-leave', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'This Command will succed if you have a Job. You left your Job. Example:\n  +'+name+'', false)
+		.addField('Description', 'This Command will succed if you have a Job. You left your Job. Example:\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -1807,7 +1820,7 @@ new Command('job-view', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [JobName]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'View data of the specified Job. Example:\n  +'+name+' "Informatic Engineer"', false)
+		.addField('Description', 'View data of the specified Job. Example:\n  '+PREFIX+name+' "Informatic Engineer"', false)
 	msg.channel.send(_embed);
 });
 
@@ -1840,7 +1853,7 @@ new Command('bank-create', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] {onCreateAmountMoney}\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Create a Bank with the starter money amount. Example:\n  +'+name+' "Flammrock Bank" 100.0', false)
+		.addField('Description', 'Create a Bank with the starter money amount. Example:\n  '+PREFIX+name+' "Flammrock Bank" 100.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -1880,7 +1893,7 @@ new Command('bank-delete', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Delete a Bank by name. Example:\n  +'+name+' "Flammrock Bank"', false)
+		.addField('Description', 'Delete a Bank by name. Example:\n  '+PREFIX+name+' "Flammrock Bank"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -1934,7 +1947,7 @@ new Command('bank-add-user', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [User]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Add a User/Character to a Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
+		.addField('Description', 'Add a User/Character to a Bank by name. Example:\n  '+PREFIX+name+' "Flammrock Bank" @Flammrock#5464\n  '+PREFIX+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -1973,7 +1986,7 @@ new Command('bank-remove-user', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [User]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Remove a User/Character to a Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
+		.addField('Description', 'Remove a User/Character to a Bank by name. Example:\n  '+PREFIX+name+' "Flammrock Bank" @Flammrock#5464\n  '+PREFIX+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2025,7 +2038,7 @@ new Command('bank-give-money-user', function(appdata,commandname,msg,args,t) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [User] [AmountMoney]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Add money to the specified User/Character to the specified Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464 1000.0\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur" 9.99', false)
+		.addField('Description', 'Add money to the specified User/Character to the specified Bank by name. Example:\n  '+PREFIX+name+' "Flammrock Bank" @Flammrock#5464 1000.0\n  '+PREFIX+name+' "Flammrock Bank" "Bob le Bricoleur" 9.99', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2044,7 +2057,7 @@ new Command('bank-remove_money_user', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [User] [AmountMoney]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Remove money to the specified User/Character to the specified Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464 10.5\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur" 2.0', false)
+		.addField('Description', 'Remove money to the specified User/Character to the specified Bank by name. Example:\n  '+PREFIX+name+' "Flammrock Bank" @Flammrock#5464 10.5\n  '+PREFIX+name+' "Flammrock Bank" "Bob le Bricoleur" 2.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2062,7 +2075,7 @@ new Command('bank-set-money-user', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [User] [AmountMoney]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Set money to the specified User/Character to the specified Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464 5000.0\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur" 500.0', false)
+		.addField('Description', 'Set money to the specified User/Character to the specified Bank by name. Example:\n  '+PREFIX+name+' "Flammrock Bank" @Flammrock#5464 5000.0\n  '+PREFIX+name+' "Flammrock Bank" "Bob le Bricoleur" 500.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2099,7 +2112,7 @@ new Command('bank-get-money-user', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [User]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Get money to the specified User/Character to the specified Bank by name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
+		.addField('Description', 'Get money to the specified User/Character to the specified Bank by name. Example:\n  '+PREFIX+name+' "Flammrock Bank" @Flammrock#5464\n  '+PREFIX+name+' "Flammrock Bank" "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2116,7 +2129,7 @@ new Command('bank-reset-all', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Reset Bank System. Example:\n  +'+name+'', false)
+		.addField('Description', 'Reset Bank System. Example:\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 
@@ -2180,7 +2193,7 @@ new Command('give-money', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [User] [UserBankName] [AmountMoney]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Give Money to another user with specified Banks name. Example:\n  +'+name+' "Flammrock Bank" @Flammrock#5464 "Flammrock Bank" 500.0\n  +'+name+' "Flammrock Bank" "Bob le Bricoleur" "Flammrock Bank" 1000.0', false)
+		.addField('Description', 'Give Money to another user with specified Banks name. Example:\n  '+PREFIX+name+' "Flammrock Bank" @Flammrock#5464 "Flammrock Bank" 500.0\n  '+PREFIX+name+' "Flammrock Bank" "Bob le Bricoleur" "Flammrock Bank" 1000.0', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -2234,7 +2247,7 @@ new Command('bank-create-account', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Create a Bank Account in the specified Bank. Example:\n  +'+name+' "Flammrock Bank"', false)
+		.addField('Description', 'Create a Bank Account in the specified Bank. Example:\n  '+PREFIX+name+' "Flammrock Bank"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -2272,7 +2285,7 @@ new Command('bank-delete-account', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Delete a Bank Account in the specified Bank. Example:\n  +'+name+' "Flammrock Bank"', false)
+		.addField('Description', 'Delete a Bank Account in the specified Bank. Example:\n  '+PREFIX+name+' "Flammrock Bank"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -2330,7 +2343,7 @@ new Command('get-money', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' {BankName}\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'If a Bank is specified, the Amount Money in the Bank account is displayed else the Cash Money Amount is dispayed. Example:\n  +'+name+' "Flammrock Bank"\n  +'+name+'', false)
+		.addField('Description', 'If a Bank is specified, the Amount Money in the Bank account is displayed else the Cash Money Amount is dispayed. Example:\n  '+PREFIX+name+' "Flammrock Bank"\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -2360,7 +2373,7 @@ new Command('bank-list', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'List all Banks. Example:\n  +'+name+'', false)
+		.addField('Description', 'List all Banks. Example:\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -2406,7 +2419,7 @@ new Command('bank-deposit', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [AmountMoney]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Deposit your cash money in your Bank account. Example:\n  +'+name+' "Flammrock Bank" 500.0', false)
+		.addField('Description', 'Deposit your cash money in your Bank account. Example:\n  '+PREFIX+name+' "Flammrock Bank" 500.0', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -2452,7 +2465,7 @@ new Command('bank-withdraw', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [BankName] [AmountMoney]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Withdraw your money in your Bank account. Example:\n  +'+name+' "Flammrock Bank" 500.0', false)
+		.addField('Description', 'Withdraw your money in your Bank account. Example:\n  '+PREFIX+name+' "Flammrock Bank" 500.0', false)
 	msg.channel.send(_embed);
 });
 
@@ -2493,7 +2506,7 @@ new Command('item-create', function(appdata,commandname,msg,args,t) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName] {Price} {Shops} {Type} {Image} {Description}\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Create a Item. Example:\n  +'+name+' "A Super Item" 9.99 "[Flammrock Shop]" "" "http://image.jpg" "It\'s a super item!"\n  +'+name+' "Apple" 2.0 "[Flammrock Shop] [Shop 2]" "[food]" "http://image.jpg" "You can eat with \'+item-eat Apple\'"', false)
+		.addField('Description', 'Create a Item. Example:\n  '+PREFIX+name+' "A Super Item" 9.99 "[Flammrock Shop]" "" "http://image.jpg" "It\'s a super item!"\n  '+PREFIX+name+' "Apple" 2.0 "[Flammrock Shop] [Shop 2]" "[food]" "http://image.jpg" "You can eat with \'+item-eat Apple\'"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2522,7 +2535,7 @@ new Command('item-update-price', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Price]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Update the price of the specified Item. Example:\n  +'+name+' "A Super Item" 15.0', false)
+		.addField('Description', 'Update the price of the specified Item. Example:\n  '+PREFIX+name+' "A Super Item" 15.0', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2551,7 +2564,7 @@ new Command('item-update-shops', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Shops]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Update the shops of the specified Item. Example:\n  +'+name+' "A Super Item" "[Flammrock Shop] [Shop 2]"', false)
+		.addField('Description', 'Update the shops of the specified Item. Example:\n  '+PREFIX+name+' "A Super Item" "[Flammrock Shop] [Shop 2]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2580,7 +2593,7 @@ new Command('item-update-type', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Type]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Update the Types of the specified Item. Example:\n  +'+name+' "A Super Item" "[food] [device]"', false)
+		.addField('Description', 'Update the Types of the specified Item. Example:\n  '+PREFIX+name+' "A Super Item" "[food] [device]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2609,7 +2622,7 @@ new Command('item-update-image', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Image]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Update the Image of the specified Item. Example:\n  +'+name+' "A Super Item" "http://image.jpg"', false)
+		.addField('Description', 'Update the Image of the specified Item. Example:\n  '+PREFIX+name+' "A Super Item" "http://image.jpg"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2638,7 +2651,7 @@ new Command('item-update-desciption', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName] [Description]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Update the Description of the specified Item. Example:\n  +'+name+' "A Super Item" "Amazing Item"', false)
+		.addField('Description', 'Update the Description of the specified Item. Example:\n  '+PREFIX+name+' "A Super Item" "Amazing Item"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2664,7 +2677,7 @@ new Command('item-delete', function(appdata,commandname,msg,args,t) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Delete the specified Item. Example:\n  +'+name+' "A Super Item"', false)
+		.addField('Description', 'Delete the specified Item. Example:\n  '+PREFIX+name+' "A Super Item"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2749,7 +2762,7 @@ new Command('item-give', function(appdata,commandname,msg,args,t) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName] [User] {Quantity}\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Give the specified Item to a User/Character. Example:\n  +'+name+' "A Super Item" @Flammrock#5464\n  +'+name+' "A Super Item" "Bob le Bricoleur" 6', false)
+		.addField('Description', 'Give the specified Item to a User/Character. Example:\n  '+PREFIX+name+' "A Super Item" @Flammrock#5464\n  '+PREFIX+name+' "A Super Item" "Bob le Bricoleur" 6', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2767,7 +2780,7 @@ new Command('item-remove', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName] [User] {Quantity}\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Remove the specified Item to a User/Character. Example:\n  +'+name+' "A Super Item" @Flammrock#5464\n  +'+name+' "A Super Item" "Bob le Bricoleur" 6', false)
+		.addField('Description', 'Remove the specified Item to a User/Character. Example:\n  '+PREFIX+name+' "A Super Item" @Flammrock#5464\n  '+PREFIX+name+' "A Super Item" "Bob le Bricoleur" 6', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -2784,7 +2797,7 @@ new Command('item-reset-all', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Reset Items System. Example:\n  +'+name+'', false)
+		.addField('Description', 'Reset Items System. Example:\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 
@@ -2827,7 +2840,7 @@ new Command('inventory-item-clear', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN / CITIZEN', true)
-		.addField('Description', 'Clear the Inventory, Admin can clear the Inventory of other user. Example:\n  +'+name+'\n If you are a admin:\n  +'+name+' @Flammrock#5464\n  +'+name+' "Bob le Bricoleur"', false)
+		.addField('Description', 'Clear the Inventory, Admin can clear the Inventory of other user. Example:\n  '+PREFIX+name+'\n If you are a admin:\n  '+PREFIX+name+' @Flammrock#5464\n  '+PREFIX+name+' "Bob le Bricoleur"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN/CITIZEN
@@ -2911,7 +2924,7 @@ new Command('inventory-item-view', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' {Page}\n```')
 		.addField('Permission', 'ADMIN / CITIZEN', true)
-		.addField('Description', 'Get the Inventory, Admin can see the Inventory of other user. Example:\n  +'+name+'\n If you are a admin:\n  +'+name+' @Flammrock#5464\n  +'+name+' "Bob le Bricoleur" 3', false)
+		.addField('Description', 'Get the Inventory, Admin can see the Inventory of other user. Example:\n  '+PREFIX+name+'\n If you are a admin:\n  '+PREFIX+name+' @Flammrock#5464\n  '+PREFIX+name+' "Bob le Bricoleur" 3', false)
 	msg.channel.send(_embed);
 });
 
@@ -2975,7 +2988,7 @@ new Command('item-list', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' {ShopName}\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'If a Shop is specified, that list all items in the shop else that list all items. Example:\n  +'+name+'\n  +'+name+' "Flammrock Shop"', false)
+		.addField('Description', 'If a Shop is specified, that list all items in the shop else that list all items. Example:\n  '+PREFIX+name+'\n  '+PREFIX+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -3004,7 +3017,7 @@ new Command('item-view', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'View data of the specified Item. Example:\n  +'+name+' "A Super Item"', false)
+		.addField('Description', 'View data of the specified Item. Example:\n  '+PREFIX+name+' "A Super Item"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -3178,7 +3191,7 @@ new Command('item-pay', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [ShopName] [ItemName] {BankName}\n```')
 		.addField('Permission', 'CITIZEN', true)
 		.addField('Need', 'The Shop must exist. Use `+help shop-create` for more details.', true)
-		.addField('Description', 'Pay Item in specified Shop, if not bank specified, the cash is used to pay item. Example:\n  +'+name+' "Flammrock Shop" "A Super Item" "Flammrock Bank"', false)
+		.addField('Description', 'Pay Item in specified Shop, if not bank specified, the cash is used to pay item. Example:\n  '+PREFIX+name+' "Flammrock Shop" "A Super Item" "Flammrock Bank"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -3244,7 +3257,7 @@ new Command('item-eat', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ItemName]\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Eat the specified Item if the Item is food type. Example:\n  +'+name+' "A Super Item"', false)
+		.addField('Description', 'Eat the specified Item if the Item is food type. Example:\n  '+PREFIX+name+' "A Super Item"', false)
 	msg.channel.send(_embed);
 });
 
@@ -3293,7 +3306,7 @@ new Command('shop-create', function(appdata,commandname,msg,args) {
 		.setDescription('```css\n'+PREFIX+name+' [ShopName] {SalonsAvailables} {NeedItems} {NeedTypeItems} {NeedWebItems} {NeedWebTypeItems} {WebAccess}\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
-		.addField('Description', 'Create a Shop. Example:\n  +'+name+' "Flammrock Shop" "#general #other-salon" "[A Super Item] [other item name]" "[food] [device]" "" "" "true"', false)
+		.addField('Description', 'Create a Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop" "#general #other-salon" "[A Super Item] [other item name]" "[food] [device]" "" "" "true"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3319,7 +3332,7 @@ new Command('shop-delete', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ShopName]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Delete a Shop by name. Example:\n  +'+name+' "Flammrock Shop"', false)
+		.addField('Description', 'Delete a Shop by name. Example:\n  '+PREFIX+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3349,7 +3362,7 @@ new Command('shop-update-salons', function(appdata,commandname,msg,args,t) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ShopName] [SalonsAvailables]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Update Salons Availables of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "#general #other-salon"', false)
+		.addField('Description', 'Update Salons Availables of the specified Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop" "#general #other-salon"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3381,7 +3394,7 @@ new Command('shop-update-need', function(appdata,commandname,msg,args,t) {
 		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
-		.addField('Description', 'Update Need Items of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "[A Super Item] [other item name]"', false)
+		.addField('Description', 'Update Need Items of the specified Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop" "[A Super Item] [other item name]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3413,7 +3426,7 @@ new Command('shop-update-needType', function(appdata,commandname,msg,args,t) {
 		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedTypeItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
-		.addField('Description', 'Update Need Items Type of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "[food] [device]"', false)
+		.addField('Description', 'Update Need Items Type of the specified Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop" "[food] [device]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3445,7 +3458,7 @@ new Command('shop-update-needWeb', function(appdata,commandname,msg,args,t) {
 		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
-		.addField('Description', 'Update Need Web Items of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "[A Super Item] [other item name]"', false)
+		.addField('Description', 'Update Need Web Items of the specified Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop" "[A Super Item] [other item name]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3477,7 +3490,7 @@ new Command('shop-update-needWebType', function(appdata,commandname,msg,args,t) 
 		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedWebTypeItems]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Need', 'The Items must exist. Use `+help item-create` for more details.', true)
-		.addField('Description', 'Update Need Web Items Type of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "[food] [device]"', false)
+		.addField('Description', 'Update Need Web Items Type of the specified Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop" "[food] [device]"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3508,7 +3521,7 @@ new Command('shop-update-web', function(appdata,commandname,msg,args,t) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+' [ShopName] [NeedWebTypeItems]\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Update Web Access of the specified Shop. Example:\n  +'+name+' "Flammrock Shop" "true"\n  +'+name+' "Flammrock Shop" "false"', false)
+		.addField('Description', 'Update Web Access of the specified Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop" "true"\n  '+PREFIX+name+' "Flammrock Shop" "false"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3549,7 +3562,7 @@ new Command('shop-delete-all-items-associed-with', function(appdata,commandname,
 		.setDescription('```css\n'+PREFIX+name+' [ShopName]\n```')
 		.addField('Permission', 'ADMIN', true)
 		.addField('Information', 'You should type `+help item-create` to see more details.', true)
-		.addField('Description', 'Delete all Items associated with the specified Shop. Example:\n  +'+name+' "Flammrock Shop"', false)
+		.addField('Description', 'Delete all Items associated with the specified Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 // ADMIN
@@ -3566,7 +3579,7 @@ new Command('shop-reset-all', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'ADMIN', true)
-		.addField('Description', 'Reset Shop System. Example:\n  +'+name+'', false)
+		.addField('Description', 'Reset Shop System. Example:\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 
@@ -3596,7 +3609,7 @@ new Command('shop-view', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'View data of the specified Shop. Example:\n  +'+name+' "Flammrock Shop"', false)
+		.addField('Description', 'View data of the specified Shop. Example:\n  '+PREFIX+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -3626,7 +3639,7 @@ new Command('shop-list', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'List all Shops. Example:\n  +'+name+'', false)
+		.addField('Description', 'List all Shops. Example:\n  '+PREFIX+name+'', false)
 	msg.channel.send(_embed);
 });
 // CITIZEN
@@ -3656,7 +3669,7 @@ new Command('shop-get-website', function(appdata,commandname,msg,args) {
 		.setColor('#0099ff')
 		.setDescription('```css\n'+PREFIX+name+'\n```')
 		.addField('Permission', 'CITIZEN', true)
-		.addField('Description', 'Get the Website of the specified Shop if it exist. Example:\n  +'+name+' "Flammrock Shop"', false)
+		.addField('Description', 'Get the Website of the specified Shop if it exist. Example:\n  '+PREFIX+name+' "Flammrock Shop"', false)
 	msg.channel.send(_embed);
 });
 
