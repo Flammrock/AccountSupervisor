@@ -428,6 +428,7 @@ function getDatabaseInfo(msg,callback) {
 					msg.reply('```diff\n-Error when attempting to connect to the MySQL Remote Server!\n-Please check if the host, user, password and database name are good!\n```');
 					return;
 				}
+				console.log(`Logged in Remote MySQL Server!`);
 				callback();
 			});
 		});
